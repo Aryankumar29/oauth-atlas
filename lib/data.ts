@@ -2,6 +2,7 @@ import appsSeed from "@/data/apps.seed.json";
 import { rawGuides } from "@/data/guides";
 import { difficulty, type DifficultyResult } from "@/lib/difficulty";
 import { devToProdChip } from "@/lib/format";
+import { isDifficultyUnknown } from "@/lib/guide-content";
 import { appSchema, guideSchema, type App, type Guide, type Tier } from "@/lib/schema";
 
 export const apps: App[] = appsSeed.map((app) => appSchema.parse(app));
@@ -20,7 +21,9 @@ export function getAllGuides(): Guide[] {
   return guides;
 }
 
-export function guideDifficulty(guide: Guide): DifficultyResult {
+// null = unknown (partial result with no gates).
+export function guideDifficulty(guide: Guide): DifficultyResult | null {
+  if (isDifficultyUnknown(guide)) return null;
   return difficulty(guide.gates, { profile: guide.verdict.profile });
 }
 
@@ -29,7 +32,7 @@ export type LibraryEntry = {
   app: App;
   tier: Tier;
   guide: {
-    difficulty: DifficultyResult;
+    difficulty: DifficultyResult | null;
     summary: string;
     timeChip: string;
   } | null;

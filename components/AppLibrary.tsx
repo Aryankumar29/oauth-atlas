@@ -80,7 +80,7 @@ export function AppLibrary({ entries }: { entries: LibraryEntry[] }) {
       ) {
         return false;
       }
-      if (difficulty !== "all" && String(guide?.difficulty.score) !== difficulty) return false;
+      if (difficulty !== "all" && String(guide?.difficulty?.score) !== difficulty) return false;
       if (approval !== "all" && app.approvalModel !== approval) return false;
       if (managed !== "all" && app.composio.managed !== managed) return false;
       if (tier !== "all" && t !== tier) return false;

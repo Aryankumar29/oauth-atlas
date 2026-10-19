@@ -58,3 +58,10 @@ export function alternateProfiles(guide: Guide): string[] {
 export function isLiveGenerated(guide: Guide): boolean {
   return guide.generatedBy === "agent" || guide.app.tier === "generated";
 }
+
+export const DIFFICULTY_UNKNOWN = "Difficulty: unknown (partial result)";
+
+// A partial run with no gates would score 1 ("Instant"), which is misleading.
+export function isDifficultyUnknown(guide: Guide): boolean {
+  return guide.partial && guide.gates.length === 0;
+}

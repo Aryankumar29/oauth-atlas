@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { toLibraryEntry } from "@/lib/data";
 import { guideToMarkdown } from "@/lib/markdown";
 import { guideSchema } from "@/lib/schema";
 
@@ -37,5 +38,16 @@ describe("guideToMarkdown", () => {
     expect(md).toContain("- PKCE: unknown");
     expect(md).toContain("Live-generated — verify");
     expect(md).toContain("**Partial:**");
+  });
+
+  it("shows unknown difficulty for a partial guide with no gates", () => {
+    const partial = guideSchema.parse({ ...sample, partial: true, gates: [] });
+    const md = guideToMarkdown(partial);
+    expect(md).toContain("**Difficulty: unknown (partial result).**");
+    expect(md).not.toMatch(/Difficulty \d\/5/);
+    expect(toLibraryEntry(partial.app, partial).guide?.difficulty).toBeNull();
+
+    const complete = guideSchema.parse({ ...sample, gates: [] });
+    expect(guideToMarkdown(complete)).toContain("Difficulty 1/5");
   });
 });

@@ -6,6 +6,8 @@ import { formatHours, formatWait, humanize, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
   COMMUNITY_BADGE,
+  DIFFICULTY_UNKNOWN,
+  isDifficultyUnknown,
   isLiveGenerated,
   MANAGED_VERDICT,
   MILESTONE_LABELS,
@@ -95,7 +97,7 @@ function List({ items }: { items: ReactNode[] }) {
 
 export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolean }) {
   const { app } = guide;
-  const d = difficulty(guide.gates, { profile: guide.verdict.profile });
+  const d = isDifficultyUnknown(guide) ? null : difficulty(guide.gates, { profile: guide.verdict.profile });
   const alternates = alternateProfiles(guide).map((p) => ({ profile: p, result: difficulty(guide.gates, { profile: p }) }));
   const live = isLiveGenerated(guide);
   const oc = guide.oauthConfig;
@@ -163,7 +165,7 @@ export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolea
         <dl className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <dt className="text-xs text-zinc-500">Difficulty</dt>
-            <dd className="mt-1 font-semibold text-zinc-900" data-testid="difficulty">{d.score}/5 · {d.label}</dd>
+            <dd className="mt-1 font-semibold text-zinc-900" data-testid="difficulty">{d ? `${d.score}/5 · ${d.label}` : DIFFICULTY_UNKNOWN}</dd>
           </div>
           <div>
             <dt className="text-xs text-zinc-500">Approval</dt>
@@ -180,8 +182,14 @@ export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolea
             </dd>
           </div>
         </dl>
-        <p className="mt-5 text-xs font-medium text-zinc-500">Why this score</p>
-        <List items={d.rationale} />
+        {d ? (
+          <>
+            <p className="mt-5 text-xs font-medium text-zinc-500">Why this score</p>
+            <List items={d.rationale} />
+          </>
+        ) : (
+          <p className="mt-5 text-sm text-zinc-600">No gates were extracted before generation stopped, so difficulty cannot be scored.</p>
+        )}
         {alternates.map(({ profile, result }) => (
           <p key={profile} className="mt-2 text-sm text-zinc-700">
             <strong>{profile} path:</strong> {result.score}/5 · {result.label}

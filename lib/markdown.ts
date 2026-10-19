@@ -3,6 +3,8 @@ import { formatHours, formatWait, humanize, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
   COMMUNITY_BADGE,
+  DIFFICULTY_UNKNOWN,
+  isDifficultyUnknown,
   isLiveGenerated,
   MANAGED_VERDICT,
   MILESTONE_LABELS,
@@ -27,7 +29,7 @@ function list(items: string[]): string[] {
 
 export function guideToMarkdown(guide: Guide): string {
   const { app } = guide;
-  const d = difficulty(guide.gates, { profile: guide.verdict.profile });
+  const d = isDifficultyUnknown(guide) ? null : difficulty(guide.gates, { profile: guide.verdict.profile });
   const out: string[] = [];
 
   out.push(`# ${app.name} OAuth guide`, "");
@@ -47,8 +49,12 @@ export function guideToMarkdown(guide: Guide): string {
   out.push("Sources:", ...OWN_APP_SOURCES.map((s) => `- [${s.title}](${s.url})`), "");
 
   out.push("## Verdict", "");
-  out.push(`**Difficulty ${d.score}/5 — ${d.label}.** ${guide.verdict.summary}`, "");
-  out.push(...d.rationale.map((r) => `- ${r}`));
+  if (d) {
+    out.push(`**Difficulty ${d.score}/5 — ${d.label}.** ${guide.verdict.summary}`, "");
+    out.push(...d.rationale.map((r) => `- ${r}`));
+  } else {
+    out.push(`**${DIFFICULTY_UNKNOWN}.** ${guide.verdict.summary}`);
+  }
   for (const p of alternateProfiles(guide)) {
     const alt = difficulty(guide.gates, { profile: p });
     out.push(`- ${p} path: ${alt.score}/5 (${alt.label})`);
