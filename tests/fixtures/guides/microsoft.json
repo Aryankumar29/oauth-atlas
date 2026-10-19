@@ -1,0 +1,32 @@
+{
+  "slug": "microsoft",
+  "expected": {
+    "default": 3
+  },
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Entra app registration",
+      "appliesWhen": "always",
+      "requiredFor": [
+        "pilot-ready"
+      ]
+    },
+    {
+      "type": "publisher-verification",
+      "name": "Publisher verification via Microsoft AI Cloud Partner Program",
+      "appliesWhen": "multitenant apps; users can't consent to unverified publishers",
+      "requiredFor": [
+        "production-ready"
+      ]
+    },
+    {
+      "type": "admin-consent",
+      "name": "Tenant admin consent",
+      "appliesWhen": "per customer tenant, for admin-only or blocked scopes",
+      "requiredFor": [
+        "production-ready"
+      ]
+    }
+  ]
+}

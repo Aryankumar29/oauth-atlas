@@ -1,0 +1,17 @@
+{
+  "slug": "notion",
+  "expected": {
+    "default": 1
+  },
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Create a public connection in the developer portal",
+      "appliesWhen": "always",
+      "requiredFor": [
+        "pilot-ready",
+        "production-ready"
+      ]
+    }
+  ]
+}
