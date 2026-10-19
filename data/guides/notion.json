@@ -1,0 +1,367 @@
+{
+  "slug": "notion",
+  "app": {
+    "slug": "notion",
+    "name": "Notion",
+    "website": "https://www.notion.so",
+    "category": "Productivity",
+    "docsUrl": "https://developers.notion.com/docs/authorization",
+    "consoleUrl": "https://www.notion.so/my-integrations",
+    "approvalModel": "none",
+    "composio": {
+      "toolkitSlug": "notion",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
+  },
+  "version": "1.0.0",
+  "lastVerified": "2026-10-20",
+  "confidence": "high",
+  "partial": false,
+  "ownApp": {
+    "triggers": [
+      "You want the Notion consent prompt and page picker to name your product instead of a shared connection (inferred from the generic branding trigger).",
+      "You plan a Notion Marketplace listing: only a public connection with installation scope \"Any workspace\" is eligible, and the scope can't be changed after creation."
+    ],
+    "notes": "Composio lists Notion as a Composio-managed OAuth toolkit. Your own public connection is free and needs no review. Pick the installation scope carefully: it is set once at creation. Copy the redirect URI from the Composio dashboard (Create Auth Config); don't hard-code it."
+  },
+  "verdict": {
+    "difficulty": 1,
+    "approvalModel": "none",
+    "summary": "Instant: create a public connection in the developer portal with no review. The catch is per-user, per-page grants: each user picks pages in a page picker, and the agent sees nothing else.",
+    "canTestBeforeApproval": true
+  },
+  "milestones": [
+    {
+      "id": "dev-ready",
+      "definition": "You can authorize the connection in your development workspace and call the API with the returned token.",
+      "handsOnHours": { "min": 0.1, "max": 0.5 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "With installation scope \"Selected workspaces only\", only the workspaces you picked at creation can install it.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://developers.notion.com/guides/get-started/public-connections",
+              "quote": "Selected workspaces only Only the workspaces you select at creation time.",
+              "fetchedAt": "2026-10-19T20:38:01Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "pilot-ready",
+      "definition": "Users in other workspaces can install the connection and grant pages.",
+      "handsOnHours": { "min": 0, "max": 0.5 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": []
+    },
+    {
+      "id": "production-ready",
+      "definition": "Any Notion user can install the connection. No Notion review is needed; a Marketplace listing is a separate, optional step.",
+      "handsOnHours": { "min": 0, "max": 1 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": []
+    }
+  ],
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Create a public connection in the developer portal",
+      "appliesWhen": "always",
+      "requiredFor": ["pilot-ready", "production-ready"]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-account",
+      "label": "Notion account and a development workspace",
+      "detail": "You choose the development workspace when creating the connection.",
+      "requiredFor": "dev-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-create"]
+    },
+    {
+      "id": "req-scope",
+      "label": "Decide installation scope up front",
+      "detail": "\"Any workspace\" (Marketplace-eligible) or \"Selected workspaces only\". It can't be changed later; changing it means creating a new connection.",
+      "requiredFor": "dev-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-install-scope"]
+    },
+    {
+      "id": "req-redirect",
+      "label": "Redirect URI",
+      "detail": "From the Composio dashboard if you use Composio.",
+      "requiredFor": "dev-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-composio-byo"]
+    }
+  ],
+  "scopes": [
+    {
+      "name": "Capabilities: read content",
+      "sensitivity": "basic",
+      "whyNeeded": "Notion uses capabilities, not OAuth scope strings. Read content lets the agent read the pages the user granted.",
+      "reviewTrigger": "None. Users see the capabilities on the consent prompt.",
+      "evidenceIds": ["ev-create"]
+    },
+    {
+      "name": "Capabilities: update / insert content",
+      "sensitivity": "basic",
+      "whyNeeded": "Write back to granted pages and databases.",
+      "reviewTrigger": "None. Shown to the user on the consent prompt.",
+      "evidenceIds": ["ev-create"]
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "phase": "decide",
+      "title": "Pick installation scope and capabilities",
+      "actions": [
+        "Choose \"Any workspace\" if you might ever list on the Marketplace.",
+        "Enable only the capabilities the agent uses."
+      ],
+      "owner": "both",
+      "timeMinutes": 5,
+      "doneWhen": "Scope and capability list are written down.",
+      "artifacts": [],
+      "evidenceIds": ["ev-install-scope"]
+    },
+    {
+      "id": "s2",
+      "phase": "create",
+      "title": "Create the public connection",
+      "actions": [
+        "Developer portal → Build → Public connections → Create new connection.",
+        "Fill connection name, development workspace, redirect URI(s), installation scope and capabilities."
+      ],
+      "owner": "human",
+      "timeMinutes": 5,
+      "doneWhen": "The connection exists.",
+      "artifacts": [],
+      "evidenceIds": ["ev-create"]
+    },
+    {
+      "id": "s3",
+      "phase": "configure",
+      "title": "Copy credentials into Composio",
+      "actions": [
+        "Configuration tab → copy OAuth client ID and client secret.",
+        "In Composio, Create Auth Config → Notion, paste them, and pass the auth config ID in your session."
+      ],
+      "owner": "both",
+      "timeMinutes": 5,
+      "doneWhen": "A Composio session uses your auth config ID for notion.",
+      "artifacts": ["client ID", "client secret (secret manager only)", "auth config ID"],
+      "evidenceIds": ["ev-create", "ev-composio-byo"]
+    },
+    {
+      "id": "s4",
+      "phase": "test",
+      "title": "Authorize and confirm page scoping",
+      "actions": [
+        "Authorize from a second workspace and grant one page.",
+        "Confirm the agent can read that page and gets an error on an ungranted page."
+      ],
+      "owner": "both",
+      "timeMinutes": 10,
+      "doneWhen": "Grant scoping behaves as expected.",
+      "artifacts": [],
+      "evidenceIds": ["ev-page-picker"]
+    }
+  ],
+  "oauthConfig": {
+    "redirectUris": [
+      {
+        "value": "Register one or more redirect URIs on the connection; Notion redirects there with the code or an error parameter.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://developers.notion.com/docs/authorization",
+            "quote": "If the user denies access, they are redirected to the redirect_uri with an error query parameter.",
+            "fetchedAt": "2026-10-19T20:38:02Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ],
+    "pkce": {
+      "value": "Not mentioned in the authorization guide; the token exchange uses HTTP Basic auth with the client secret.",
+      "status": "inferred",
+      "sources": [],
+      "lastChecked": "2026-10-20",
+      "note": "Absence in the docs we fetched, not a confirmed lack of support."
+    },
+    "refresh": {
+      "value": "The token response includes a refresh_token used to get a new access_token.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://developers.notion.com/docs/authorization",
+          "quote": "The refresh_token will be used to refresh the access token, which generates a new access_token .",
+          "fetchedAt": "2026-10-19T20:38:02Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "rateLimits": [
+      {
+        "value": "Per connection: 600 requests/minute on Business and Enterprise workspaces, 180 requests/minute on all other plans. A per-workspace limit also applies.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://developers.notion.com/reference/request-limits",
+            "quote": "Business and Enterprise 600 requests per minute (an average of 10 per second) All other plans 180 requests per minute (an average of 3 per second)",
+            "fetchedAt": "2026-10-19T20:38:03Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "id": "b-page-grants",
+      "severity": "medium",
+      "description": "The agent only sees pages each user picks in the OAuth page picker, and every workspace member must authorize separately. Agents expecting workspace-wide access find nothing.",
+      "affects": "pilot-ready",
+      "workaround": "Tell users which pages to grant during onboarding, or offer a Notion template in the auth flow.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-page-picker"]
+    },
+    {
+      "id": "b-install-scope",
+      "severity": "low",
+      "description": "Installation scope is fixed at creation. \"Selected workspaces only\" connections can't list on the Marketplace.",
+      "affects": "production-ready",
+      "workaround": "Create a new connection with \"Any workspace\".",
+      "agentCanHelp": false,
+      "evidenceIds": ["ev-install-scope"]
+    }
+  ],
+  "agentTasks": [
+    "Fill the connection form in a logged-in browser.",
+    "Draft onboarding copy telling users which pages to grant.",
+    "Verify page-grant scoping with a test call."
+  ],
+  "humanTasks": [
+    "Log in to Notion and choose the development workspace.",
+    "Store the client secret."
+  ],
+  "probes": [
+    {
+      "url": "https://api.notion.com/.well-known/oauth-authorization-server",
+      "method": "GET",
+      "status": 400,
+      "observed": "JSON error invalid_request_url: no RFC 8414 discovery document.",
+      "at": "2026-10-19T20:37:17Z"
+    },
+    {
+      "url": "https://api.notion.com/v1/oauth/authorize?client_id=oauth-atlas-probe&response_type=code&owner=user&redirect_uri=https%3A%2F%2Fexample.com%2Fcb",
+      "method": "GET",
+      "status": 302,
+      "redirect": "https://app.notion.com/install-integration?response_type=code&client_id=oauth-atlas-probe&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&owner=user",
+      "observed": "Authorize endpoint is live and hands off to the install-integration page without validating the client_id server-side.",
+      "at": "2026-10-19T20:37:17Z"
+    }
+  ],
+  "unknowns": [
+    "PKCE support: not documented in the pages we fetched.",
+    "Access and refresh token lifetimes: not stated in the authorization guide.",
+    "Exact developer-portal URL and form fields today: pending the T-011 attempt (seed consoleUrl is notion.so/my-integrations).",
+    "Notion Marketplace listing review process and timeline (optional path; not researched)."
+  ],
+  "evidence": [
+    {
+      "id": "ev-create",
+      "claim": "Create new connection asks for name, development workspace, redirect URIs, installation scope and capabilities.",
+      "sourceUrl": "https://developers.notion.com/guides/get-started/public-connections",
+      "sourceType": "official-doc",
+      "quote": "Click Create new connection and fill in the required fields, including: Connection name and development workspace Redirect URI(s) for the OAuth flow",
+      "retrievedAt": "2026-10-19T20:38:01Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-install-scope",
+      "claim": "Installation scope is set once and can't be changed.",
+      "sourceUrl": "https://developers.notion.com/guides/get-started/public-connections",
+      "sourceType": "official-doc",
+      "quote": "Installation scope is set once, at creation time, and can’t be changed afterward.",
+      "retrievedAt": "2026-10-19T20:38:01Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-page-picker",
+      "claim": "Users pick pages during authorization, and each workspace member authorizes separately.",
+      "sourceUrl": "https://developers.notion.com/guides/get-started/public-connections",
+      "sourceType": "official-doc",
+      "quote": "If multiple members in a workspace want to use the same public connection, each user needs to complete the authorization flow individually.",
+      "retrievedAt": "2026-10-19T20:38:01Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-refresh",
+      "claim": "The token response includes a refresh_token.",
+      "sourceUrl": "https://developers.notion.com/docs/authorization",
+      "sourceType": "official-doc",
+      "quote": "Notion responds to the request with an access_token , refresh_token , and additional information.",
+      "retrievedAt": "2026-10-19T20:38:02Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-rate",
+      "claim": "Per-connection rate limits depend on the workspace plan.",
+      "sourceUrl": "https://developers.notion.com/reference/request-limits",
+      "sourceType": "official-doc",
+      "quote": "Each connection has a fixed budget of requests per 60-second window, based on the workspace’s plan",
+      "retrievedAt": "2026-10-19T20:38:03Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-probe-authorize",
+      "claim": "The authorize endpoint redirects to app.notion.com/install-integration.",
+      "sourceUrl": "https://api.notion.com/v1/oauth/authorize",
+      "sourceType": "test",
+      "retrievedAt": "2026-10-19T20:37:17Z",
+      "status": "tested",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-composio-byo",
+      "claim": "For OAuth toolkits, the Composio dashboard shows the redirect URI to register with the provider.",
+      "sourceUrl": "https://docs.composio.dev/docs/authentication/custom-app-vs-managed-app",
+      "sourceType": "official-doc",
+      "quote": "For OAuth toolkits, the dashboard shows the redirect URI to add in the provider's developer portal.",
+      "retrievedAt": "2026-10-19T20:38:04Z",
+      "status": "primary",
+      "confidence": "high"
+    }
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-20",
+      "claim": "Notion API rate limit",
+      "before": "An average of three requests per second per connection.",
+      "after": "Per connection, per 60-second window: 600/min on Business and Enterprise, 180/min (about 3/s) on other plans, plus a per-workspace limit.",
+      "reason": "Notion's request-limits page now ties the budget to the workspace plan.",
+      "sourceUrl": "https://developers.notion.com/reference/request-limits",
+      "guideVersion": "1.0.0"
+    }
+  ],
+  "generatedBy": "human"
+}

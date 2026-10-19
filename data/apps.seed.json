@@ -12,7 +12,8 @@
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "google",
@@ -42,7 +43,8 @@
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "notion",
@@ -57,7 +59,8 @@
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "salesforce",
@@ -302,13 +305,16 @@
     "name": "Gmail",
     "website": "https://mail.google.com",
     "category": "Email",
+    "docsUrl": "https://developers.google.com/workspace/gmail/api/auth/scopes",
+    "consoleUrl": "https://console.cloud.google.com",
     "approvalModel": "scope-verification",
     "composio": {
       "toolkitSlug": "gmail",
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "googlecalendar",
@@ -614,13 +620,16 @@
     "name": "Instagram",
     "website": "https://www.instagram.com",
     "category": "Social",
+    "docsUrl": "https://developers.facebook.com/docs/instagram-platform/overview",
+    "consoleUrl": "https://developers.facebook.com/apps",
     "approvalModel": "app-review",
     "composio": {
       "toolkitSlug": "instagram",
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "whatsapp",

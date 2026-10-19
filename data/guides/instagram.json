@@ -1,0 +1,477 @@
+{
+  "slug": "instagram",
+  "app": {
+    "slug": "instagram",
+    "name": "Instagram",
+    "website": "https://www.instagram.com",
+    "category": "Social",
+    "docsUrl": "https://developers.facebook.com/docs/instagram-platform/overview",
+    "consoleUrl": "https://developers.facebook.com/apps",
+    "approvalModel": "app-review",
+    "composio": {
+      "toolkitSlug": "instagram",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
+  },
+  "version": "1.0.0",
+  "lastVerified": "2026-10-20",
+  "confidence": "medium",
+  "partial": false,
+  "ownApp": {
+    "triggers": [
+      "Leaving managed auth means your own Meta app needs Business Verification and per-permission App Review before anyone without a role on the app can connect (Meta access-level rules).",
+      "You need permissions beyond what Composio's managed app requests, for example messaging or content publishing; each one is reviewed separately (inferred)."
+    ],
+    "notes": "Composio lists Instagram as a Composio-managed OAuth toolkit. Only Instagram professional accounts (business or creator) can connect through the Instagram Platform. If you bring your own app, expect weeks of waiting; Meta publishes no review-time commitment. Copy the redirect URI from the Composio dashboard (Create Auth Config)."
+  },
+  "verdict": {
+    "difficulty": 4,
+    "approvalModel": "app-review",
+    "summary": "The \"weeks of waiting\" case. Testing works only for people with a role on your app. Any other user needs Advanced Access: Meta Business Verification of your company plus App Review of each permission, with no official review-time commitment. Professional accounts only.",
+    "canTestBeforeApproval": true
+  },
+  "milestones": [
+    {
+      "id": "dev-ready",
+      "definition": "Your own Instagram professional account, added to the app, can log in and call the API with Standard Access.",
+      "handsOnHours": { "min": 0.5, "max": 1.5 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "Only Instagram professional accounts (business or creator) are supported.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://developers.facebook.com/docs/instagram-platform/overview",
+              "quote": "The Instagram Platform is a collection of APIs that allows your app to access data for Instagram professional accounts, including business and creator accounts.",
+              "fetchedAt": "2026-10-19T20:51:14Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "pilot-ready",
+      "definition": "Pilot users you add to the app (as testers or other roles) can connect their professional accounts.",
+      "handsOnHours": { "min": 0.25, "max": 1 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "With Standard Access, permissions can only be requested from users who have a role on your app.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://developers.facebook.com/docs/graph-api/overview/access-levels",
+              "quote": "Permissions with Standard Access can only be requested from app users who have a role on the requesting app.",
+              "fetchedAt": "2026-10-19T20:51:04Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "production-ready",
+      "definition": "Any Instagram professional account can connect: Advanced Access granted after Business Verification and App Review.",
+      "handsOnHours": { "min": 8, "max": 24 },
+      "wait": { "minDays": 9, "maxDays": null },
+      "basis": "community",
+      "limitsUntilNext": [
+        {
+          "value": "Meta publishes no App Review SLA. A June 2026 developer report says the dashboard reads \"Most submissions are reviewed within 20 days\", with commenters reporting 9–29 days. Business Verification is reported (secondary) as up to 14 business days. Reported by developers, not a commitment.",
+          "status": "secondary",
+          "sources": [
+            {
+              "url": "https://www.reddit.com/r/facebook/comments/1u1h6rl/",
+              "title": "Reddit r/facebook: App Review time (community report)",
+              "fetchedAt": "2026-10-20"
+            }
+          ],
+          "lastChecked": "2026-10-20",
+          "note": "Lowest developer-reported App Review time (reports range 9–29 days); Business Verification runs in parallel; Meta publishes no SLA. From research.md §3.6. The thread returned 403 to our fetcher today. Confirm by reading the App Review dashboard during an attempt."
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "type": "testing-cap",
+      "name": "Standard Access: only users with a role on the app",
+      "appliesWhen": "until Advanced Access",
+      "requiredFor": ["pilot-ready"]
+    },
+    {
+      "type": "business-verification",
+      "name": "Meta Business Verification",
+      "appliesWhen": "Advanced Access",
+      "requiredFor": ["production-ready"],
+      "duration": {
+        "value": "Reported as up to 14 business days (Meta Business Help Center, via secondary sources).",
+        "status": "secondary",
+        "sources": [],
+        "lastChecked": "2026-10-20",
+        "note": "research.md §3.6 [S2]; the Business Help Center page was not fetched."
+      }
+    },
+    {
+      "type": "app-review",
+      "name": "Meta App Review per permission",
+      "appliesWhen": "Advanced Access",
+      "requiredFor": ["production-ready"],
+      "duration": {
+        "value": "About 20 days per a reported dashboard message; developers report 9–29 days.",
+        "status": "secondary",
+        "sources": [
+          {
+            "url": "https://www.reddit.com/r/facebook/comments/1u1h6rl/",
+            "fetchedAt": "2026-10-20"
+          }
+        ],
+        "lastChecked": "2026-10-20",
+        "note": "Community report. Not a Meta commitment."
+      },
+      "recurring": {
+        "value": "Apps with Advanced Access must complete the annual Data Use Checkup.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://developers.facebook.com/docs/graph-api/overview/access-levels",
+            "quote": "Apps that have Advanced Access for a permission or feature must complete Data Use Checkup , which is an annual process",
+            "fetchedAt": "2026-10-19T20:51:04Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-meta-account",
+      "label": "Meta developer account and a professional Instagram account",
+      "detail": "A Facebook account with developer access, plus an Instagram business or creator account to test with.",
+      "requiredFor": "dev-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-professional"]
+    },
+    {
+      "id": "req-business",
+      "label": "Business portfolio and legal-entity documents",
+      "detail": "Connect the app to a Business; only a Business admin can complete verification in Business Manager.",
+      "requiredFor": "production-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-bv"]
+    },
+    {
+      "id": "req-review-assets",
+      "label": "Screen recordings and reviewer access",
+      "detail": "A recording per permission showing its use, working test access for reviewers, a 1024x1024 app icon, and a successful API call within 30 days before submitting.",
+      "requiredFor": "production-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-review", "ev-review-sub"]
+    }
+  ],
+  "scopes": [
+    {
+      "name": "instagram_business_basic",
+      "sensitivity": "unknown",
+      "whyNeeded": "Read the connected professional account's profile and media.",
+      "reviewTrigger": "Advanced Access via App Review for users without a role on the app.",
+      "justificationDraft": "The agent reads the user's own recent posts to draft captions and reports for them.",
+      "evidenceIds": ["ev-scopes", "ev-levels"]
+    },
+    {
+      "name": "instagram_business_manage_comments",
+      "sensitivity": "unknown",
+      "whyNeeded": "Read and reply to comments on the account's media.",
+      "reviewTrigger": "Separate App Review approval.",
+      "evidenceIds": ["ev-scopes"]
+    },
+    {
+      "name": "instagram_business_content_publish",
+      "sensitivity": "unknown",
+      "whyNeeded": "Publish posts on the user's behalf.",
+      "reviewTrigger": "Separate App Review approval.",
+      "evidenceIds": ["ev-scopes"]
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "phase": "create",
+      "title": "Create the Meta app with the Instagram use case",
+      "actions": [
+        "developers.facebook.com/apps → Create app → Instagram API with Instagram Login (no Facebook Page needed).",
+        "Add the Composio redirect URI in Business Login settings.",
+        "Add your professional account and pilot users as testers."
+      ],
+      "owner": "human",
+      "timeMinutes": 45,
+      "doneWhen": "Your own professional account completes login and you get a token.",
+      "artifacts": ["app ID", "app secret (secret manager only)"],
+      "evidenceIds": ["ev-iglogin"]
+    },
+    {
+      "id": "s2",
+      "phase": "submit",
+      "title": "Business Verification",
+      "actions": [
+        "App Dashboard → Settings → Basic → Verification → Start Verification.",
+        "A Business admin completes verification in Business Manager with company documents."
+      ],
+      "owner": "human",
+      "doneWhen": "The app shows a connected, verified Business.",
+      "artifacts": ["business documents"],
+      "evidenceIds": ["ev-bv"]
+    },
+    {
+      "id": "s3",
+      "phase": "submit",
+      "title": "App Review per permission",
+      "actions": [
+        "Make a successful call for each permission within 30 days before submitting.",
+        "Record a screencast per permission and write reviewer instructions with working test access.",
+        "Submit, then keep the test access working until approval."
+      ],
+      "owner": "both",
+      "doneWhen": "Each requested permission has Advanced Access.",
+      "artifacts": ["screencasts", "reviewer test instructions"],
+      "evidenceIds": ["ev-review", "ev-review-sub"]
+    },
+    {
+      "id": "s4",
+      "phase": "launch",
+      "title": "Go live and calendar the Data Use Checkup",
+      "actions": [
+        "Switch the app to Live mode.",
+        "Set a yearly reminder for the Data Use Checkup."
+      ],
+      "owner": "human",
+      "timeMinutes": 15,
+      "doneWhen": "A user without a role on the app connects successfully.",
+      "artifacts": [],
+      "evidenceIds": ["ev-duc"]
+    }
+  ],
+  "oauthConfig": {
+    "redirectUris": [
+      {
+        "value": "Meta redirects to your registered redirect URI with an authorization code.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login",
+            "quote": "When the user submits the login flow, Meta redirects your app user to your redirect URI and sends an authorization code.",
+            "fetchedAt": "2026-10-19T20:51:17Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ],
+    "tokenLifetime": {
+      "value": "The code yields a short-lived token; exchange it for a long-lived token valid for 60 days.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login",
+          "quote": "Your app can exchanged this short-lived access token for a long-lived Instagram user access token that is valid for 60 days.",
+          "fetchedAt": "2026-10-19T20:51:17Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "refresh": {
+      "value": "No refresh token: refresh the long-lived token itself once it is at least 24 hours old and before it expires. Tokens not refreshed within 60 days die.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://developers.facebook.com/docs/instagram-platform/reference/refresh_access_token",
+          "quote": "Refresh a long-lived accesstoken that is at least 24 hours old but has not expired.",
+          "fetchedAt": "2026-10-19T20:51:25Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "rateLimits": []
+  },
+  "blockers": [
+    {
+      "id": "b-bv",
+      "severity": "high",
+      "description": "Advanced Access requires Business Verification. Without a verified Business, users from other businesses can't grant permissions and features stay inactive.",
+      "affects": "production-ready",
+      "workaround": "Start Business Verification on day one; it runs in parallel with building.",
+      "agentCanHelp": false,
+      "evidenceIds": ["ev-bv", "ev-levels"]
+    },
+    {
+      "id": "b-review",
+      "severity": "high",
+      "description": "If reviewers can't access your app, the whole submission is rejected; untestable permissions are denied.",
+      "affects": "production-ready",
+      "workaround": "Provide working test credentials and screencasts that follow the exact reviewer path.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-review"]
+    },
+    {
+      "id": "b-personal-accounts",
+      "severity": "medium",
+      "description": "Personal Instagram accounts can't connect; only business or creator accounts.",
+      "affects": "dev-ready",
+      "workaround": "Ask users to switch to a professional account (free in the Instagram app).",
+      "agentCanHelp": false,
+      "evidenceIds": ["ev-professional"]
+    }
+  ],
+  "agentTasks": [
+    "Draft per-permission use-case descriptions and the screencast script.",
+    "Write reviewer test instructions and check that test access works.",
+    "Check that the privacy policy and data-deletion URLs are reachable."
+  ],
+  "humanTasks": [
+    "Facebook login and 2FA; create the app.",
+    "Business admin: complete Business Verification with company documents.",
+    "Record screencasts and submit App Review.",
+    "Complete the annual Data Use Checkup."
+  ],
+  "probes": [
+    {
+      "url": "https://www.instagram.com/.well-known/openid-configuration",
+      "method": "GET",
+      "status": 200,
+      "observed": "OIDC discovery: issuer https://www.instagram.com, authorization_endpoint https://www.instagram.com/oauth/dialog, response_types [code]. No code_challenge_methods_supported listed.",
+      "at": "2026-10-19T20:37:20Z"
+    },
+    {
+      "url": "https://www.instagram.com/oauth/authorize?client_id=oauth-atlas-probe&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&response_type=code&scope=instagram_business_basic",
+      "method": "GET",
+      "status": 200,
+      "observed": "Returns the Instagram web app shell (about 587 KB HTML). No server-side client_id error is visible without a logged-in session.",
+      "at": "2026-10-19T20:37:21Z"
+    }
+  ],
+  "unknowns": [
+    "Official App Review duration: Meta publishes none; the ~20-day figure is a community report.",
+    "Business Verification duration: \"up to 14 business days\" seen only via secondary sources.",
+    "PKCE support for Instagram Login: not in the discovery doc or the pages we fetched.",
+    "Rate limits for the Instagram API with Instagram Login: not researched.",
+    "Whether Composio's managed Instagram app already holds Advanced Access for the permissions you need."
+  ],
+  "evidence": [
+    {
+      "id": "ev-levels",
+      "claim": "Standard Access works only for users with a role on the app; Advanced Access requires Business Verification.",
+      "sourceUrl": "https://developers.facebook.com/docs/graph-api/overview/access-levels",
+      "sourceType": "official-doc",
+      "quote": "However, Business Verification is required to get Advanced Access.",
+      "retrievedAt": "2026-10-19T20:51:04Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-bv",
+      "claim": "Only a Business admin can complete Business Verification.",
+      "sourceUrl": "https://developers.facebook.com/docs/development/release/business-verification",
+      "sourceType": "official-doc",
+      "quote": "Note that anyone with an Administrator role on your app can connect it to a Business, but only someone with an Admin role in the Business will be able to complete the verification process.",
+      "retrievedAt": "2026-10-19T20:51:05Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-review",
+      "claim": "Reviewers test the app; inaccessible apps are rejected entirely.",
+      "sourceUrl": "https://developers.facebook.com/docs/app-review",
+      "sourceType": "official-doc",
+      "quote": "If we are unable to access your app to test it, your entire submission will be rejected.",
+      "retrievedAt": "2026-10-19T20:51:09Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-review-sub",
+      "claim": "A successful API call must be made within 30 days before submitting.",
+      "sourceUrl": "https://developers.facebook.com/docs/app-review/submission-guide",
+      "sourceType": "official-doc",
+      "quote": "A successful call must be made within 30 days of submitting for App Review.",
+      "retrievedAt": "2026-10-19T20:51:21Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-professional",
+      "claim": "The Instagram Platform serves professional (business and creator) accounts.",
+      "sourceUrl": "https://developers.facebook.com/docs/instagram-platform/overview",
+      "sourceType": "official-doc",
+      "quote": "The Instagram Platform is a collection of APIs that allows your app to access data for Instagram professional accounts, including business and creator accounts.",
+      "retrievedAt": "2026-10-19T20:51:14Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-iglogin",
+      "claim": "Instagram API with Instagram Login doesn't require a linked Facebook Page.",
+      "sourceUrl": "https://developers.facebook.com/docs/instagram-platform/overview",
+      "sourceType": "official-doc",
+      "quote": "There are two Instagram API configurations: Instagram API with Instagram Login serves Instagram professional accounts without requiring a linked Facebook Page.",
+      "retrievedAt": "2026-10-19T20:51:14Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-scopes",
+      "claim": "Current scope names are instagram_business_*.",
+      "sourceUrl": "https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login",
+      "sourceType": "official-doc",
+      "quote": "The new scope values are: instagram_business_basic instagram_business_content_publish instagram_business_manage_messages instagram_business_manage_comments",
+      "retrievedAt": "2026-10-19T20:51:17Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-duc",
+      "claim": "Data Use Checkup is annual and required before switching to Live mode.",
+      "sourceUrl": "https://developers.facebook.com/docs/development/maintaining-data-access/data-use-checkup",
+      "sourceType": "policy",
+      "quote": "In addition, developers do not need to complete DUC while the app is in Development mode , but will need to complete DUC before the app can be switched to Live mode.",
+      "retrievedAt": "2026-10-19T20:51:19Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-review-time",
+      "claim": "App Review reportedly takes about 20 days (9–29 reported).",
+      "sourceUrl": "https://www.reddit.com/r/facebook/comments/1u1h6rl/",
+      "sourceType": "community",
+      "retrievedAt": "2026-10-20",
+      "status": "secondary",
+      "confidence": "low"
+    },
+    {
+      "id": "ev-probe-oidc",
+      "claim": "Instagram publishes OIDC discovery with authorization_endpoint /oauth/dialog.",
+      "sourceUrl": "https://www.instagram.com/.well-known/openid-configuration",
+      "sourceType": "test",
+      "retrievedAt": "2026-10-19T20:37:20Z",
+      "status": "tested",
+      "confidence": "high"
+    }
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-20",
+      "claim": "Meta App Review time",
+      "before": "A few days.",
+      "after": "No official SLA. The dashboard reportedly says most submissions are reviewed within 20 days (community report, 2026).",
+      "reason": "Developer reports in 2026; Meta's App Review docs we fetched give no timeline.",
+      "sourceUrl": "https://www.reddit.com/r/facebook/comments/1u1h6rl/",
+      "guideVersion": "1.0.0"
+    }
+  ],
+  "generatedBy": "human"
+}
