@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createMockFetch, createMockLlm } from "@/lib/agent/llm/mock";
-import { runPipeline, type StoredRun } from "@/lib/agent/pipeline";
+import { runPipeline } from "@/lib/agent/pipeline";
 import type { LlmAdapter, PipelineDeps, RunEvent } from "@/lib/agent/types";
 import { guideSchema } from "@/lib/schema";
 import { createMemoryStore } from "@/lib/store";
@@ -47,9 +47,9 @@ describe("runPipeline", () => {
     expect(ev["ev-install-own-team"]).toBe("primary");
     expect(ev["ev-review-time"]).toBe("inferred");
 
-    const stored = (await deps.store.getRun("r1")) as StoredRun;
-    expect(stored.status).toBe("done");
-    expect(stored.guide?.slug).toBe("miro");
+    const stored = await deps.store.getRun("r1");
+    expect(stored?.status).toBe("done");
+    expect(stored?.guide?.slug).toBe("miro");
     expect(await deps.store.getGuide("miro")).not.toBeNull();
   });
 

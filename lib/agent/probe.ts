@@ -32,6 +32,7 @@ export type Discovery = {
   tokenEndpoint?: string;
   codeChallengeMethods: string[];
   grantTypes: string[];
+  scopes: string[];
 };
 
 export type ProbeResult = {
@@ -52,6 +53,7 @@ export function parseDiscovery(json: unknown): Discovery | null {
     tokenEndpoint: typeof j.token_endpoint === "string" ? j.token_endpoint : undefined,
     codeChallengeMethods: arr(j.code_challenge_methods_supported),
     grantTypes: arr(j.grant_types_supported),
+    scopes: arr(j.scopes_supported),
   };
 }
 
@@ -133,6 +135,26 @@ export function authorizeProbeUrl(endpoint: string, scope?: string): string {
   return u.toString();
 }
 
+// RFC 8414 §3 path insertion: an issuer with a path publishes at /.well-known/<suffix><path>,
+// and some OIDC servers append instead (<path>/.well-known/openid-configuration).
+export function pathDiscoveryUrls(authorizeUrl: string): string[] {
+  let u: URL;
+  try {
+    u = new URL(authorizeUrl);
+  } catch {
+    return [];
+  }
+  const segments = u.pathname.split("/").filter(Boolean);
+  const issuerPaths = new Set<string>();
+  // GitHub: /login/oauth/authorize → issuer path /login/oauth.
+  for (let n = segments.length - 1; n >= 1; n--) issuerPaths.add(`/${segments.slice(0, n).join("/")}`);
+  return [...issuerPaths].slice(0, 2).flatMap((path) => [
+    `${u.origin}/.well-known/oauth-authorization-server${path}`,
+    `${u.origin}/.well-known/openid-configuration${path}`,
+    `${u.origin}${path}/.well-known/openid-configuration`,
+  ]);
+}
+
 function candidateOrigins(resolved: ResolvedApp, authorizeHint?: string): string[] {
   const hosts = new Set<string>();
   const add = (u?: string) => {
@@ -179,7 +201,10 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
   const result: ProbeResult = { probes, summary: "" };
 
   // 1. Discovery documents, in parallel.
-  const urls = candidateOrigins(resolved, authorizeHint).flatMap((o) => WELL_KNOWN_PATHS.map((p) => o + p));
+  const urls = [
+    ...candidateOrigins(resolved, authorizeHint).flatMap((o) => WELL_KNOWN_PATHS.map((p) => o + p)),
+    ...(authorizeHint ? pathDiscoveryUrls(authorizeHint) : []),
+  ];
   const settled = await Promise.allSettled(
     urls.map(async (url) => {
       const r = await probeGet(url, { ...opts, perRequestMs: Math.min(opts.perRequestMs ?? 5000, remaining()) }, "application/json");
@@ -218,7 +243,8 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
   const authorizeEndpoint = result.discovery?.authorizationEndpoint ?? authorizeHint;
   if (authorizeEndpoint && remaining() > 0) {
     // OIDC providers (Google) reject a missing scope before checking the client.
-    const url = authorizeProbeUrl(authorizeEndpoint, result.discovery ? "openid" : undefined);
+    const oidc = !!result.discovery && (result.discovery.url.includes("openid") || result.discovery.scopes.includes("openid"));
+    const url = authorizeProbeUrl(authorizeEndpoint, oidc ? "openid" : undefined);
     try {
       const r = await probeGet(url, { ...opts, perRequestMs: Math.min(opts.perRequestMs ?? 5000, remaining()) }, "text/html");
       const { kind, observed } = interpretAuthorize(r.status, r.location, r.body);

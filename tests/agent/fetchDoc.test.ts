@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { BROWSER_UA, fetchDoc, htmlToText } from "@/lib/agent/fetchDoc";
+import { BROWSER_UA, fetchDoc, htmlToText, MINIMAL_BROWSER_UA } from "@/lib/agent/fetchDoc";
 import { createMockFetch } from "@/lib/agent/llm/mock";
 
 const now = () => new Date("2026-10-20T00:00:00Z");
@@ -20,6 +20,29 @@ describe("fetchDoc", () => {
     expect(r.doc.text).toContain("register an OAuth application");
     expect(seen).toHaveLength(2);
     expect(seen[1]).toBe(BROWSER_UA);
+  });
+
+  it("Meta: retries with a minimal Mozilla/5.0 UA after the full Chrome UA gets a 400", async () => {
+    const seen: string[] = [];
+    const base = createMockFetch();
+    const spy: typeof fetch = (input, init) => {
+      seen.push((init?.headers as Record<string, string>)["User-Agent"]);
+      return base(input, init);
+    };
+    const r = await fetchDoc("https://developers.facebook.com/docs/facebook-login/overview", { fetch: spy, now });
+    expect(r.ok && r.via).toBe("browser-ua");
+    expect(seen.slice(1)).toEqual([BROWSER_UA, MINIMAL_BROWSER_UA]);
+    if (r.ok) expect(r.doc.text).toContain("minimal User-Agent");
+  });
+
+  it("does not try the minimal UA after a 404", async () => {
+    const seen: string[] = [];
+    const f: typeof fetch = async (_i, init) => {
+      seen.push((init?.headers as Record<string, string>)["User-Agent"]);
+      return new Response("gone", { status: 404 });
+    };
+    await fetchDoc("https://gone.example/", { fetch: f, now });
+    expect(seen).not.toContain(MINIMAL_BROWSER_UA);
   });
 
   it("marks a source unreachable when every step fails", async () => {

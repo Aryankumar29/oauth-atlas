@@ -12,7 +12,9 @@
       "url": "https://developers.miro.com",
       "synthetic": true,
       "status": 302,
-      "headers": { "location": "https://miro.com/login/" },
+      "headers": {
+        "location": "https://miro.com/login/"
+      },
       "body": ""
     },
     {
@@ -34,6 +36,26 @@
       "finalUrl": "https://docs.example-loginwall.test/login?next=/oauth",
       "contentType": "text/html",
       "body": "<html><body><h1>Sign in</h1><form>Email <input> Password <input type=password></form></body></html>"
+    },
+    {
+      "url": "https://developers.facebook.com/docs/facebook-login/overview",
+      "synthetic": true,
+      "_why": "Reproduces guide-researcher's finding: Meta docs return 400 to a full Chrome UA and 200 to 'Mozilla/5.0'.",
+      "status": 403,
+      "contentType": "text/html",
+      "body": "<html><body>Blocked</body></html>",
+      "byUA": {
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36": {
+          "status": 400,
+          "contentType": "text/html",
+          "body": "<html><body>Bad request</body></html>"
+        },
+        "Mozilla/5.0": {
+          "status": 200,
+          "contentType": "text/html",
+          "body": "<html><head><title>MOCK FIXTURE: Meta login docs (synthetic)</title></head><body><p>Synthetic page served only to the minimal User-Agent. Not real Meta documentation.</p><p>Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length.</p></body></html>"
+        }
+      }
     }
   ]
 }

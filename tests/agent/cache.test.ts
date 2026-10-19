@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { clientIp, serveFromCache } from "@/lib/agent/cache";
+import { cachedInfo, clientIp, serveFromCache } from "@/lib/agent/cache";
 import { createMockFetch, createMockLlm } from "@/lib/agent/llm/mock";
 import { runPipeline } from "@/lib/agent/pipeline";
 import type { PipelineDeps, RunEvent } from "@/lib/agent/types";
@@ -27,7 +27,7 @@ describe("demo cache", () => {
 
     await runPipeline({ query: "Miro", runId: "live" }, d, fast);
     const hit = await serveFromCache({ query: "miro.com", runId: "c1" }, d);
-    expect(hit?.cachedFrom?.runId).toBe("live");
+    expect(hit && cachedInfo(hit)?.sourceRunId).toBe("live");
     expect(hit?.guide?.slug).toBe("miro");
     expect((await d.store.getRun("c1"))?.status).toBe("done");
     expect(d.events.at(-1)?.message).toMatch(/cached guide/);

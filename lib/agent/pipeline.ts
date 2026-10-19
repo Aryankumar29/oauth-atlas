@@ -8,12 +8,6 @@ import type { FetchedDoc, PipelineDeps, PipelineInput, PipelineStep, RunEvent, R
 import { validateGuide } from "@/lib/agent/validate";
 import type { ComposioInfo, Guide } from "@/lib/schema";
 
-// Persisted run. `guide` is the guide this run produced (guide:{slug} only holds the latest).
-export type StoredRun = RunRecord & {
-  guide?: Guide;
-  // Set when the demo cache answered instead of a live run.
-  cachedFrom?: { runId?: string; generatedAt: string };
-};
 
 export type PipelineOptions = {
   // SPEC §9.15: stop discovery and extract from what we have.
@@ -40,14 +34,14 @@ export async function runPipeline(
   input: PipelineInput,
   deps: PipelineDeps,
   options: PipelineOptions = {},
-): Promise<StoredRun> {
+): Promise<RunRecord> {
   const opts = { ...DEFAULTS, ...options };
   const start = deps.now().getTime();
   const elapsed = () => deps.now().getTime() - start;
   const softRemaining = () => opts.softDeadlineMs - elapsed();
   const hardRemaining = () => opts.hardDeadlineMs - elapsed();
 
-  const run: StoredRun = {
+  const run: RunRecord = {
     runId: input.runId,
     input,
     status: "running",
@@ -246,7 +240,7 @@ function applyProbeFacts(guide: Guide, probe: ProbeResult): Guide {
   return g;
 }
 
-async function finish(run: StoredRun, deps: PipelineDeps, status: RunRecord["status"], error?: string) {
+async function finish(run: RunRecord, deps: PipelineDeps, status: RunRecord["status"], error?: string) {
   run.status = status;
   run.finishedAt = deps.now().toISOString();
   if (error) run.error = error;
@@ -254,7 +248,7 @@ async function finish(run: StoredRun, deps: PipelineDeps, status: RunRecord["sta
   return run;
 }
 
-async function safePut(deps: PipelineDeps, run: StoredRun) {
+async function safePut(deps: PipelineDeps, run: RunRecord) {
   try {
     await deps.store.putRun(run);
   } catch (e) {

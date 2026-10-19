@@ -59,6 +59,8 @@ type HttpEntry = {
   headers?: Record<string, string>;
   body: string;
   finalUrl?: string;
+  // Response per exact User-Agent; falls back to the entry itself.
+  byUA?: Record<string, { status: number; contentType?: string; body: string }>;
   browserUA?: { status: number; contentType?: string; body: string };
 };
 
@@ -90,7 +92,7 @@ export function createMockFetch(entries: HttpEntry[] = HTTP): typeof globalThis.
     const e = entries.find((x) => x.url === url) ?? entries.find((x) => x.url.replace(/\/$/, "") === bare);
     if (!e) return respond("Not recorded (MOCK_LLM)", 404, { "content-type": "text/plain" }, url);
     const ua = headerOf(init, "user-agent");
-    const v = e.browserUA && ua === BROWSER_UA ? e.browserUA : e;
+    const v = (ua && e.byUA?.[ua]) || (e.browserUA && ua === BROWSER_UA ? e.browserUA : e);
     const headers: Record<string, string> = { "content-type": v.contentType ?? "text/html", ...(e.headers ?? {}) };
     if (init?.redirect !== "manual" && e.status >= 300 && e.status < 400 && headers.location) {
       const next = await mockFetch(new URL(headers.location, url).toString(), init);

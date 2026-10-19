@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { isMockMode } from "@/lib/agent/deps";
-import type { StoredRun } from "@/lib/agent/pipeline";
+import { cachedInfo } from "@/lib/agent/cache";
+import type { RunRecord } from "@/lib/agent/types";
 import { DIFFICULTY_LABELS, difficulty, type DifficultyScore } from "@/lib/difficulty";
 import type { Guide } from "@/lib/schema";
 import { getStore } from "@/lib/store";
@@ -24,9 +25,11 @@ export default function RunPage(props: PageProps<"/generate/[runId]">) {
 async function Run({ params }: { params: PageProps<"/generate/[runId]">["params"] }) {
   const { runId } = await params;
   const store = await getStore();
-  const run = (await store.getRun(runId)) as StoredRun | null;
+  const run = await store.getRun(runId);
   if (!run) notFound();
-  const guide = run.guide ?? (run.guideSlug ? await store.getGuide(run.guideSlug) : null);
+  const latest = !run.guide && run.guideSlug ? await store.getGuide(run.guideSlug) : null;
+  const guide = run.guide ?? latest;
+  const cached = cachedInfo(run);
 
   return (
     <div className="mt-6 space-y-8">
@@ -38,9 +41,14 @@ async function Run({ params }: { params: PageProps<"/generate/[runId]">["params"
       <p className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800">
         Live-generated — verify before relying on it.
       </p>
-      {run.cachedFrom && guide && (
+      {latest && (
+        <p className="rounded-xl border border-zinc-200 bg-zinc-100 px-4 py-2 text-sm text-zinc-700">
+          This run did not store its own guide; showing the latest guide for this app.
+        </p>
+      )}
+      {cached && guide && (
         <p className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-900">
-          Cached demo guide, generated {run.cachedFrom.generatedAt}.{" "}
+          Cached demo guide, generated {cached.generatedAt}.{" "}
           <Link
             href={`/generate?app=${encodeURIComponent(guide.app.name)}&slug=${guide.slug}&force=1`}
             className="font-medium underline"
@@ -132,7 +140,7 @@ function GuideStub({ guide }: { guide: Guide }) {
   );
 }
 
-function RunTrace({ run }: { run: StoredRun }) {
+function RunTrace({ run }: { run: RunRecord }) {
   return (
     <Section title={`Run trace (${run.status})`}>
       <ol className="space-y-1 text-xs text-zinc-600" data-testid="run-trace">

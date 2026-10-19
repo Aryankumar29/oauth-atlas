@@ -4,6 +4,8 @@ import type { FetchedDoc } from "@/lib/agent/types";
 
 export const BROWSER_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+// Meta (developers.facebook.com) answers 400 to a full Chrome UA but 200 to this.
+export const MINIMAL_BROWSER_UA = "Mozilla/5.0";
 export const PLAIN_UA = "OAuthAtlasBot/0.1 (+https://github.com/Aryankumar29)";
 
 export type FetchVia = "plain" | "browser-ua" | "reader";
@@ -98,18 +100,23 @@ function toDoc(url: string, body: string, contentType: string | null, opts: Fetc
 export async function fetchDoc(url: string, opts: FetchDocOptions): Promise<FetchDocResult> {
   const failures: string[] = [];
   let loginWall = false;
+  let lastStatus = 0;
 
   for (const [via, ua] of [
     ["plain", PLAIN_UA],
     ["browser-ua", BROWSER_UA],
+    ["browser-ua", MINIMAL_BROWSER_UA],
   ] as const) {
+    if (ua === MINIMAL_BROWSER_UA && lastStatus !== 400 && lastStatus !== 403) break;
     const r = await attempt(url, ua, opts);
     if ("error" in r) {
+      lastStatus = 0;
       failures.push(`${via}: ${r.error}`);
       continue;
     }
+    lastStatus = r.res.status;
     if (!r.res.ok) {
-      failures.push(`${via}: HTTP ${r.res.status}`);
+      failures.push(`${via}${ua === MINIMAL_BROWSER_UA ? " (minimal)" : ""}: HTTP ${r.res.status}`);
       continue;
     }
     // Final URL after redirects (search-grounding links are redirect wrappers).
