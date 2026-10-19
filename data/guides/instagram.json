@@ -94,7 +94,7 @@
             }
           ],
           "lastChecked": "2026-10-20",
-          "note": "Lowest developer-reported App Review time (reports range 9–29 days); Business Verification runs in parallel; Meta publishes no SLA. From research.md §3.6. The thread returned 403 to our fetcher today. Confirm by reading the App Review dashboard during an attempt."
+          "note": "Lowest developer-reported App Review time (reports range 9–29 days); Meta publishes no SLA. From research.md §3.6. The thread returned 403 to our fetcher today. Confirm by reading the App Review dashboard during an attempt."
         }
       ]
     }
@@ -305,7 +305,7 @@
       "severity": "high",
       "description": "Advanced Access requires Business Verification. Without a verified Business, users from other businesses can't grant permissions and features stay inactive.",
       "affects": "production-ready",
-      "workaround": "Start Business Verification on day one; it runs in parallel with building.",
+      "workaround": "Start Business Verification early, before you plan to submit for App Review.",
       "agentCanHelp": false,
       "evidenceIds": ["ev-bv", "ev-levels"]
     },
