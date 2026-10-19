@@ -43,7 +43,7 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 `app/api/generate/route.ts` streams Server-Sent Events from `runPipeline` (`lib/agent/pipeline.ts`):
 
 1. **Resolve.** Matches the query to the seed list: exact name, slug, or alias first, then word-prefix. Short queries never pick a substring hit. An ambiguous match is listed in the guide's unknowns, and so is a guessed website.
-2. **Composio.** Checks whether the app is Composio-managed. Sources in order: the toolkit API (with `COMPOSIO_API_KEY`), the live managed-auth page, then the bundled snapshot `data/composio-managed.json` (123 managed toolkits, 2026-10-20).
+2. **Composio.** Checks whether the app is Composio-managed. Sources in order: the toolkit API (with `COMPOSIO_API_KEY`), the live managed-auth page, then the bundled snapshot `data/composio-managed.json`: 123 managed / 211 bring-your-own toolkits, snapshot 2026-10-20, from https://docs.composio.dev/toolkits/managed-auth.
 3. **Discover** and **probe**, run concurrently:
    - **Discover:** a grounded LLM research call, then fetching official docs. A 403 gets a browser User-Agent retry, with the Jina Reader as a fallback. Login walls are detected.
    - **Probe:** credential-free requests (20 s cap) to the provider's discovery, authorize, and console endpoints.
@@ -86,15 +86,37 @@ Deploying (Vercel, env var owners, duration limits, cache warming, smoke checkli
 ## Testing
 
 ```bash
-npm run check      # typecheck && lint && vitest (118 tests) && validate:guides && next build
+npm run check      # typecheck && lint && vitest (128 tests) && validate:guides && next build
 npm run test:e2e   # Playwright smoke on :3300 with MOCK_LLM=1 (first run: npx playwright install chromium)
 ```
 
 Everything runs without API keys. Details are in [`docs/testing.md`](docs/testing.md).
 
+## Batch library generation (T-007)
+
+`scripts/generate-library.ts` runs the same pipeline over the queued seed apps. It writes `data/guides/<slug>.json` only for guides that pass the SPEC §12 QA gate (`qaGate` in `lib/agent/batch.ts`). The gate requires all of these:
+- the guide is not partial
+- at least 3 distinct sources, at least 1 of them primary after validation
+- at least one milestone limit is cited, and every gate that drives the difficulty score is cited
+- the probe step ran
+- the unknowns list is not empty
+- every step has an owner
+
+```bash
+npx tsx scripts/generate-library.ts --dry-run --limit 3        # report only, writes nothing
+npx tsx scripts/generate-library.ts --only miro,calendly        # write data/guides/<slug>.json for passing guides
+```
+
+- **Idempotent:** existing guide files are skipped unless you pass `--force`.
+- **Mock mode:** `MOCK_LLM=1` is refused without `--dry-run`, because mock output is never published.
+- **Isolated store:** batch runs use a memory store, so they never touch the public `guide:{slug}` cache.
+- **No auto-publish:** the script never edits `data/guides/index.ts` or the seed. It prints the import lines and the tier change for a human to apply after a spot check.
+- **Keys:** real runs need the LLM keys exported in your shell, because `tsx` does not load `.env.local`.
+- **Status:** on main, the library still has the 5 curated guides; no batch output has been committed.
+
 ## Key decisions
 
-- **"Do you need your own OAuth app?" comes first.** Composio already manages OAuth for 123 toolkits. Your own app (with its review path) becomes your problem only when you need your brand, custom scopes, or dedicated quota. Each guide says which case you're in.
+- **"Do you need your own OAuth app?" comes first.** Composio already manages OAuth for 123 toolkits (123 managed / 211 bring-your-own, snapshot 2026-10-20, [source](https://docs.composio.dev/toolkits/managed-auth)). Your own app (with its review path) becomes your problem only when you need your brand, custom scopes, or dedicated quota. Each guide says which case you're in.
 - **Three milestones.** Dev-ready, pilot-ready, and production-ready each have hands-on hours, wait days, and the limits until the next milestone. Time to first test user is separate from time to public launch.
 - **Difficulty is computed from gates**, not judged by an LLM. The scores for the curated guides are regression-tested.
 - **Evidence is claim-level.** Statuses are tested / primary / secondary / inferred. Probes and recorded setup attempts are the only way to get `tested`.
@@ -125,8 +147,8 @@ See `DECISIONS.md` for the full ADR log.
 - Unverified items: see `docs/research.md` §6.4. These include the exact Composio BYO callback URL, the Microsoft Partner Center verification duration, LinkedIn partner timelines, Salesforce (JS-rendered) and Intuit (403) pages, and the "no self-serve" candidates.
 - Open QA items (`docs/qa-report.md`), all P2:
   - **QA-10(2):** `github.com/<slug>` is treated as official for every app, with no ownership check.
-  - **QA-11:** URL input with a multi-part TLD (`acme.co.uk`) resolves to slug `co`.
   - **QA-12:** The `/thread/` and `/community/` UGC denylist could downgrade a real docs page with that path segment.
+  - **QA-13:** URL inputs match seed apps by registrable domain only, so `https://mail.google.com` resolves to the generic `google` seed instead of `gmail`. Name inputs ("Gmail") are unaffected.
   - Accepted: no `server-only` guard (QA-3); unknown slugs return 200 with a not-found page (QA-5); `/evidence` links to repo docs 404 while the repo is private (QA-6).
 - Time estimates are ranges with a stated basis, not guarantees. This is not legal or compliance advice.
 
@@ -138,7 +160,7 @@ components/           Library, guide view, generate client
 lib/                  schema.ts, difficulty.ts, store.ts (Upstash/memory), agent/ (pipeline, resolve,
                       composio, discover, fetchDoc, probe, extract, validate, cache, llm/)
 data/                 apps.seed.json (100), guides/*.json (5), composio-managed.json
-scripts/              validate-guides, cache-guide, probe, snapshot-composio
+scripts/              generate-library (T-007 batch), validate-guides, cache-guide, probe, snapshot-composio
 tests/, e2e/          Vitest unit + offline pipeline tests; Playwright smoke
 docs/                 deploy, testing, demo-script, verification log, corrections, qa-report, research
 ```
