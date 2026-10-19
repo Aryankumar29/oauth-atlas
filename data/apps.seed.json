@@ -1,0 +1,221 @@
+[
+  {
+    "slug": "github",
+    "name": "GitHub",
+    "website": "https://github.com",
+    "category": "Developer tools",
+    "archetype": "self-serve",
+    "docsUrl": "https://docs.github.com/en/apps/oauth-apps",
+    "consoleUrl": "https://github.com/settings/developers",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "google",
+    "name": "Google Workspace",
+    "website": "https://workspace.google.com",
+    "category": "Productivity",
+    "archetype": "verification-heavy",
+    "docsUrl": "https://developers.google.com/identity/protocols/oauth2",
+    "consoleUrl": "https://console.cloud.google.com/apis/credentials",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "slack",
+    "name": "Slack",
+    "website": "https://slack.com",
+    "category": "Communication",
+    "archetype": "marketplace",
+    "docsUrl": "https://api.slack.com/authentication/oauth-v2",
+    "consoleUrl": "https://api.slack.com/apps",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "notion",
+    "name": "Notion",
+    "website": "https://www.notion.so",
+    "category": "Productivity",
+    "archetype": "self-serve",
+    "docsUrl": "https://developers.notion.com/docs/authorization",
+    "consoleUrl": "https://www.notion.so/my-integrations",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "salesforce",
+    "name": "Salesforce",
+    "website": "https://www.salesforce.com",
+    "category": "CRM",
+    "archetype": "enterprise",
+    "docsUrl": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_oauth_and_connected_apps.htm",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "plaid",
+    "name": "Plaid",
+    "website": "https://plaid.com",
+    "category": "Fintech",
+    "archetype": "fintech",
+    "docsUrl": "https://plaid.com/docs/link/oauth/",
+    "consoleUrl": "https://dashboard.plaid.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "hubspot",
+    "name": "HubSpot",
+    "website": "https://www.hubspot.com",
+    "category": "CRM",
+    "archetype": "marketplace",
+    "docsUrl": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth",
+    "consoleUrl": "https://developers.hubspot.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "atlassian",
+    "name": "Atlassian",
+    "website": "https://www.atlassian.com",
+    "category": "Productivity",
+    "archetype": "marketplace",
+    "docsUrl": "https://developer.atlassian.com/cloud/oauth/getting-started/overview/",
+    "consoleUrl": "https://developer.atlassian.com/console/myapps/",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "shopify",
+    "name": "Shopify",
+    "website": "https://www.shopify.com",
+    "category": "Commerce",
+    "archetype": "marketplace",
+    "docsUrl": "https://shopify.dev/docs/apps/auth/oauth",
+    "consoleUrl": "https://partners.shopify.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "microsoft",
+    "name": "Microsoft 365",
+    "website": "https://www.microsoft.com/microsoft-365",
+    "category": "Productivity",
+    "archetype": "enterprise",
+    "docsUrl": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
+    "consoleUrl": "https://entra.microsoft.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "miro",
+    "name": "Miro",
+    "website": "https://miro.com",
+    "category": "Collaboration",
+    "archetype": "marketplace",
+    "docsUrl": "https://developers.miro.com/docs/getting-started-with-oauth",
+    "consoleUrl": "https://developers.miro.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "calendly",
+    "name": "Calendly",
+    "website": "https://calendly.com",
+    "category": "Scheduling",
+    "archetype": "long-tail",
+    "docsUrl": "https://developer.calendly.com/how-to-authenticate-with-oauth",
+    "consoleUrl": "https://developer.calendly.com",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "linear",
+    "name": "Linear",
+    "website": "https://linear.app",
+    "category": "Developer tools",
+    "archetype": "self-serve",
+    "docsUrl": "https://developers.linear.app/docs/oauth/authentication",
+    "consoleUrl": "https://linear.app/settings/api/applications",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "airtable",
+    "name": "Airtable",
+    "website": "https://www.airtable.com",
+    "category": "Productivity",
+    "archetype": "self-serve",
+    "docsUrl": "https://airtable.com/developers/web/guides/oauth",
+    "consoleUrl": "https://airtable.com/create/oauth",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "asana",
+    "name": "Asana",
+    "website": "https://asana.com",
+    "category": "Productivity",
+    "archetype": "marketplace",
+    "docsUrl": "https://developers.asana.com/docs/oauth",
+    "consoleUrl": "https://app.asana.com/0/my-apps",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "dropbox",
+    "name": "Dropbox",
+    "website": "https://www.dropbox.com",
+    "category": "Storage",
+    "archetype": "marketplace",
+    "docsUrl": "https://developers.dropbox.com/oauth-guide",
+    "consoleUrl": "https://www.dropbox.com/developers/apps",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "zoom",
+    "name": "Zoom",
+    "website": "https://zoom.us",
+    "category": "Communication",
+    "archetype": "marketplace",
+    "docsUrl": "https://developers.zoom.us/docs/integrations/oauth/",
+    "consoleUrl": "https://marketplace.zoom.us/develop/create",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "stripe",
+    "name": "Stripe",
+    "website": "https://stripe.com",
+    "category": "Fintech",
+    "archetype": "fintech",
+    "docsUrl": "https://docs.stripe.com/connect/oauth-reference",
+    "consoleUrl": "https://dashboard.stripe.com/settings/connect",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "quickbooks",
+    "name": "QuickBooks",
+    "website": "https://quickbooks.intuit.com",
+    "category": "Fintech",
+    "archetype": "enterprise",
+    "docsUrl": "https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0",
+    "consoleUrl": "https://developer.intuit.com/app/developer/myapps",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  },
+  {
+    "slug": "meta",
+    "name": "Meta",
+    "website": "https://www.meta.com",
+    "category": "Social",
+    "archetype": "verification-heavy",
+    "docsUrl": "https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow",
+    "consoleUrl": "https://developers.facebook.com/apps",
+    "managedOAuth": "unknown",
+    "tier": "indexed"
+  }
+]
