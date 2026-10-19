@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { GuideView } from "@/components/guide/GuideView";
 import { apps, getApp, getGuide } from "@/lib/data";
@@ -20,16 +21,7 @@ export async function generateMetadata(props: PageProps<"/apps/[slug]">): Promis
   };
 }
 
-export default async function AppPage(props: PageProps<"/apps/[slug]">) {
-  const { slug } = await props.params;
-  const app = getApp(slug);
-
-  if (!app) {
-    notFound();
-  }
-
-  const guide = getGuide(slug);
-
+export default function AppPage(props: PageProps<"/apps/[slug]">) {
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-12 sm:px-6">
       <Link
@@ -39,6 +31,36 @@ export default async function AppPage(props: PageProps<"/apps/[slug]">) {
         ← Back to library
       </Link>
 
+      <Suspense fallback={<GuideSkeleton />}>
+        <AppGuide params={props.params} />
+      </Suspense>
+    </main>
+  );
+}
+
+function GuideSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="Loading guide" className="mt-6 animate-pulse space-y-4">
+      <div className="h-10 w-1/2 rounded-lg bg-zinc-200" />
+      <div className="h-40 rounded-2xl bg-zinc-100" />
+      <div className="h-32 rounded-2xl bg-zinc-100" />
+    </div>
+  );
+}
+
+// Awaits params inside <Suspense> so navigation into /apps/[slug] stays instant.
+async function AppGuide({ params }: { params: PageProps<"/apps/[slug]">["params"] }) {
+  const { slug } = await params;
+  const app = getApp(slug);
+
+  if (!app) {
+    notFound();
+  }
+
+  const guide = getGuide(slug);
+
+  return (
+    <>
       {guide ? (
         <div className="mt-6">
           <GuideView guide={guide} />
@@ -113,6 +135,6 @@ export default async function AppPage(props: PageProps<"/apps/[slug]">) {
           </section>
         </>
       )}
-    </main>
+    </>
   );
 }
