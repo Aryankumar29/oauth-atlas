@@ -60,6 +60,8 @@ export interface RunRecord {
   status: "running" | "done" | "failed" | "partial";
   events: RunEvent[];
   guideSlug?: string;
+  // The guide this run produced; guide:{slug} only holds the latest one.
+  guide?: Guide;
   startedAt: string;
   finishedAt?: string;
   error?: string;

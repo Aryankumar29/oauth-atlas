@@ -1,0 +1,69 @@
+{
+  "recordedAt": "2026-10-19T20:49:44.536Z",
+  "note": "Recorded authorize responses to a dummy client_id. Bodies trimmed to the text around the error.",
+  "authorize": {
+    "google": {
+      "url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=oauth-atlas-probe-fake&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&response_type=code&scope=openid&state=oauth-atlas-probe",
+      "status": 302,
+      "location": "https://accounts.google.com/signin/oauth/error?authError=Cg5pbnZhbGlkX2NsaWVudBIfVGhlIE9BdXRoIGNsaWVudCB3YXMgbm90IGZvdW5kLiCRAw&flowName=GeneralOAuthFlow&client_id=oauth-atlas-probe-fake&as=S-98246073%3A1792442985948546&aes=AVQXgOCDqAOK-lIMa6kIQ4er-a3E",
+      "body": ""
+    },
+    "linkedin": {
+      "url": "https://www.linkedin.com/oauth/v2/authorization?client_id=oauth-atlas-probe-fake&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&response_type=code&state=oauth-atlas-probe",
+      "status": 200,
+      "location": null,
+      "body": "<html><head><title>Authorize | LinkedIn</title></head><body>  ><div class=\"wrapper\"><div class=\"header\"><h1 class=\"header__logo\">LinkedIn</h1></div><div class=\"canvas\"><div class=\"alert-error\" role=\"alert\"><div class=\"wrapper\"><p class=\"message\">The passed in client_id is invalid &quot;oauth-atlas-probe-fake&quot;</p></div></div></div></div><script src=\"https://static.licdn.com/sc/h/cotzwtw7wo6b9ivn7mqg4t3ae\"></script><script src=\"https://static.licdn.com/sc/h/bd4wlgg9kzz4u85nas4duu0py\" async></script></body></html></body></html>"
+    },
+    "github": {
+      "url": "https://github.com/login/oauth/authorize?client_id=oauth-atlas-probe-fake&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&response_type=code&state=oauth-atlas-probe",
+      "status": 302,
+      "location": "https://github.com/login?client_id=oauth-atlas-probe-fake&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3Doauth-atlas-probe-fake%26redirect_uri%3Dhttps%253A%252F%252Fexample.com%252Fcb%26response_type%3Dcode%26state%3Doauth-atlas-probe",
+      "body": ""
+    },
+    "notion": {
+      "url": "https://api.notion.com/v1/oauth/authorize?client_id=oauth-atlas-probe-fake&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&response_type=code&state=oauth-atlas-probe",
+      "status": 302,
+      "location": "https://app.notion.com/install-integration?response_type=code&client_id=oauth-atlas-probe-fake&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&state=oauth-atlas-probe",
+      "body": ""
+    }
+  },
+  "discovery": {
+    "google": {
+      "url": "https://accounts.google.com/.well-known/openid-configuration",
+      "status": 200,
+      "json": {
+        "issuer": "https://accounts.google.com",
+        "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth",
+        "token_endpoint": "https://oauth2.googleapis.com/token",
+        "code_challenge_methods_supported": [
+          "plain",
+          "S256"
+        ],
+        "grant_types_supported": [
+          "authorization_code",
+          "refresh_token",
+          "urn:ietf:params:oauth:grant-type:device_code",
+          "urn:ietf:params:oauth:grant-type:jwt-bearer"
+        ]
+      }
+    },
+    "github": {
+      "url": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
+      "status": 200,
+      "recordedAt": "2026-10-19T20:57:21.393Z",
+      "json": {
+        "issuer": "https://github.com/login/oauth",
+        "authorization_endpoint": "https://github.com/login/oauth/authorize",
+        "token_endpoint": "https://github.com/login/oauth/access_token",
+        "code_challenge_methods_supported": [
+          "S256"
+        ],
+        "grant_types_supported": [
+          "authorization_code",
+          "refresh_token",
+          "urn:ietf:params:oauth:grant-type:device_code"
+        ]
+      }
+    }
+  }
+}

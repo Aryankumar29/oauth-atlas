@@ -1,12 +1,16 @@
 import Link from "next/link";
+import { Suspense } from "react";
+
+import { GenerateClient } from "@/components/generate/GenerateClient";
+import { isMockMode } from "@/lib/agent/deps";
 
 const steps = [
-  "Resolve the app and its official developer docs",
-  "Discover OAuth, scope, and approval requirements",
-  "Extract claims with quotes and source URLs",
-  "Verify sources and flag contradictions",
-  "Plan the guide, timeline, blockers, and handoff",
-  "Critique coverage and render the shareable guide",
+  "Resolve the app and check Composio managed auth",
+  "Search and fetch the official developer docs",
+  "Probe discovery, authorize, and console endpoints (no credentials)",
+  "Extract the guide in the library schema",
+  "Check every primary quote against the fetched docs; compute difficulty from gates",
+  "Save a shareable guide, partial if anything timed out",
 ];
 
 export default function GeneratePage() {
@@ -24,38 +28,13 @@ export default function GeneratePage() {
         Live guides are labeled unverified until a human checks the sources.
       </p>
 
-      <form className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <label
-          htmlFor="app-input"
-          className="text-sm font-medium text-zinc-900"
-        >
-          App name or website
-        </label>
-        <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-          <input
-            id="app-input"
-            name="app"
-            type="text"
-            placeholder="e.g. miro.com or Calendly"
-            className="h-11 flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white"
-          />
-          <button
-            type="button"
-            disabled
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-medium text-white opacity-50"
-            title="The generation pipeline is not wired yet"
-          >
-            Generate (coming next)
-          </button>
-        </div>
-        <p className="mt-3 text-xs text-zinc-500">
-          Pipeline not wired yet. T-005 adds the streaming API and persisted run.
-        </p>
-      </form>
+      <Suspense fallback={<div className="mt-8 h-40 rounded-2xl border border-zinc-200 bg-white" />}>
+        <GenerateClient mock={isMockMode()} />
+      </Suspense>
 
       <section className="mt-8 rounded-2xl border border-zinc-200 bg-zinc-50 p-6">
         <h2 className="text-sm font-semibold text-zinc-900">
-          What the agent will do
+          What the agent does
         </h2>
         <ol className="mt-4 space-y-3">
           {steps.map((step, index) => (
