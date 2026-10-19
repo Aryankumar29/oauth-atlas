@@ -5,7 +5,7 @@ import type { FetchDocOptions } from "@/lib/agent/fetchDoc";
 import { runProbes, type ProbeResult } from "@/lib/agent/probe";
 import { resolveApp, type ResolvedApp } from "@/lib/agent/resolve";
 import type { FetchedDoc, PipelineDeps, PipelineInput, PipelineStep, RunEvent, RunRecord } from "@/lib/agent/types";
-import { validateGuide } from "@/lib/agent/validate";
+import { officialDomainsFor, validateGuide } from "@/lib/agent/validate";
 import type { ComposioInfo, Guide } from "@/lib/schema";
 
 
@@ -188,7 +188,7 @@ export async function runPipeline(
     await record("verify", "start", "Checking quotes against fetched docs and computing difficulty");
     if (probe) guide = applyProbeFacts(guide, probe);
     guide.partial = guide.partial || partial;
-    const v = validateGuide(guide, { docs, llmDifficulty });
+    const v = validateGuide(guide, { docs, officialDomains: officialDomainsFor(resolved), llmDifficulty });
     guide = v.guide;
     await record(
       "verify",

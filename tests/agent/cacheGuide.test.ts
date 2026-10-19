@@ -32,6 +32,15 @@ describe("cacheGuide", () => {
     expect(run?.guide?.slug).toBe("miro");
   });
 
+  it("rejects hand-written guides", async () => {
+    const store = createMemoryStore();
+    const g = miroGuide();
+    g.generatedBy = "human";
+    g.app.tier = "verified";
+    await expect(cacheGuide(g, store)).rejects.toThrow(/Refusing to cache/);
+    expect(await store.getGuide("miro")).toBeNull();
+  });
+
   it("rejects schema errors and a wrong difficulty", async () => {
     const store = createMemoryStore();
     await expect(cacheGuide({ slug: "x" }, store)).rejects.toThrow(/Invalid guide/);
