@@ -7,7 +7,7 @@ Everything below runs **without API keys**. Unit tests inject fakes directly. `M
 |---|---|---|
 | `npm run typecheck` | `next typegen && tsc --noEmit` | every change |
 | `npm run lint` | `eslint` | every change |
-| `npm test` | `vitest run`: 14 files, 128 tests as of cc94a95 | every change |
+| `npm test` | `vitest run`: 14 files, 146 tests as of 83d643d | every change |
 | `npm run validate:guides` | `scripts/validate-guides.ts`: Zod-validates `data/apps.seed.json` and every `data/guides/*.json`, plus no duplicate slugs, filename = slug, slug in the seed, file imported in `data/guides/index.ts`, and `verdict.difficulty` equal to the computed score. Prints `OK: 100 apps, 5 guides` | after any guide or seed edit |
 | `npm run build` | `next build` | part of `check` |
 | `npm run check` | typecheck && lint && test && validate:guides && build | **definition of done** |
@@ -34,9 +34,9 @@ Other scripts:
 ## Batch generation (T-007)
 `tests/agent/batch.test.ts` runs offline:
 - mock mode refuses to write unless `--dry-run`
-- idempotent skip unless `--force`
+- idempotent skip unless `--force`; curated guides are never overwritten (QA-14); `--limit` accepts only positive integers (QA-15b)
 - the thin mock Miro guide fails the QA gate and is not written
-- every gate reason is reported
+- every gate reason is reported; probe/test sources don't count toward the 3 distinct sources (QA-15a)
 - schema-invalid input is rejected
 - the curated guides are run through `qaGate` as a strictness sanity check
 - generated `index.ts` lines are valid identifiers
@@ -67,6 +67,19 @@ Put the keys in `.env.local` (names in `.env.example`) and leave `MOCK_LLM` unse
 
 ## QA
 Follow `docs/deploy.md` §5 on the preview, and record results in `docs/qa-report.md`.
+
+**Live red-team runner (`e2e/redteam.mjs`, T-009).** Plain Node, not part of Playwright or `check`:
+```bash
+node e2e/redteam.mjs https://<preview> "Miro" "Calendly" "Toggl Track"
+```
+For each query, it POSTs to `/api/generate`, reads the SSE stream, and prints one block with:
+- the run status, its duration (flagged if over 3 min), and the `mock` and `cached` flags
+- what the app resolved to, and its Composio status
+- the probe count, and whether every probe is timestamped
+- the computed difficulty, how many claims were downgraded out of how many checked (with the first 8 downgrades), and the primary-evidence count
+- any step errors
+
+Every uncached query is a live run and counts toward the 5/IP/hour rate limit, so keep a batch to 5 or fewer, or use cached demo slugs.
 
 ## Secret hygiene check (before every push)
 ```bash
