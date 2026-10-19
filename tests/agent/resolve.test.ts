@@ -20,6 +20,15 @@ describe("resolveApp (QA-9)", () => {
     expect(slugOf(q)).toBe(slug);
   });
 
+  it.each([
+    ["https://acme.co.uk", "acme", "https://acme.co.uk"],
+    ["developer.acme.co.uk/oauth", "acme", "https://developer.acme.co.uk"],
+    ["https://acme.github.io/docs", "acme", "https://acme.github.io"],
+  ])("QA-11: %s → unknown app %s", (q, slug, website) => {
+    const r = resolveApp(q);
+    expect("error" in r ? null : { slug: r.slug, website: r.website, seed: r.seed }).toEqual({ slug, website, seed: undefined });
+  });
+
   it("short queries without an exact match never pick a substring hit", () => {
     expect(slugOf("bo")).toBe("unknown:bo");
   });
