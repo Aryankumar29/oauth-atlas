@@ -48,9 +48,8 @@ export async function runPipeline(
     setTimeout(() => softAbort.abort(new Error("soft deadline")), opts.softDeadlineMs),
     setTimeout(() => hardAbort.abort(new Error("hard deadline")), opts.hardDeadlineMs),
   ];
-  const nowMs = Date.now();
-  const researchOpts = { deadlineAt: nowMs + opts.softDeadlineMs, signal: softAbort.signal };
-  const extractOpts = { deadlineAt: nowMs + opts.hardDeadlineMs, signal: hardAbort.signal };
+  const researchOpts = { deadlineAt: start + opts.softDeadlineMs, signal: softAbort.signal };
+  const extractOpts = { deadlineAt: start + opts.hardDeadlineMs, signal: hardAbort.signal };
 
   const run: RunRecord = {
     runId: input.runId,
@@ -152,7 +151,7 @@ export async function runPipeline(
       for (const f of disc.failed) {
         unknowns.push(f.reason === "login-wall" ? `Docs behind a login wall: ${f.url}` : `Could not fetch ${f.url}`);
       }
-      if (disc.stoppedEarly || (disc.researchError && /timed out/.test(disc.researchError))) {
+      if (disc.stoppedEarly || disc.researchTimedOut) {
         partial = true;
         unknowns.push("Generation hit the soft deadline; discovery stopped early.");
       }

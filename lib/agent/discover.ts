@@ -1,13 +1,16 @@
 import { fetchDoc, type FetchDocOptions } from "@/lib/agent/fetchDoc";
 import type { ResolvedApp } from "@/lib/agent/resolve";
 import type { FetchedDoc, LlmAdapter, LlmCallOptions } from "@/lib/agent/types";
-import { withTimeout } from "@/lib/agent/extract";
+import { TimeoutError, withTimeout } from "@/lib/agent/extract";
+import { LlmError } from "@/lib/agent/llm/errors";
 
 export type DiscoverResult = {
   docs: FetchedDoc[];
   citedUrls: string[];
   failed: { url: string; reason: "unreachable" | "login-wall"; detail: string }[];
   researchError?: string;
+  // Research ended because of a deadline (pipeline timeout or adapter cancellation), not a hard failure.
+  researchTimedOut: boolean;
   stoppedEarly: boolean;
 };
 
@@ -25,7 +28,7 @@ export async function discover(
   },
 ): Promise<DiscoverResult> {
   const hints = [resolved.docsUrl, resolved.consoleUrl].filter((u): u is string => !!u);
-  const out: DiscoverResult = { docs: [], citedUrls: [], failed: [], stoppedEarly: false };
+  const out: DiscoverResult = { docs: [], citedUrls: [], failed: [], stoppedEarly: false, researchTimedOut: false };
 
   try {
     const research = await withTimeout(
@@ -38,6 +41,9 @@ export async function discover(
     deps.onProgress(`Research returned ${research.docs.length} docs and ${research.citedUrls.length} cited URLs`);
   } catch (e) {
     out.researchError = e instanceof Error ? e.message : String(e);
+    // Typed check first; the message fallback covers adapters that throw plain errors.
+    out.researchTimedOut =
+      e instanceof TimeoutError || (e instanceof LlmError && e.kind === "timeout") || /timed out/i.test(out.researchError);
     deps.onProgress(`Research failed: ${out.researchError}`);
   }
 
