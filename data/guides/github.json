@@ -233,7 +233,7 @@
         {
           "url": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
           "title": "RFC 8414 metadata (public preview)",
-          "quote": "\"code_challenge_methods_supported\": [\"S256\"]",
+          "quote": "\"code_challenge_methods_supported\":[\"S256\"]",
           "fetchedAt": "2026-10-19T20:38:49Z"
         },
         {
@@ -423,7 +423,7 @@
       "claim": "The RFC 8414 metadata advertises PKCE S256.",
       "sourceUrl": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
       "sourceType": "test",
-      "quote": "\"code_challenge_methods_supported\": [\"S256\"]",
+      "quote": "\"code_challenge_methods_supported\":[\"S256\"]",
       "retrievedAt": "2026-10-19T20:38:49Z",
       "status": "tested",
       "confidence": "high"
