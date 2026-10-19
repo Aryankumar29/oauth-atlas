@@ -1,5 +1,5 @@
 import { difficulty } from "@/lib/difficulty";
-import { formatHours, formatWait, humanize, UNKNOWN } from "@/lib/format";
+import { humanize, milestoneHours, milestoneWait, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
   COMMUNITY_BADGE,
@@ -70,7 +70,7 @@ export function guideToMarkdown(guide: Guide): string {
   out.push("| Milestone | Definition | Hands-on | Wait | Basis |", "|---|---|---|---|---|");
   for (const m of guide.milestones) {
     const basis = m.basis === "community" ? `community (${COMMUNITY_BADGE.toLowerCase()})` : m.basis;
-    out.push(`| ${MILESTONE_LABELS[m.id]} | ${m.definition} | ${formatHours(m.handsOnHours)} | ${formatWait(m.wait)} | ${basis} |`);
+    out.push(`| ${MILESTONE_LABELS[m.id]} | ${m.definition} | ${milestoneHours(m)} | ${milestoneWait(m)} | ${basis} |`);
   }
   for (const m of guide.milestones) {
     if (m.limitsUntilNext.length) {
