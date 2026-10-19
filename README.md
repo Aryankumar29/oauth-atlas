@@ -140,7 +140,7 @@ See `DECISIONS.md` for the full ADR log.
 ## Limitations
 
 - **No completed provider approvals.** No paid accounts or production domains were used.
-- **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) are **pending** in the verification log. Until they're recorded, `tested` evidence comes from credential-free endpoint probes only.
+- **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) were **cut** at 03:30 IST and not performed (see the verification log). `tested` evidence comes from credential-free endpoint probes only.
 - **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" comes from community reports, and Business Verification "up to 14 business days" comes from a Meta business solution provider (360dialog). Both are labeled secondary.
 - **Live guides are drafts** until a human checks the sources. They are labeled unverified and never rated high confidence.
 - **LLM quota.** Live runs depend on the provider's quota; at 5 runs/IP/hour, a long run may end as a labeled partial guide.
