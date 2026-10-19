@@ -112,11 +112,18 @@
       "appliesWhen": "Advanced Access",
       "requiredFor": ["production-ready"],
       "duration": {
-        "value": "Reported as up to 14 business days (Meta Business Help Center, via secondary sources).",
+        "value": "Reported as up to 14 business days by a Meta business solution provider; Meta's own developer docs give no timeline.",
         "status": "secondary",
-        "sources": [],
+        "sources": [
+          {
+            "url": "https://docs.360dialog.com/docs/resources/meta-business-verification/standard-business-verification",
+            "title": "360dialog: Standard Business Verification (third-party BSP docs)",
+            "quote": "Meta reviews submissions within up to 14 business days",
+            "fetchedAt": "2026-10-19T21:35:47Z"
+          }
+        ],
         "lastChecked": "2026-10-20",
-        "note": "research.md §3.6 [S2]; the Business Help Center page was not fetched."
+        "note": "Third-party source, not a Meta commitment. Meta's Business Help Center article was not fetchable as text."
       }
     },
     {
