@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { ShareButtons } from "@/components/guide/ShareButtons";
 import { difficulty } from "@/lib/difficulty";
-import { formatHours, formatWait, humanize, UNKNOWN } from "@/lib/format";
+import { humanize, milestoneHours, milestoneWait, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
   COMMUNITY_BADGE,
@@ -205,11 +205,11 @@ export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolea
             <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
               <div>
                 <dt className="text-xs text-zinc-500">Hands-on</dt>
-                <dd className="font-semibold text-zinc-900">{formatHours(m.handsOnHours)}</dd>
+                <dd className="font-semibold text-zinc-900">{milestoneHours(m)}</dd>
               </div>
               <div>
                 <dt className="text-xs text-zinc-500">Wait</dt>
-                <dd className="font-semibold text-zinc-900">{formatWait(m.wait)}</dd>
+                <dd className="font-semibold text-zinc-900">{milestoneWait(m)}</dd>
               </div>
             </dl>
             <div className="mt-3 flex flex-wrap gap-1.5">
