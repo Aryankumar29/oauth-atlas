@@ -1,0 +1,206 @@
+{
+  "slug": "gmail",
+  "app": {
+    "slug": "gmail",
+    "name": "Gmail",
+    "website": "https://mail.google.com",
+    "category": "Email",
+    "approvalModel": "scope-verification",
+    "docsUrl": "https://developers.google.com/gmail/api",
+    "consoleUrl": "https://console.cloud.google.com",
+    "composio": { "toolkitSlug": "gmail", "managed": "yes", "checkedAt": "2026-10-20" },
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
+  },
+  "version": "1.0.0",
+  "lastVerified": "2026-10-20",
+  "confidence": "medium",
+  "ownApp": {
+    "triggers": ["Your agent needs gmail.modify with your own consent branding"],
+    "notes": "UI fixture only. Not a published guide."
+  },
+  "verdict": {
+    "difficulty": 5,
+    "approvalModel": "scope-verification",
+    "summary": "Testable today with 100 test users; restricted scopes need verification and an annual security assessment.",
+    "canTestBeforeApproval": true
+  },
+  "milestones": [
+    {
+      "id": "dev-ready",
+      "definition": "You and up to 100 test users",
+      "handsOnHours": { "min": 0.5, "max": 1 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "official-estimate",
+      "limitsUntilNext": [
+        {
+          "value": "100 test users; refresh tokens expire after 7 days",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://support.google.com/cloud/answer/15549945",
+              "title": "Manage app audience",
+              "quote": "limited to 100 test users",
+              "fetchedAt": "2026-10-20"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "pilot-ready",
+      "definition": "External users with sensitive scopes",
+      "handsOnHours": { "min": 4, "max": 8 },
+      "wait": { "minDays": 3, "maxDays": 10 },
+      "basis": "community",
+      "limitsUntilNext": []
+    },
+    {
+      "id": "production-ready",
+      "definition": "Any Google user, no unverified-app screen",
+      "handsOnHours": { "min": 16, "max": 40 },
+      "wait": { "minDays": 30, "maxDays": null },
+      "basis": "unknown",
+      "limitsUntilNext": []
+    }
+  ],
+  "gates": [
+    {
+      "type": "testing-cap",
+      "name": "Testing mode: 100 test users, 7-day refresh tokens",
+      "appliesWhen": "until the app is published",
+      "requiredFor": ["pilot-ready"]
+    },
+    {
+      "type": "scope-review",
+      "name": "Sensitive scope verification (gmail.send)",
+      "appliesWhen": "sensitive scopes in production",
+      "requiredFor": ["production-ready"]
+    },
+    {
+      "type": "scope-review",
+      "name": "Restricted scope verification",
+      "appliesWhen": "read/modify profile",
+      "requiredFor": ["production-ready"],
+      "skipForProfiles": ["send-only"],
+      "duration": {
+        "value": "Several weeks",
+        "status": "secondary",
+        "sources": [{ "url": "https://www.reddit.com/r/googlecloud/", "fetchedAt": "2026-10-20" }],
+        "lastChecked": "2026-10-20"
+      }
+    },
+    {
+      "type": "security-assessment",
+      "name": "CASA security assessment (annual)",
+      "appliesWhen": "restricted Gmail scopes",
+      "requiredFor": ["production-ready"],
+      "skipForProfiles": ["send-only"]
+    },
+    {
+      "type": "admin-consent",
+      "name": "Workspace admin allowlisting",
+      "appliesWhen": "customer Workspace blocks third-party apps",
+      "requiredFor": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-domain",
+      "label": "Verified domain and privacy policy",
+      "detail": "Homepage and privacy policy on a domain you own.",
+      "requiredFor": "production-ready",
+      "owner": "human",
+      "evidenceIds": []
+    }
+  ],
+  "scopes": [
+    {
+      "name": "https://www.googleapis.com/auth/gmail.modify",
+      "sensitivity": "restricted",
+      "whyNeeded": "Read and label mail for the agent",
+      "reviewTrigger": "Restricted scope verification and CASA",
+      "justificationDraft": "The agent triages the user's inbox on request.",
+      "evidenceIds": ["ev-1"]
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "phase": "create",
+      "title": "Create a Google Cloud project",
+      "actions": ["Open the console", "Create a project"],
+      "owner": "human",
+      "timeMinutes": 5,
+      "doneWhen": "Project exists",
+      "artifacts": [],
+      "evidenceIds": []
+    },
+    {
+      "id": "s2",
+      "phase": "configure",
+      "title": "Configure the consent screen",
+      "actions": ["Set audience to External", "Add test users"],
+      "owner": "both",
+      "doneWhen": "Test user can authorize",
+      "artifacts": [],
+      "evidenceIds": []
+    }
+  ],
+  "oauthConfig": {
+    "redirectUris": [
+      {
+        "value": "Exact match; https required except localhost",
+        "status": "primary",
+        "sources": [],
+        "lastChecked": "2026-10-20"
+      }
+    ],
+    "pkce": {
+      "value": "Supported",
+      "status": "tested",
+      "testKind": "probe",
+      "sources": [],
+      "lastChecked": "2026-10-20"
+    },
+    "rateLimits": []
+  },
+  "blockers": [
+    {
+      "id": "b1",
+      "severity": "high",
+      "description": "Restricted scopes require an annual third-party assessment.",
+      "affects": "production-ready",
+      "workaround": "Use gmail.send only, or Composio-managed auth.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-1"]
+    }
+  ],
+  "agentTasks": ["Draft scope justifications"],
+  "humanTasks": ["Record the demo video for verification"],
+  "probes": [
+    {
+      "url": "https://accounts.google.com/o/oauth2/v2/auth?client_id=dummy",
+      "method": "GET",
+      "status": 400,
+      "observed": "invalid_client error page",
+      "at": "2026-10-20T01:30:00Z"
+    }
+  ],
+  "unknowns": ["Exact CASA turnaround for a new tier-2 app"],
+  "evidence": [
+    {
+      "id": "ev-1",
+      "claim": "Restricted scopes require a security assessment",
+      "sourceUrl": "https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification",
+      "sourceType": "official-doc",
+      "quote": "security assessment",
+      "retrievedAt": "2026-10-20",
+      "status": "primary",
+      "confidence": "high"
+    }
+  ],
+  "corrections": [],
+  "generatedBy": "human"
+}

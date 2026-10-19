@@ -1,0 +1,114 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`guideToMarkdown > matches the snapshot 1`] = `
+"# Gmail OAuth guide
+
+https://mail.google.com · v1.0.0 · last verified 2026-10-20 · confidence medium · tier verified
+
+## Do you need your own OAuth app?
+
+**Composio managed:** yes (checked 2026-10-20). Composio-managed OAuth is available. You can start without your own OAuth app.
+
+Bring your own app when:
+- The consent screen must show your brand, not "Composio"
+- You need custom scopes
+- You need your own rate quota (managed apps share quota)
+- You need polling faster than 15 minutes (the managed minimum)
+- You connect to a custom or self-hosted instance
+- Enterprise customers require your branding end-to-end
+- Your agent needs gmail.modify with your own consent branding
+
+UI fixture only. Not a published guide.
+
+**Redirect URI:** Copy the callback URL from the Composio dashboard (Create Auth Config); don't hard-code it.
+
+Switching to your own app affects new connections only. Existing connected accounts stay on the old auth config until users re-authenticate.
+
+Sources:
+- [Composio managed-auth directory](https://docs.composio.dev/toolkits/managed-auth)
+- [Custom app vs. managed app](https://docs.composio.dev/docs/authentication/custom-app-vs-managed-app)
+- [White-labeling authentication](https://docs.composio.dev/docs/authentication/white-labeling-authentication)
+
+## Verdict
+
+**Difficulty 5/5 — Very hard.** Testable today with 100 test users; restricted scopes need verification and an annual security assessment.
+
+- CASA security assessment (annual) (security-assessment, weight 5)
+- send-only path: 3/5 (Moderate)
+
+- Approval model: scope verification
+- Can test before approval: true
+
+## Milestones
+
+| Milestone | Definition | Hands-on | Wait | Basis |
+|---|---|---|---|---|
+| Dev-ready | You and up to 100 test users | 0.5–1 h | no wait | official-estimate |
+| Pilot-ready | External users with sensitive scopes | 4–8 h | 3–10 days | community (reported by developers, not a commitment) |
+| Production-ready | Any Google user, no unverified-app screen | 16–40 h | 30+ days | unknown |
+
+Limits at Dev-ready:
+- 100 test users; refresh tokens expire after 7 days _(primary)_ — https://support.google.com/cloud/answer/15549945
+
+## Next actions
+
+- **Create a Google Cloud project** (human) — done when: Project exists
+- **Configure the consent screen** (both) — done when: Test user can authorize
+
+## Blockers
+
+- **high** (production-ready): Restricted scopes require an annual third-party assessment. Workaround: Use gmail.send only, or Composio-managed auth. _Agent can help._
+
+## Before you start
+
+- **Verified domain and privacy policy** (human, production-ready): Homepage and privacy policy on a domain you own.
+
+## Gates
+
+- **Testing mode: 100 test users, 7-day refresh tokens** (testing-cap; pilot-ready) — applies when: until the app is published
+- **Sensitive scope verification (gmail.send)** (scope-review; production-ready) — applies when: sensitive scopes in production
+- **Restricted scope verification** (scope-review; production-ready) — applies when: read/modify profile; duration: Several weeks _(secondary, reported by developers, not a commitment)_ — https://www.reddit.com/r/googlecloud/
+- **CASA security assessment (annual)** (security-assessment; production-ready) — applies when: restricted Gmail scopes
+- **Workspace admin allowlisting** (admin-consent; conditional, not scored) — applies when: customer Workspace blocks third-party apps
+
+## Scopes
+
+| Scope | Sensitivity | Why | Review trigger |
+|---|---|---|---|
+| \`https://www.googleapis.com/auth/gmail.modify\` | restricted | Read and label mail for the agent | Restricted scope verification and CASA |
+
+## Setup steps
+
+1. **Create a Google Cloud project** (create, human, ~5 min): Open the console; Create a project. Done when: Project exists
+2. **Configure the consent screen** (configure, both): Set audience to External; Add test users. Done when: Test user can authorize
+
+## OAuth configuration
+
+- Redirect URIs: Exact match; https required except localhost _(primary)_
+- PKCE: Supported _(tested probe)_
+- Token lifetime: unknown
+- Refresh: unknown
+- Rate limits: unknown
+
+## Agent vs. human
+
+Agent:
+- Draft scope justifications
+
+Human:
+- Record the demo video for verification
+
+## Probe results
+
+- \`GET https://accounts.google.com/o/oauth2/v2/auth?client_id=dummy\` → 400: invalid_client error page (2026-10-20T01:30:00Z)
+
+## Evidence
+
+- [ev-1] Restricted scopes require a security assessment — _primary, high_ — https://developers.google.com/identity/protocols/oauth2/production-readiness/restricted-scope-verification (2026-10-20)
+  > security assessment
+
+## Unknowns
+
+- Exact CASA turnaround for a new tier-2 app
+"
+`;
