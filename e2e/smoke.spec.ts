@@ -52,8 +52,6 @@ test("queued app cards link to live generation", async ({ page }) => {
 });
 
 test("gmail guide shows the Composio box and three milestones", async ({ page }) => {
-  // FIXME: unskip once the T-004 Gmail guide (data/guides/gmail.json) is merged to main.
-  test.fixme(true, "depends on T-004 Gmail guide");
   await page.goto("/apps/gmail");
   await expect(page.getByTestId("composio-box")).toBeVisible();
   await expect(page.getByTestId("milestone")).toHaveCount(3);
