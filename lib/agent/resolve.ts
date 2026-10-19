@@ -1,3 +1,4 @@
+import { registrable } from "@/lib/agent/validate";
 import { apps } from "@/lib/data";
 import type { App } from "@/lib/schema";
 
@@ -36,10 +37,8 @@ function hostOf(input: string): string | null {
   }
 }
 
-// Registrable-ish domain: last two labels ("developers.miro.com" → "miro.com").
-function baseDomain(host: string): string {
-  return host.split(".").slice(-2).join(".");
-}
+// Same rule as the official-source check: acme.co.uk, full host for shared platforms (QA-11).
+const baseDomain = registrable;
 
 function fromSeed(app: App, alternatives: ResolvedApp["alternatives"]): ResolvedApp {
   return {
