@@ -81,11 +81,17 @@ export function resolveApp(query: string, slug?: string): ResolvedApp | { error:
   const host = hostOf(q);
   if (host) {
     const base = baseDomain(host);
-    const hits = apps.filter((a) => {
-      const h = hostOf(a.website);
-      return h && baseDomain(h) === base;
-    });
-    if (hits.length) return fromSeed(hits[0], hits.slice(1).map(brief));
+    // QA-13: exact website host > docs/console host > registrable domain (mail.google.com → gmail, not google).
+    const tiers = [
+      apps.filter((a) => hostOf(a.website) === host),
+      apps.filter((a) => [a.docsUrl, a.consoleUrl].some((u) => u && hostOf(u) === host)),
+      apps.filter((a) => {
+        const h = hostOf(a.website);
+        return h && baseDomain(h) === base;
+      }),
+    ];
+    const hits = tiers.find((t) => t.length);
+    if (hits) return fromSeed(hits[0], hits.slice(1, 5).map(brief));
     const label = base.split(".")[0];
     return {
       slug: slugify(label),
