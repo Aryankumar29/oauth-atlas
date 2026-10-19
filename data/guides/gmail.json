@@ -92,7 +92,7 @@
       "definition": "Any Google user can connect with no unverified-app screen and no user cap.",
       "handsOnHours": { "min": 10, "max": 40 },
       "wait": { "minDays": 14, "maxDays": null },
-      "basis": "official-estimate",
+      "basis": "estimate",
       "limitsUntilNext": [
         {
           "value": "Google says restricted-scope verification \"can potentially take several weeks\" and, elsewhere, \"several months\" depending on sensitivity. No upper bound is published. 14 days is our floor reading of \"several weeks\".",
@@ -177,7 +177,7 @@
       "requiredFor": ["production-ready"],
       "skipForProfiles": ["send-only"],
       "cost": {
-        "value": "Paid to the assessor. Vendor price lists suggest roughly $500–$3,000/yr for AL1 and $3,000–$9,000/yr for AL2.",
+        "value": "Paid to the assessor. One vendor (Secusy) lists AL1 at $499–$3,000/yr and AL2 at about $5,400/yr.",
         "status": "secondary",
         "sources": [
           {
@@ -535,7 +535,7 @@
     },
     {
       "id": "ev-casa-cost",
-      "claim": "CASA AL1 roughly $500–$3,000/yr; AL2 roughly $3,000–$9,000/yr (vendor prices).",
+      "claim": "CASA AL2 about $5,400/yr (one vendor, Secusy); AL1 $499–$3,000.",
       "sourceUrl": "https://www.secusy.ai/blog/google-casa-assessment-cost",
       "sourceType": "pricing",
       "retrievedAt": "2026-10-20",
