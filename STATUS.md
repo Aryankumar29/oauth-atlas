@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 01:47 IST
+**Last updated:** 2026-10-20 02:30 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -22,7 +22,26 @@
 
 ## In progress
 
-- Push `main` to `origin` (awaiting human OK), then the Phase 1 parallel kickoff.
+**02:30 block boundary.** Phase 1 started 02:05 (main pushed). The builders work in worktrees under `Desktop/One Piece/oauth-wt/{ui,pipeline,guides,verify,review}`. Agent-type worktree isolation did not apply, so the lead created them manually. No branch is merged or pushed yet; each waits for verifier approval in merge order.
+
+| Task | Branch @ sha | State |
+|---|---|---|
+| T-004 guides (5/5) + T-006a docs | `feat/T-004-guides` @ abc6f02 | done, in verifier review (blocks all merges) |
+| T-002 library | `feat/T-002-library` @ a65e85e | **approved** |
+| T-003 guide page | `feat/T-003-guide` @ aa97634 | 8f51c01 **approved**; partial-difficulty fix delta in review |
+| T-006b `/evidence` | `feat/T-006-evidence` @ 0a2e039 | done, queued for review |
+| T-005a+b live generation | `feat/T-005-agent` @ 6cf6152 | done in MOCK_LLM (63 tests); `scripts/cache-guide.ts` pending; GuideView swap after T-003 merges |
+| T-013 e2e smoke | `feat/T-013-e2e` @ 607581d | done; 3 pass and 2 fixme until T-004/T-005 land |
+| T-011 attempts | — | waiting on human + Grokbot |
+
+- **Cut lines at 02:30:** none apply. Every lane is ahead of its cap. The next checks are 03:30 (T-011: GitHub only) and 04:00/04:30 (already met in mock).
+- **Main-only commits since T-010:** 7480a2b (`next typegen` before tsc), a7d447b (`.gitattributes` for snapshot EOL). Not pushed.
+- **Content decisions:** Slack prod floor 0 (only upper bounds are published) and Instagram prod floor 9 (community), both with explicit notes. research.md was wrong in four places (GitHub discovery, the Slack 2026-03-03 extension, X Public Utility, Xero dates); see docs/corrections.md.
+- **Blockers (human):**
+  - A stale `next start -p 3100` (PIDs 25504/18744, started 00:49) locks the main checkout's node_modules, so that checkout needs `npm ci` after it stops. Stopping it was denied by the permission classifier.
+  - Repo visibility: the /evidence links 404 while the repo is private.
+  - Keys must be in before 04:30.
+  - Vercel plan for `maxDuration = 300`.
 
 ## Schedule (IST)
 
