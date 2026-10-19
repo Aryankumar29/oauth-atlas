@@ -58,8 +58,6 @@ test("gmail guide shows the Composio box and three milestones", async ({ page })
 });
 
 test("generate Miro streams steps and lands on the run page in mock mode", async ({ page }) => {
-  // FIXME: unskip once T-005 (streaming /generate + /generate/[runId]) is merged to main.
-  test.fixme(true, "depends on T-005 live generation");
   test.setTimeout(180_000);
   await page.goto("/generate");
   await page.getByLabel(/app name or website/i).fill("Miro");
@@ -69,7 +67,8 @@ test("generate Miro streams steps and lands on the run page in mock mode", async
   await expect.poll(() => page.getByTestId("generate-step").count()).toBeGreaterThan(1);
 
   await page.waitForURL(/\/generate\/[^/?#]+$/, { timeout: 150_000 });
-  await expect(page.getByText(/MOCK MODE/)).toBeVisible();
+  // The /generate banner can linger in the DOM during the client transition; assert on the visible one.
+  await expect(page.getByText(/MOCK MODE/).locator("visible=true")).toHaveCount(1);
   await expect(page.getByTestId("composio-box")).toBeVisible();
   await expect(page.getByTestId("milestone")).toHaveCount(3);
 });
