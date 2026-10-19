@@ -37,39 +37,15 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
 
 ## Entries
 
-<!-- PLACEHOLDER (T-011): the human and Grokbot run the GitHub and Notion attempts 02:45–03:30 IST.
-     Fill the fields below from their notes. Until then these entries are NOT evidence, and the guides stay tier "verified". -->
+### GitHub — OAuth app (T-011)
+**Not performed:** cut at 03:30 IST; human-supervised setup attempts were not run. Evidence for these guides is primary sources + automated probes only.
+- **Tier:** stays `verified`; no attempt claims in `data/guides/github.json`.
+- **Open checks for a later attempt:** up to 10 callback URLs; "Expire user access tokens" on by default; required fields (docs: Application name, Homepage URL, Authorization callback URL; description optional; "Enable Device Flow" checkbox).
 
-### GitHub — OAuth app (T-011) — PENDING
-- **When (IST):**
-- **Account type:** personal, free
-- **Driver:** grokbot box browser / Claude Code Playwright MCP; human login
-- **Attempted:** register an OAuth app at github.com/settings/developers
-- **Completed:**
-- **Stopped because:**
-- **Docs said vs console required:**
-  - Up to 10 callback URLs?
-  - "Expire user access tokens" on by default?
-  - Required fields? (Docs: Application name, Homepage URL, Authorization callback URL; description optional; "Enable Device Flow" checkbox.)
-- **Screenshots:** `docs/screenshots/github-*.png`
-- **Cleanup:** app deleted / secret rotated
-
-### Notion — public connection (T-011) — PENDING
-- **When (IST):**
-- **Account type:** free workspace
-- **Driver:**
-- **Attempted:** Developer portal → Build → Public connections → Create
-- **Completed:**
-- **Stopped because:**
-- **Docs said vs console required:** required fields, installation scope, capabilities, console URL
-  - Portal URL actually used (seed and guide say `https://www.notion.so/my-integrations`; docs say "Developer portal → Build → Public connections")?
-  - Installation scope choices "Any workspace" / "Selected workspaces only", and does the form warn that the choice can't be changed later?
-  - Any PKCE or token-lifetime setting visible? (Both are unknowns in `data/guides/notion.json`.)
-- **Screenshots:** `docs/screenshots/notion-*.png`
-- **Cleanup:**
+### Notion — public connection (T-011)
+**Not performed:** cut at 03:30 IST; human-supervised setup attempts were not run. Evidence for these guides is primary sources + automated probes only.
+- **Tier:** stays `verified`; no attempt claims in `data/guides/notion.json`.
+- **Open checks for a later attempt:** portal URL actually used (seed and guide say `https://www.notion.so/my-integrations`); installation-scope choices and whether the form warns that they can't be changed; any PKCE or token-lifetime setting (both unknowns in the guide).
 
 ### Slack — app from manifest (optional)
-- **When (IST):**
-- **Attempted:** create from a manifest, open Manage Distribution, check the Marketplace submission page's estimated review time
-- **Completed / Stopped because:**
-- **Screenshots:** `docs/screenshots/slack-*.png`
+**Not performed** (optional attempt; not run). Evidence for the Slack guide is primary sources + automated probes only.
