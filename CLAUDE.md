@@ -1,98 +1,62 @@
-# CLAUDE.md — OAuth Atlas (OAuth Agent)
+# OAuth Atlas — Claude Code instructions
 
-> Project-specific instructions. Read this first, then `SPEC.md`, `TASKS.md`, and `STATUS.md`. Keep this file under ~150 lines.
+@AGENTS.md
 
-## One-line summary
+> AGENTS.md holds the Next.js 16 breaking-change notes. **Before editing any framework code** (routing, route handlers, server/client components, caching, config), read the relevant file in `node_modules/next/dist/docs/`. Do not rely on memory of Next 13–15 APIs.
 
-Decision-grade OAuth setup and approval guides for developers building AI agents — a searchable library plus a live agent that researches any app and generates a shareable guide.
+## What we're building (ship today)
+Decision-grade OAuth setup and approval guides for developers building AI agents. It has three parts:
+1. **Library** of curated guides, plus 100 tracked apps (most of them `queued`).
+2. **Guide page.** Opens with "Do you need your own OAuth app?" (Composio managed status), then a computed difficulty, three milestones (dev-ready, pilot-ready, production-ready), gates, an agent/human split, and evidence.
+3. **Live generation** for any app: resolve → composio → discover → probe → extract → verify → render, streamed over SSE and persisted in Upstash.
 
-## Domain
-
-Technical product / developer tooling / AI integrations. It exists because provider docs explain how to configure OAuth but not whether a developer can ship, how long approval takes, what blocks them, or what to do next.
-
-## Current phase
-
-Phase 0 — scaffold and core guide schema. Target: a working take-home MVP in 6–8 focused hours. Then Phase 1 — live generation and the 100-app library.
-
-## Stack & tools
-
-- Next.js 16.4.2 (App Router), React 19, TypeScript, Tailwind CSS 4, ESLint, npm.
-- Zod for schemas.
-- Planned: SQLite/Postgres + Drizzle (or JSON for v0), Vercel AI SDK + Anthropic/OpenAI, Tavily/Brave search, Playwright optional.
-- Deploy: Vercel; fallback Fly.io/Railway if generation exceeds serverless limits.
-- Repo folder: `OAuth Agent`; package slug: `oauth-atlas`; memory prefix: `oauth-agent`.
-
-## Key decisions made
-
-- Decision-first guide, not a docs mirror — `DECISIONS.md` ADR-001.
-- One pipeline, two modes: batch library + live generation — ADR-002.
-- Claim-level evidence tiers: tested / primary / secondary / inferred — ADR-003.
-- Two timelines: time to first test user vs. time to public launch — ADR-004.
-- Quality tiers for the 100-app library: tested / verified / indexed — ADR-005.
-- No auth, billing, token storage, or completed provider approvals in the MVP — ADR-006.
-- JSON files for the v0 library; add a database only if needed — ADR-007.
-
-## Constraints
-
-- 6–8 hour build budget; demo 3–5 varied apps plus one live-generated app.
-- No paid accounts, no production domains, no completed provider approvals.
-- Credentials never enter the repo; use `.env.local`. Redact screenshots and logs.
-- Do not automate account creation, accept legal terms, or bypass provider review.
-- Live generation must be labeled as unverified until checked. Never invent approvals or review times.
-
-## What I want from Claude on this project
-
-Implementation help, code review, and agent orchestration. Be proactive on the MVP, but keep scope tight. Prefer working vertical slices over broad scaffolding. When making content claims, cite sources and mark confidence. Ask before changing the guide schema or the demo app set.
-
-## Active TODOs / next steps
-
-1. Finalize guide schema and seed data — T-001.
-2. Build the library page with filters and guide cards — T-002.
-3. Build the guide detail page with verdict, timeline, scopes, blockers, and evidence — T-003.
-4. Add 5 demo guides with sources — T-004.
-5. Build the live generation API and streaming UI — T-005.
-6. Add evidence panel, verification log, and corrections — T-006.
-7. Seed 100 apps and add the batch generation script — T-007.
-8. Deploy, README, and demo script — T-008.
-9. Independent QA pass — T-009.
-
-## Out of scope (don't suggest)
-
-- Production OAuth token storage or a full auth platform.
-- User accounts, billing, admin panels.
-- 100 hand-written guides.
-- Browser automation for every provider.
-- Completed provider approvals.
-- A custom design system or a mobile app.
-
-## Team workflow
-
-- **Grokbot** — coordinator/PM. Owns `TASKS.md`, `STATUS.md`, acceptance criteria, merge order. No code unless a small fix.
-- **Claude Code Opus 5.5** — lead builder. Owns app code, UI, agent pipeline, tests. One branch per task.
-- **Fable 5.1** — independent verifier. Reviews diffs, checks sources, red-teams claims. Never reviews its own code.
-- **Human** — accounts, legal acceptance, final submission, demo narration.
-- The repo is the source of truth, not chat. Update `STATUS.md` after each block.
-- One writer per file area; no concurrent edits to the same files.
+Sources of truth:
+- `SPEC.md`: product and schema
+- `TASKS.md`: tasks, owners, times, cut lines
+- `STATUS.md`: current state
+- `docs/research.md`: facts. **Never invent provider facts or timelines.**
 
 ## Commands
+```bash
+npm run dev               # local; set MOCK_LLM=1 in .env.local to run without keys
+npm run typecheck         # tsc --noEmit
+npm run lint
+npm test                  # vitest (unit + offline pipeline tests)
+npm run validate:guides   # every data/guides/*.json + seed against Zod
+npm run test:e2e          # Playwright smoke, MOCK_LLM=1 via webServer.env
+npm run check             # typecheck && lint && test && validate:guides && build  ← definition of done
+```
 
-- `npm run dev` — local dev server.
-- `npm run build` — production build.
-- `npm run lint` — ESLint.
-- `git status` / `git diff` — inspect work before handoff.
+## File ownership (stay in your lane)
+| Owner | Owns | Must not touch |
+|---|---|---|
+| schema-architect | `lib/schema.ts`, `lib/difficulty.ts`, `lib/composio.ts`, `lib/agent/types.ts`, `data/apps.seed.json`, `data/composio-managed.json`, `data/guides/index.ts` (initial), `tests/schema.test.ts`, `tests/difficulty.test.ts`, `tests/fixtures/guides/**`, `scripts/validate-guides.ts`, `vitest.config.ts`, `package.json` | `app/**`, `components/**` |
+| ui-builder | `app/**` except `app/api/**` and `app/generate/**` internals owned by pipeline, `components/**`, `lib/markdown.ts`, `lib/data.ts`, `tests/markdown.test.ts` | `lib/schema.ts`, `lib/agent/**`, `data/**` |
+| pipeline-engineer | `app/api/**`, `app/generate/**`, `lib/agent/**` (not `types.ts` without lead OK), `lib/store.ts`, `scripts/{probe,generate-library,record-fixtures}.ts`, `tests/agent/**`, `tests/fixtures/{http,llm}/**` | `components/guide/**` (reuse `GuideView`, don't fork it), `data/guides/*.json` |
+| guide-researcher | `data/guides/*.json` (+ index entries), `docs/verification-log.md`, `docs/corrections.md`, `docs/screenshots/**` | all code |
+| verifier | `e2e/**`, `playwright.config.ts`, `docs/qa-report.md` | everything else is read-only; file bugs instead |
+| release-engineer | `README.md`, `.env.example`, `docs/{demo-script,deploy,testing}.md`, `vercel.json` | app code (except trivial config) |
+| lead | `SPEC.md`, `TASKS.md`, `STATUS.md`, `CLAUDE.md`, merges | — |
 
-## External references
+Need a change outside your lane, such as a new dependency or a schema field? Ask the lead. Only the lead edits `package.json` after T-010.
 
-- Assignment brief: `docs/assignment.md`
-- Product spec: `SPEC.md`
-- Task board: `TASKS.md`
-- Decisions: `DECISIONS.md`
-- Verification: `docs/verification-log.md`, `docs/corrections.md`
-- Demo script: `docs/demo-script.md`
-- Next.js version note: read `AGENTS.md` and `node_modules/next/dist/docs/` before changing framework code.
+## Conventions
+- TypeScript strict. Zod is the contract: parse every external input, guide JSON, and LLM output.
+- The pipeline uses dependency injection: `runPipeline(input, deps)`, with `deps = { fetch, llm, store, now, emit }`. No hidden globals, so it can be tested offline.
+- Difficulty is **only** computed by `lib/difficulty.ts`. Never accept an LLM-provided score.
+- Evidence statuses: `tested | primary | secondary | inferred | conflicting | stale`.
+  - Probe results are `tested` (kind `probe`) and carry an ISO timestamp.
+  - Community timelines are `secondary` and get a badge.
+- Guides load through static imports in `data/guides/index.ts`. **No runtime `fs`**, because Vercel's filesystem is read-only.
+- Server-only code (LLM keys, Redis) never ships in client components.
+- Keep UI plain Tailwind. No new design system.
+- Windows dev box: don't write POSIX-only npm scripts.
 
----
-
-## Memory convention reminder
-
-Per-project memories use the prefix `proj-oauth-agent_<topic>.md` under `C:\Users\arygu\.claude\projects\C--WINDOWS-System32\memory\`. The folder is `OAuth Agent`; the slug is `oauth-agent`.
+## Definition of done (every task)
+1. The acceptance criteria in `TASKS.md` are met.
+2. `npm run check` passes. Paste the tail of its output in the handoff.
+3. New logic has tests. Pipeline tests run offline with fixtures.
+4. No secrets: never read or print `.env.local`, never commit keys, no client secrets in screenshots.
+5. Small commits (`T-xxx: <what>`), one branch per task, rebased on `main`.
+6. Append a one-line entry to `STATUS.md` → "Done", or hand that line to the lead if `STATUS.md` isn't in your lane.
+7. If you hit the time cap: stop, ship what passes, and list the cuts.
