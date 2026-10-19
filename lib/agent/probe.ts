@@ -1,4 +1,4 @@
-import { BROWSER_UA, fetchWithTimeout } from "@/lib/agent/fetchDoc";
+import { BROWSER_UA, fetchWithTimeout, htmlToText } from "@/lib/agent/fetchDoc";
 import type { ResolvedApp } from "@/lib/agent/resolve";
 import type { Probe } from "@/lib/schema";
 
@@ -89,19 +89,21 @@ export function interpretAuthorize(
       loc = new URL(location, "https://example.invalid");
     } catch {}
     const params = loc ? loc.searchParams : new URLSearchParams();
-    const err = params.get("authError") || params.get("error") || params.get("error_description");
-    const decoded = decodeURIComponent(location);
-    if (/invalid_client|invalid client|client.?id/i.test(`${err ?? ""} ${decoded}`) && !LOGIN_RE.test(loc?.pathname ?? "")) {
-      return { kind: "invalid-client-redirect", observed: `Redirected with an invalid-client error (${err ? err.slice(0, 120) : "in URL"})` };
+    const authError = params.get("authError");
+    const err = (authError && decodeAuthError(authError)) || params.get("error_description") || params.get("error");
+    if (err || /invalid_client/i.test(decodeURIComponent(location))) {
+      const text = (err ?? "invalid_client").replace(/[^ -~]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
+      return /invalid_client|invalid client|client.?id/i.test(text)
+        ? { kind: "invalid-client-redirect", observed: `Redirected with an invalid-client error: ${text}` }
+        : { kind: "error-redirect", observed: `Redirected with error: ${text}` };
     }
     if (loc && LOGIN_RE.test(`${loc.hostname}${loc.pathname}`)) {
       return { kind: "login-redirect", observed: `Redirected to login (${loc.hostname}${loc.pathname}) before validating the client` };
     }
-    if (err) return { kind: "error-redirect", observed: `Redirected with error: ${err.slice(0, 160)}` };
     return { kind: "other", observed: `HTTP ${status} redirect to ${loc ? loc.hostname + loc.pathname : location.slice(0, 120)}` };
   }
   if (status === 404) return { kind: "not-found", observed: "Authorize endpoint returned 404" };
-  const text = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  const text = htmlToText(body).text.replace(/\s+/g, " ");
   const m = text.match(/[^.]{0,60}(invalid[_ ]client|invalid "?[\w-]*"?|client[_ ]id[^.]{0,40}(invalid|not found|unknown))[^.]{0,60}/i);
   if (m) return { kind: "invalid-client-page", observed: `HTTP ${status}; page shows: "${m[0].trim().slice(0, 160)}"` };
   if (/(sign in|log in|password)/i.test(text)) {
@@ -110,11 +112,23 @@ export function interpretAuthorize(
   return { kind: "other", observed: `HTTP ${status}; no recognizable error shape` };
 }
 
-export function authorizeProbeUrl(endpoint: string): string {
+// Google packs the error into a base64url protobuf; the readable parts are plain ASCII.
+export function decodeAuthError(v: string): string {
+  try {
+    const bin = atob(v.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(v.length / 4) * 4, "="));
+    const text = bin.replace(/[^ -~]+/g, " ").replace(/\s+/g, " ").trim();
+    return text || v;
+  } catch {
+    return v;
+  }
+}
+
+export function authorizeProbeUrl(endpoint: string, scope?: string): string {
   const u = new URL(endpoint);
   u.searchParams.set("client_id", PROBE_CLIENT_ID);
   u.searchParams.set("redirect_uri", PROBE_REDIRECT);
   u.searchParams.set("response_type", "code");
+  if (scope) u.searchParams.set("scope", scope);
   u.searchParams.set("state", "oauth-atlas-probe");
   return u.toString();
 }
@@ -203,7 +217,8 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
   // 2. Authorize endpoint with a dummy client_id.
   const authorizeEndpoint = result.discovery?.authorizationEndpoint ?? authorizeHint;
   if (authorizeEndpoint && remaining() > 0) {
-    const url = authorizeProbeUrl(authorizeEndpoint);
+    // OIDC providers (Google) reject a missing scope before checking the client.
+    const url = authorizeProbeUrl(authorizeEndpoint, result.discovery ? "openid" : undefined);
     try {
       const r = await probeGet(url, { ...opts, perRequestMs: Math.min(opts.perRequestMs ?? 5000, remaining()) }, "text/html");
       const { kind, observed } = interpretAuthorize(r.status, r.location, r.body);
