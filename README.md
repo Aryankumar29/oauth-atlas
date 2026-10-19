@@ -64,7 +64,7 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 
 **Mock mode.** `MOCK_LLM=1` swaps in a mock LLM, recorded HTTP fixtures (unrecorded URLs return 404), and an in-memory store, so no network calls are made and no keys are needed. A `MOCK MODE` banner is shown. Mock runs never write to Redis.
 
-**Providers.** Gemini (`gemini-2.5-flash` with Google Search grounding) by default. Switch with `LLM_PROVIDER=anthropic|openai`; override the model with `LLM_MODEL`.
+**Providers.** Anthropic by default: `claude-opus-5-5` with the server-side web search tool for research, then a separate JSON extraction call (effort `medium`, server-side refusal fallback). Gemini (`gemini-2.5-flash` with Google Search grounding) and OpenAI stay available via `LLM_PROVIDER=gemini|openai`; override the model with `LLM_MODEL`.
 
 ## Quickstart
 
@@ -79,7 +79,7 @@ Offline, with no keys:
 MOCK_LLM=1 npm run dev
 ```
 
-With real keys, set `GEMINI_API_KEY` (or another provider's key with `LLM_PROVIDER`) in `.env.local`. Upstash is optional locally; without it runs live in memory. Then run `npm run dev` and open `http://localhost:3000`.
+With real keys, set `ANTHROPIC_API_KEY` (or another provider's key with `LLM_PROVIDER`) in `.env.local`. Upstash is optional locally; without it runs live in memory. Then run `npm run dev` and open `http://localhost:3000`.
 
 Deploying (Vercel, env var owners, duration limits, cache warming, smoke checklist): see [`docs/deploy.md`](docs/deploy.md).
 
@@ -121,7 +121,7 @@ npx tsx scripts/generate-library.ts --only miro,calendly        # write data/gui
 - **Difficulty is computed from gates**, not judged by an LLM. The scores for the curated guides are regression-tested.
 - **Evidence is claim-level.** Statuses are tested / primary / secondary / inferred. Probes and recorded setup attempts are the only way to get `tested`.
 - **Quality tiers over mass coverage.** 100 tracked apps, 5 curated guides, and live generation for the rest. We don't have 100 thin guides.
-- **Gemini with grounding by default**, provider-switchable.
+- **Claude (`claude-opus-5-5`) with web search by default**, provider-switchable to Gemini or OpenAI.
 - **Redis (Upstash) for runs and generated guides**, because Vercel's filesystem is read-only. The curated library is static JSON.
 - **No token storage, accounts, or billing.** This is a guidance product, not an OAuth provider.
 

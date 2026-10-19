@@ -7,9 +7,10 @@ export const isMockMode = () => process.env.MOCK_LLM === "1";
 
 export type LlmProvider = "gemini" | "anthropic" | "openai";
 
+// Anthropic is the configured default; gemini and openai stay selectable.
 export function llmProvider(): LlmProvider {
-  const p = (process.env.LLM_PROVIDER || "gemini").toLowerCase();
-  return p === "anthropic" || p === "openai" ? p : "gemini";
+  const p = (process.env.LLM_PROVIDER || "anthropic").toLowerCase();
+  return p === "gemini" || p === "openai" ? p : "anthropic";
 }
 
 export async function getLlm(): Promise<LlmAdapter> {

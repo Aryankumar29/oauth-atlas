@@ -1,3 +1,4 @@
+import { LlmError } from "@/lib/agent/llm/errors";
 import type { ResolvedApp } from "@/lib/agent/resolve";
 import type { ExtractInput, LlmAdapter } from "@/lib/agent/types";
 import { difficulty } from "@/lib/difficulty";
@@ -89,7 +90,8 @@ export async function extractGuide(
       );
     } catch (e) {
       errors.push(`attempt ${attempt}: ${e instanceof Error ? e.message : String(e)}`);
-      if (e instanceof TimeoutError) break;
+      // Refusals, auth and rate-limit failures won't change on an immediate retry.
+      if (e instanceof TimeoutError || (e instanceof LlmError && !e.retryable)) break;
     }
   }
   const error = errors.join(" | ");
