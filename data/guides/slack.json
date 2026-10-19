@@ -1,0 +1,515 @@
+{
+  "slug": "slack",
+  "app": {
+    "slug": "slack",
+    "name": "Slack",
+    "website": "https://slack.com",
+    "category": "Communication",
+    "docsUrl": "https://api.slack.com/authentication/oauth-v2",
+    "consoleUrl": "https://api.slack.com/apps",
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "slack",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
+  },
+  "version": "1.0.0",
+  "lastVerified": "2026-10-20",
+  "confidence": "high",
+  "partial": false,
+  "ownApp": {
+    "triggers": [
+      "Your agent reads channel history: a new unlisted app of your own gets conversations.history and conversations.replies at 1 request/minute and 15 objects per call until it is approved for the Slack Marketplace. Check this before leaving managed auth.",
+      "You need user-facing branding in the \"Add to Slack\" consent screen or your own bot name and icon (inferred from the generic branding trigger)."
+    ],
+    "notes": "Composio lists Slack as a Composio-managed OAuth toolkit. We did not verify whether Composio's managed app is Marketplace-listed, so we can't say whether it avoids the non-Marketplace throttle. Your own app is free and self-serve, but scale depends on Marketplace approval. Copy the redirect URL from the Composio dashboard (Create Auth Config); Slack requires HTTPS."
+  },
+  "verdict": {
+    "difficulty": 3,
+    "approvalModel": "listing-review",
+    "summary": "Minutes to build, weeks to months to scale. Unlisted apps work in other workspaces, but history reads are throttled to 1 request/minute until Marketplace approval: up to 10 business days plus up to 10 weeks, and you need 10 active installs first.",
+    "canTestBeforeApproval": true
+  },
+  "milestones": [
+    {
+      "id": "dev-ready",
+      "definition": "The app is installed in its own development workspace and API calls work.",
+      "handsOnHours": { "min": 0.25, "max": 1 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "By default a new app installs only in its associated workspace.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://docs.slack.dev/distribution/",
+              "quote": "By default, a newly built Slack app can only be installed in its associated workspace as mentioned above.",
+              "fetchedAt": "2026-10-19T20:43:29Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "pilot-ready",
+      "definition": "Other workspaces can install the app through unlisted distribution.",
+      "handsOnHours": { "min": 0.5, "max": 2 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "Commercially distributed apps created after 2025-05-29 that are not Marketplace-approved: conversations.history and conversations.replies are limited to 1 request per minute and 15 objects per request.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
+              "quote": "The new rate limits will be updated to allow 1 request per minute and will return a maximum of 15 objects per request.",
+              "fetchedAt": "2026-10-19T20:43:32Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        },
+        {
+          "value": "Slack positions unlisted distribution for pilots; commercial apps should be submitted to the Marketplace.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://docs.slack.dev/distribution/",
+              "quote": "Distributing your unlisted app is perfect for when you want to test out your app by running a pilot for early customers; however, apps intended for commercial distribution should be submitted and approved for listing in the Slack Marketplace.",
+              "fetchedAt": "2026-10-19T20:43:29Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "production-ready",
+      "definition": "Approved for the Slack Marketplace, which lifts the history throttle for any workspace.",
+      "handsOnHours": { "min": 8, "max": 24 },
+      "wait": { "minDays": 0, "maxDays": 84 },
+      "basis": "official-estimate",
+      "limitsUntilNext": [
+        {
+          "value": "Review is \"up to\" 10 business days (preliminary) plus \"up to\" 10 weeks (functional) for new apps; Slack won't expedite. 84 days is the sum of the two upper bounds and excludes time spent fixing feedback or reaching 10 installs.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
+              "quote": "Currently, the preliminary part of the review takes up to 10 business days to receive feedback, while the functional review takes up to 10 weeks for new submissions and 6 weeks for published apps resubmitting changes.",
+              "fetchedAt": "2026-10-19T20:43:34Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Create a Slack app",
+      "appliesWhen": "always",
+      "requiredFor": ["pilot-ready"]
+    },
+    {
+      "type": "listing-throttle",
+      "name": "Non-Marketplace commercial app rate limit (1 req/min, 15 objects on conversations.history/replies)",
+      "appliesWhen": "unlisted commercial distribution",
+      "requiredFor": ["pilot-ready"],
+      "duration": {
+        "value": "Lasts until the app is approved for the Slack Marketplace. Internal customer-built apps are not affected.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
+            "quote": "This change will not impact Marketplace apps.",
+            "fetchedAt": "2026-10-19T20:43:32Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    },
+    {
+      "type": "marketplace-review",
+      "name": "Slack Marketplace review",
+      "appliesWhen": "to escape the non-Marketplace throttle",
+      "requiredFor": ["production-ready"],
+      "duration": {
+        "value": "Up to 10 business days for preliminary feedback, then up to 10 weeks for the functional review (6 weeks for resubmissions).",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
+            "quote": "We are unable to skip or accelerate the review process in order to coordinate with your launch.",
+            "fetchedAt": "2026-10-19T20:43:34Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      },
+      "cost": {
+        "value": "Prerequisite: at least 10 installations on active workspaces, maintained for the whole review.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/changelog/2026/09/01/slack-marketplace-install-requirement",
+            "quote": "Your app needs to stay at 10 or more installed workspaces throughout the entire duration of the review .",
+            "fetchedAt": "2026-10-19T20:43:35Z"
+          }
+        ],
+        "lastChecked": "2026-10-20",
+        "note": "No fee found. The cost here is the install prerequisite."
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-workspace",
+      "label": "A Slack workspace where you can install apps",
+      "detail": "Development happens in the app's associated workspace.",
+      "requiredFor": "dev-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-dist"]
+    },
+    {
+      "id": "req-https-redirect",
+      "label": "HTTPS redirect URL",
+      "detail": "The redirect_uri must use HTTPS and match, or be a subdirectory of, a Redirect URL configured in App Management. Use the Composio dashboard's URL.",
+      "requiredFor": "pilot-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-redirect"]
+    },
+    {
+      "id": "req-10-installs",
+      "label": "10 active workspace installs",
+      "detail": "Needed to submit to the Marketplace, and must hold through the whole review, while you are still throttled.",
+      "requiredFor": "production-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-installs"]
+    }
+  ],
+  "scopes": [
+    {
+      "name": "channels:history",
+      "sensitivity": "unknown",
+      "whyNeeded": "Read messages in public channels the app is in (conversations.history / replies).",
+      "reviewTrigger": "No per-scope review, but the history methods are throttled for unlisted commercial apps; the Marketplace review covers all requested scopes.",
+      "justificationDraft": "The agent summarizes threads in channels the user has added it to.",
+      "evidenceIds": ["ev-throttle"]
+    },
+    {
+      "name": "chat:write",
+      "sensitivity": "unknown",
+      "whyNeeded": "Post replies as the bot.",
+      "reviewTrigger": "Reviewed only as part of a Marketplace submission.",
+      "evidenceIds": ["ev-review"]
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "phase": "decide",
+      "title": "Check whether the throttle hits your agent",
+      "actions": [
+        "List the Web API methods the agent calls. If it uses conversations.history or conversations.replies across many workspaces, plan for the Marketplace.",
+        "If only one customer uses it, consider an internal app built in their workspace (not throttled)."
+      ],
+      "owner": "both",
+      "timeMinutes": 10,
+      "doneWhen": "You know whether you need the Marketplace path.",
+      "artifacts": [],
+      "evidenceIds": ["ev-throttle"]
+    },
+    {
+      "id": "s2",
+      "phase": "create",
+      "title": "Create the app from a manifest",
+      "actions": [
+        "api.slack.com/apps → Create New App → From a manifest.",
+        "Paste a manifest with bot scopes and the HTTPS redirect URL.",
+        "Install to your workspace."
+      ],
+      "owner": "both",
+      "timeMinutes": 10,
+      "doneWhen": "A bot token works in your workspace.",
+      "artifacts": ["app manifest (YAML/JSON)"],
+      "evidenceIds": ["ev-dist", "ev-redirect"]
+    },
+    {
+      "id": "s3",
+      "phase": "configure",
+      "title": "Enable distribution and wire Composio",
+      "actions": [
+        "Manage Distribution → activate public (unlisted) distribution.",
+        "Decide on token rotation now: once on it can't be turned off, and access tokens then expire every 12 hours.",
+        "Copy client ID and secret into a Composio auth config."
+      ],
+      "owner": "both",
+      "timeMinutes": 15,
+      "doneWhen": "A second workspace can install via your auth config.",
+      "artifacts": ["auth config ID"],
+      "evidenceIds": ["ev-rotation"]
+    },
+    {
+      "id": "s4",
+      "phase": "submit",
+      "title": "Reach 10 installs and submit to the Marketplace",
+      "actions": [
+        "Recruit at least 10 active workspaces and keep them installed.",
+        "Prepare listing copy, privacy policy and support pages; submit and answer reviewer feedback."
+      ],
+      "owner": "both",
+      "doneWhen": "The app is approved for the Slack Marketplace.",
+      "artifacts": ["listing copy", "reviewer test instructions"],
+      "evidenceIds": ["ev-installs", "ev-review"]
+    }
+  ],
+  "oauthConfig": {
+    "redirectUris": [
+      {
+        "value": "HTTPS only; the redirect_uri must match or be a subdirectory of a configured Redirect URL.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/authentication/installing-with-oauth",
+            "quote": "Your redirect_uri must match or be a subdirectory of a Redirect URL configured under App Management .",
+            "fetchedAt": "2026-10-19T20:43:38Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ],
+    "pkce": {
+      "value": "Supported, but enabling it marks the app as a public client, which can't be undone without Slack support. Server-side agents usually don't need it.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://docs.slack.dev/authentication/using-pkce",
+          "quote": "Enabling PKCE marks your app as a public client, which is is a one-way operation.",
+          "fetchedAt": "2026-10-19T20:45:13Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "tokenLifetime": {
+      "value": "Without token rotation, access tokens never expire. With rotation they expire every 12 hours.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://docs.slack.dev/authentication/using-token-rotation",
+          "quote": "Without token rotation, the access token never expires.",
+          "fetchedAt": "2026-10-19T20:43:40Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "refresh": {
+      "value": "Token rotation is opt-in and can't be turned off once enabled.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://docs.slack.dev/authentication/using-token-rotation",
+          "quote": "Token rotation may not be turned off once it's turned on",
+          "fetchedAt": "2026-10-19T20:43:40Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "rateLimits": [
+      {
+        "value": "Unlisted commercial apps: conversations.history/replies at 1 request/minute and 15 objects (Tier 1 instead of Tier 3).",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
+            "quote": "The new rate limits will be updated to allow 1 request per minute and will return a maximum of 15 objects per request.",
+            "fetchedAt": "2026-10-19T20:43:32Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      },
+      {
+        "value": "Other Web API methods follow per-method tiers (Tier 1: 1+ per minute … Tier 3: 50+ per minute).",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.slack.dev/apis/web-api/rate-limits",
+            "quote": "Web API Tier 3 50+ per minute",
+            "fetchedAt": "2026-10-19T20:43:41Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "id": "b-throttle",
+      "severity": "high",
+      "description": "Unlisted commercial apps read channel history at 1 request/minute and 15 objects per call. An agent that summarizes channels is effectively unusable at scale.",
+      "affects": "pilot-ready",
+      "workaround": "Pilot with few workspaces, or have a single customer build an internal app (not throttled). The real fix is Marketplace approval.",
+      "agentCanHelp": false,
+      "evidenceIds": ["ev-throttle", "ev-internal-exempt"]
+    },
+    {
+      "id": "b-installs",
+      "severity": "high",
+      "description": "The Marketplace needs 10 active installs held through the whole review, which you must recruit while still throttled.",
+      "affects": "production-ready",
+      "workaround": "Line up design partners before submitting.",
+      "agentCanHelp": false,
+      "evidenceIds": ["ev-installs"]
+    },
+    {
+      "id": "b-review-time",
+      "severity": "medium",
+      "description": "Marketplace review takes up to 10 business days plus up to 10 weeks, and Slack won't accelerate it.",
+      "affects": "production-ready",
+      "workaround": "Submit as early as possible; keep the reviewer test workspace working.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-review"]
+    }
+  ],
+  "agentTasks": [
+    "Generate the app manifest with the minimum bot scopes.",
+    "Audit which API methods the agent calls and flag throttled ones.",
+    "Draft Marketplace listing copy and reviewer test instructions."
+  ],
+  "humanTasks": [
+    "Install the app as a workspace admin.",
+    "Recruit and retain 10 active workspace installs.",
+    "Submit to the Marketplace and respond to reviewer feedback."
+  ],
+  "probes": [
+    {
+      "url": "https://slack.com/.well-known/openid-configuration",
+      "method": "GET",
+      "status": 200,
+      "observed": "OIDC discovery for Sign in with Slack (authorization_endpoint https://slack.com/openid/connect/authorize). The app OAuth v2 flow uses slack.com/oauth/v2/authorize instead.",
+      "at": "2026-10-19T20:37:18Z"
+    },
+    {
+      "url": "https://slack.com/oauth/v2/authorize?client_id=oauth-atlas-probe&scope=channels:history&redirect_uri=https%3A%2F%2Fexample.com%2Fcb&tracked=1",
+      "method": "GET",
+      "status": 302,
+      "redirect": "https://slack.com/workspace-signin?redir=%2Foauth%3Fclient_id%3Doauth-atlas-probe...",
+      "observed": "Authorize endpoint is live; unauthenticated requests go to workspace sign-in before the client_id is validated. The first request (without tracked=1) returned 200 with a JS redirect.",
+      "at": "2026-10-19T20:37:43Z"
+    }
+  ],
+  "unknowns": [
+    "Whether Composio's managed Slack app is Marketplace-listed (and so exempt from the history throttle).",
+    "Research.md reported (secondary) that the throttle was extended to existing installs from 2026-03-03. The official 2025-05-29 entry and its 2025-06-03 clarification (internal customer-built apps keep existing limits) say nothing about such an extension; we found no official confirmation.",
+    "Marketplace minimum review time: Slack publishes only upper bounds.",
+    "Whether a Marketplace listing has any fee (none found)."
+  ],
+  "evidence": [
+    {
+      "id": "ev-dist",
+      "claim": "New apps install only in their associated workspace by default; unlisted distribution is meant for pilots.",
+      "sourceUrl": "https://docs.slack.dev/distribution/",
+      "sourceType": "official-doc",
+      "quote": "By default, a newly built Slack app can only be installed in its associated workspace as mentioned above.",
+      "retrievedAt": "2026-10-19T20:43:29Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-throttle",
+      "claim": "Non-Marketplace commercial apps get 1 req/min and 15 objects on conversations.history/replies.",
+      "sourceUrl": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
+      "sourceType": "official-doc",
+      "quote": "The new rate limits will be updated to allow 1 request per minute and will return a maximum of 15 objects per request.",
+      "retrievedAt": "2026-10-19T20:43:32Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-review",
+      "claim": "Marketplace review: up to 10 business days preliminary, up to 10 weeks functional; no acceleration.",
+      "sourceUrl": "https://docs.slack.dev/slack-marketplace/slack-marketplace-review-guide",
+      "sourceType": "official-doc",
+      "quote": "Currently, the preliminary part of the review takes up to 10 business days to receive feedback, while the functional review takes up to 10 weeks for new submissions and 6 weeks for published apps resubmitting changes.",
+      "retrievedAt": "2026-10-19T20:43:34Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-installs",
+      "claim": "Marketplace submissions need at least 10 active workspace installs, held through review.",
+      "sourceUrl": "https://docs.slack.dev/changelog/2026/09/01/slack-marketplace-install-requirement",
+      "sourceType": "official-doc",
+      "quote": "As of July 2026, we require that apps submitting to the Slack Marketplace have at least 10 installations on active workspaces, up from the temporary lower threshold.",
+      "retrievedAt": "2026-10-19T20:43:35Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-redirect",
+      "claim": "The redirect_uri must use HTTPS.",
+      "sourceUrl": "https://docs.slack.dev/authentication/installing-with-oauth",
+      "sourceType": "official-doc",
+      "quote": "The redirect_uri must use HTTPS.",
+      "retrievedAt": "2026-10-19T20:43:38Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-rotation",
+      "claim": "With token rotation, access tokens expire every 12 hours; rotation can't be turned off.",
+      "sourceUrl": "https://docs.slack.dev/authentication/using-token-rotation",
+      "sourceType": "official-doc",
+      "quote": "With token rotation, it expires every 12 hours.",
+      "retrievedAt": "2026-10-19T20:43:40Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-pkce",
+      "claim": "Enabling PKCE makes the app a public client, one-way.",
+      "sourceUrl": "https://docs.slack.dev/authentication/using-pkce",
+      "sourceType": "official-doc",
+      "quote": "It cannot be disabled without contacting Slack support.",
+      "retrievedAt": "2026-10-19T20:45:13Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-internal-exempt",
+      "claim": "Internal customer-built apps keep their existing rate limits.",
+      "sourceUrl": "https://docs.slack.dev/changelog/2025/06/03/rate-limits-clarity",
+      "sourceType": "official-doc",
+      "quote": "Any internal customer-built apps will maintain their existing rate limits and will not be subject to the new posted limits.",
+      "retrievedAt": "2026-10-19T20:46:53Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-probe-authorize",
+      "claim": "slack.com/oauth/v2/authorize is live and routes unauthenticated users to workspace sign-in.",
+      "sourceUrl": "https://slack.com/oauth/v2/authorize",
+      "sourceType": "test",
+      "retrievedAt": "2026-10-19T20:37:43Z",
+      "status": "tested",
+      "confidence": "high"
+    }
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-20",
+      "claim": "Slack distribution",
+      "before": "Unlisted distribution is enough for production.",
+      "after": "Unlisted commercial apps get 1 req/min and 15 objects on conversations.history/replies; lifting that needs Marketplace approval, which needs 10 active installs and up to 10 business days plus up to 10 weeks.",
+      "reason": "Slack's 2025-05-29 rate-limit change and the July 2026 install requirement.",
+      "sourceUrl": "https://docs.slack.dev/changelog/2025/05/29/rate-limit-changes-for-non-marketplace-apps",
+      "guideVersion": "1.0.0"
+    }
+  ],
+  "generatedBy": "human"
+}

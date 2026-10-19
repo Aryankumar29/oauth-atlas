@@ -43,7 +43,8 @@
       "managed": "yes",
       "checkedAt": "2026-10-20"
     },
-    "tier": "queued"
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
   },
   {
     "slug": "notion",
