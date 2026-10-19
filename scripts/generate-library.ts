@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { indexLines, MockWriteRefused, runBatch } from "../lib/agent/batch";
+import { indexLines, MockWriteRefused, parseLimit, runBatch } from "../lib/agent/batch";
 import { createDeps, isMockMode, pipelineOptionsFromEnv } from "../lib/agent/deps";
 import { apps } from "../lib/data";
 import { createMemoryStore } from "../lib/store";
@@ -19,12 +19,12 @@ const has = (name: string) => process.argv.includes(name);
 async function main() {
   const dir = path.join(process.cwd(), "data", "guides");
   const only = arg("--only")?.split(",").map((s) => s.trim()).filter(Boolean);
-  const limit = arg("--limit") ? Number(arg("--limit")) : undefined;
+  const limit = parseLimit(has("--limit") ? (arg("--limit") ?? "") : undefined);
 
   const unknown = only?.filter((s) => !apps.some((a) => a.slug === s)) ?? [];
   if (unknown.length) throw new Error(`Not in apps.seed.json: ${unknown.join(", ")}`);
   let slugs = only ? apps.filter((a) => only.includes(a.slug)) : apps.filter((a) => a.tier === "queued");
-  if (limit !== undefined && Number.isFinite(limit)) slugs = slugs.slice(0, limit);
+  if (limit !== undefined) slugs = slugs.slice(0, limit);
 
   const result = await runBatch({
     slugs: slugs.map((a) => ({ slug: a.slug, name: a.name })),
@@ -32,6 +32,13 @@ async function main() {
     dryRun: has("--dry-run"),
     mock: isMockMode(),
     exists: (slug) => fs.existsSync(path.join(dir, `${slug}.json`)),
+    readExisting: (slug) => {
+      try {
+        return JSON.parse(fs.readFileSync(path.join(dir, `${slug}.json`), "utf8"));
+      } catch {
+        return null;
+      }
+    },
     write: (slug, json) => fs.writeFileSync(path.join(dir, `${slug}.json`), json),
     // Memory store: batch runs must not overwrite the public demo cache (guide:{slug}) in Redis.
     makeDeps: async () => ({ ...(await createDeps(() => {})), store: createMemoryStore() }),

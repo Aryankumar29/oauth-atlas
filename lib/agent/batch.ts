@@ -19,7 +19,14 @@ export function qaGate(guide: unknown, run?: Pick<RunRecord, "events">): string[
     ...g.oauthConfig.rateLimits,
     ...[g.oauthConfig.pkce, g.oauthConfig.tokenLifetime, g.oauthConfig.refresh].filter((c): c is Claim => !!c),
   ];
-  const sources = new Set([...g.evidence.map((e) => e.sourceUrl), ...claims.flatMap((c) => c.sources.map((s) => s.url))]);
+  // QA-15a: our own probe records are not sources.
+  const probeUrls = new Set(g.probes.map((p) => p.url));
+  const sources = new Set(
+    [
+      ...g.evidence.filter((e) => e.sourceType !== "test").map((e) => e.sourceUrl),
+      ...claims.filter((c) => c.status !== "tested").flatMap((c) => c.sources.map((s) => s.url)),
+    ].filter((u) => !probeUrls.has(u)),
+  );
   const primary = g.evidence.filter((e) => e.status === "primary").length + claims.filter((c) => c.status === "primary").length;
   if (sources.size < 3) reasons.push(`only ${sources.size} distinct sources (need ≥3)`);
   if (primary < 1) reasons.push("no primary source survived the validator");
@@ -51,6 +58,8 @@ export type BatchOptions = {
   dryRun: boolean;
   mock: boolean;
   exists: (slug: string) => boolean;
+  // Parsed JSON of the existing guide file, for the curated-guide check.
+  readExisting?: (slug: string) => unknown;
   write: (slug: string, json: string) => void;
   makeDeps: () => Promise<PipelineDeps>;
   pipelineOptions?: PipelineOptions;
@@ -63,6 +72,20 @@ export type BatchResult = {
   wouldWrite: string[];
   skipped: { slug: string; reasons: string[] }[];
 };
+
+// Unknown or unreadable existing files count as curated: never clobber what we cannot inspect.
+export function isCurated(existing: unknown): boolean {
+  if (typeof existing !== "object" || existing === null) return true;
+  const g = existing as { generatedBy?: unknown; app?: { tier?: unknown } };
+  return g.generatedBy !== "agent" || g.app?.tier === "verified" || g.app?.tier === "tested";
+}
+
+// QA-15b: --limit must be a positive integer.
+export function parseLimit(v: string | undefined): number | undefined {
+  if (v === undefined) return undefined;
+  if (!/^\d+$/.test(v) || Number(v) < 1) throw new Error(`--limit must be a positive integer, got "${v}"`);
+  return Number(v);
+}
 
 export class MockWriteRefused extends Error {
   constructor() {
@@ -78,6 +101,12 @@ export async function runBatch(o: BatchOptions): Promise<BatchResult> {
   const result: BatchResult = { written: [], wouldWrite: [], skipped: [] };
 
   for (const app of o.slugs) {
+    // QA-14: curated guides are never overwritten, even with --force.
+    if (o.exists(app.slug) && isCurated(o.readExisting?.(app.slug))) {
+      result.skipped.push({ slug: app.slug, reasons: ["curated guide, not overwritten"] });
+      log(`- ${app.slug}: curated guide, not overwritten`);
+      continue;
+    }
     if (o.exists(app.slug) && !o.force) {
       result.skipped.push({ slug: app.slug, reasons: ["guide already exists (use --force)"] });
       log(`- ${app.slug}: exists, skipped`);
