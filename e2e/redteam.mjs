@@ -2,7 +2,8 @@
 //   node e2e/redteam.mjs <baseUrl> "Miro" "Calendly" "Toggl Track" ...
 // Each query is one live run and counts toward the 5/IP/hour rate limit (cache hits do not).
 // Prints, per run: status, duration, Composio status, probe count + timestamps, computed difficulty,
-// downgrades, primary-evidence count, and every off-official-host primary source found on the run page.
+// downgrades (with reasons), primary-evidence count, and step errors. It does not inspect the guide's sources:
+// check off-domain primaries by hand on /generate/<runId> (T-009 checklist).
 
 const [base, ...queries] = process.argv.slice(2);
 if (!base || !queries.length) {
