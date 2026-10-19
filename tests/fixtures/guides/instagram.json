@@ -1,0 +1,32 @@
+{
+  "slug": "instagram",
+  "expected": {
+    "default": 4
+  },
+  "gates": [
+    {
+      "type": "testing-cap",
+      "name": "Standard Access: only users with a role on the app",
+      "appliesWhen": "until Advanced Access",
+      "requiredFor": [
+        "pilot-ready"
+      ]
+    },
+    {
+      "type": "business-verification",
+      "name": "Meta Business Verification",
+      "appliesWhen": "Advanced Access",
+      "requiredFor": [
+        "production-ready"
+      ]
+    },
+    {
+      "type": "app-review",
+      "name": "Meta App Review per permission",
+      "appliesWhen": "Advanced Access",
+      "requiredFor": [
+        "production-ready"
+      ]
+    }
+  ]
+}

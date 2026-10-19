@@ -1,0 +1,47 @@
+{
+  "slug": "gmail",
+  "expected": {
+    "default": 5,
+    "send-only": 3
+  },
+  "gates": [
+    {
+      "type": "testing-cap",
+      "name": "Testing mode: 100 test users, 7-day refresh tokens",
+      "appliesWhen": "until the app is published",
+      "requiredFor": [
+        "pilot-ready"
+      ]
+    },
+    {
+      "type": "scope-review",
+      "name": "Sensitive scope verification (gmail.send)",
+      "appliesWhen": "sensitive scopes in production",
+      "requiredFor": [
+        "production-ready"
+      ]
+    },
+    {
+      "type": "scope-review",
+      "name": "Restricted scope verification (gmail.readonly / gmail.modify)",
+      "appliesWhen": "read/modify profile (default for AI agents)",
+      "requiredFor": [
+        "production-ready"
+      ],
+      "skipForProfiles": [
+        "send-only"
+      ]
+    },
+    {
+      "type": "security-assessment",
+      "name": "CASA third-party security assessment (annual)",
+      "appliesWhen": "restricted Gmail scopes",
+      "requiredFor": [
+        "production-ready"
+      ],
+      "skipForProfiles": [
+        "send-only"
+      ]
+    }
+  ]
+}

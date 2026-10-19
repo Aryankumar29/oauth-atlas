@@ -1,0 +1,23 @@
+{
+  "slug": "github",
+  "expected": {
+    "default": 1
+  },
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Register an OAuth app or GitHub App",
+      "appliesWhen": "always",
+      "requiredFor": [
+        "pilot-ready",
+        "production-ready"
+      ]
+    },
+    {
+      "type": "admin-consent",
+      "name": "Org OAuth app access restrictions",
+      "appliesWhen": "only if the target org has OAuth app restrictions enabled (default for new orgs)",
+      "requiredFor": []
+    }
+  ]
+}

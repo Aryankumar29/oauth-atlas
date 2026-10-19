@@ -1,0 +1,32 @@
+{
+  "slug": "slack",
+  "expected": {
+    "default": 3
+  },
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Create a Slack app",
+      "appliesWhen": "always",
+      "requiredFor": [
+        "pilot-ready"
+      ]
+    },
+    {
+      "type": "listing-throttle",
+      "name": "Non-Marketplace commercial app rate limit (1 req/min, 15 objects on conversations.history/replies)",
+      "appliesWhen": "unlisted commercial distribution",
+      "requiredFor": [
+        "pilot-ready"
+      ]
+    },
+    {
+      "type": "marketplace-review",
+      "name": "Slack Marketplace review",
+      "appliesWhen": "to escape the non-Marketplace throttle",
+      "requiredFor": [
+        "production-ready"
+      ]
+    }
+  ]
+}

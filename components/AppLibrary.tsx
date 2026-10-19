@@ -3,22 +3,15 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import type { App } from "@/lib/schema";
+import { approvalModelSchema, type App } from "@/lib/schema";
 
-const archetypes = [
-  "all",
-  "self-serve",
-  "verification-heavy",
-  "marketplace",
-  "enterprise",
-  "fintech",
-  "long-tail",
-] as const;
+const archetypes = ["all", ...approvalModelSchema.options] as const;
 
 const tierStyles: Record<App["tier"], string> = {
   tested: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   verified: "bg-sky-50 text-sky-700 ring-sky-200",
-  indexed: "bg-zinc-100 text-zinc-600 ring-zinc-200",
+  generated: "bg-amber-50 text-amber-700 ring-amber-200",
+  queued: "bg-zinc-100 text-zinc-600 ring-zinc-200",
 };
 
 export function AppLibrary({ apps }: { apps: App[] }) {
@@ -35,7 +28,7 @@ export function AppLibrary({ apps }: { apps: App[] }) {
         app.website.toLowerCase().includes(q) ||
         app.category.toLowerCase().includes(q);
       const matchesArchetype =
-        archetype === "all" || app.archetype === archetype;
+        archetype === "all" || app.approvalModel === archetype;
 
       return matchesQuery && matchesArchetype;
     });
@@ -69,7 +62,7 @@ export function AppLibrary({ apps }: { apps: App[] }) {
         >
           {archetypes.map((value) => (
             <option key={value} value={value}>
-              {value === "all" ? "All archetypes" : value.replaceAll("-", " ")}
+              {value === "all" ? "All approval models" : value.replaceAll("-", " ")}
             </option>
           ))}
         </select>
@@ -119,7 +112,7 @@ export function AppLibrary({ apps }: { apps: App[] }) {
                 </div>
 
                 <p className="mt-4 text-sm capitalize text-zinc-600">
-                  {app.archetype.replaceAll("-", " ")}
+                  {app.approvalModel.replaceAll("-", " ")}
                 </p>
               </div>
 
@@ -127,7 +120,7 @@ export function AppLibrary({ apps }: { apps: App[] }) {
                 <span>
                   Managed OAuth:{" "}
                   <span className="font-medium text-zinc-700">
-                    {app.managedOAuth}
+                    {app.composio.managed}
                   </span>
                 </span>
                 <span className="font-medium text-zinc-900">Open guide →</span>
