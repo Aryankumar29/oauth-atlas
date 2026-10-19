@@ -149,7 +149,7 @@ export function GenerateClient({ mock }: { mock: boolean }) {
               const { status, messages } = stepState(s.id);
               const last = messages.at(-1);
               return (
-                <li key={s.id} className="text-sm" data-step={s.id} data-status={status ?? "pending"}>
+                <li key={s.id} className="text-sm" data-testid="generate-step" data-step={s.id} data-status={status ?? "pending"}>
                   <span className="font-medium text-zinc-900">{s.label}</span>{" "}
                   <span className="text-xs uppercase tracking-wide text-zinc-500">{status ?? "pending"}</span>
                   {last && <p className="mt-0.5 text-xs text-zinc-600">{last.message}</p>}
