@@ -7,7 +7,7 @@ Everything below runs **without API keys**. Unit tests inject fakes directly. `M
 |---|---|---|
 | `npm run typecheck` | `next typegen && tsc --noEmit` | every change |
 | `npm run lint` | `eslint` | every change |
-| `npm test` | `vitest run`: 13 files, 118 tests as of c86ab7c | every change |
+| `npm test` | `vitest run`: 14 files, 128 tests as of cc94a95 | every change |
 | `npm run validate:guides` | `scripts/validate-guides.ts`: Zod-validates `data/apps.seed.json` and every `data/guides/*.json`, plus no duplicate slugs, filename = slug, slug in the seed, file imported in `data/guides/index.ts`, and `verdict.difficulty` equal to the computed score. Prints `OK: 100 apps, 5 guides` | after any guide or seed edit |
 | `npm run build` | `next build` | part of `check` |
 | `npm run check` | typecheck && lint && test && validate:guides && build | **definition of done** |
@@ -17,6 +17,7 @@ Everything below runs **without API keys**. Unit tests inject fakes directly. `M
 Other scripts:
 - `npx tsx scripts/probe.ts <domain|slug|url>`: runs the probe step against the real network and prints probe records as JSON.
 - `npm run snapshot:composio`: refreshes `data/composio-managed.json`.
+- `npx tsx scripts/generate-library.ts [--only a,b] [--limit N] [--force] [--dry-run]`: T-007 batch generation (see below).
 - `npx tsx scripts/cache-guide.ts <file>`: see `docs/deploy.md` §4.
 
 ## Unit tests (`tests/`)
@@ -29,6 +30,22 @@ Other scripts:
   - `probe.test.ts`, `fetchDoc.test.ts` (403 → UA retry, Meta minimal UA, reader fallback, login walls, timeouts), `resolve.test.ts` (short queries, prefix-over-substring ranking), `cache.test.ts` and `cacheGuide.test.ts` (demo cache hit/miss, `force` bypass, client IP, partial never overwrites complete, hand-written guides refused), `prompts.test.ts`.
 
 **Fixtures:** HTTP fixtures are entries in `tests/fixtures/http/recorded.json` (`{url, status, contentType, body, …}`). Entries marked `synthetic` are hand-written test pages, not real provider docs. There is no recording script; add entries by hand.
+
+## Batch generation (T-007)
+`tests/agent/batch.test.ts` runs offline:
+- mock mode refuses to write unless `--dry-run`
+- idempotent skip unless `--force`
+- the thin mock Miro guide fails the QA gate and is not written
+- every gate reason is reported
+- schema-invalid input is rejected
+- the curated guides are run through `qaGate` as a strictness sanity check
+- generated `index.ts` lines are valid identifiers
+
+Smoke-test the script itself with no keys:
+```bash
+MOCK_LLM=1 npx tsx scripts/generate-library.ts --dry-run --only miro
+```
+Expected: Miro is skipped with the QA gate's reasons, and nothing is written. A real run needs LLM keys exported in the shell (`tsx` does not read `.env.local`). It only writes `data/guides/<slug>.json`. A human then adds the printed import lines to `data/guides/index.ts`, sets the seed tier to `generated`, spot-checks the guide, and runs `npm run check`.
 
 ## E2E (`e2e/smoke.spec.ts`)
 The first time, run `npx playwright install chromium`. There are five tests:
