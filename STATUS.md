@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 01:20 IST
+**Last updated:** 2026-10-20 01:47 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -15,10 +15,14 @@
   - `.claude/settings.json`
   - `.env.example`
   - `docs/testing.md`, `docs/claude-prompts.md`, `docs/corrections.md`, `docs/verification-log.md`
+- Kit committed to `main` (lead, 01:40). Branch renamed `master` → `main`; remote `origin` = github.com/Aryankumar29/oauth-atlas (private).
+- **T-010 merged to `main` (01:45, ahead of the 02:30 target; no cuts).** `npm run check` green (typecheck, lint, 21/21 tests, validate:guides "100 apps, 0 guides", build). Composio 123/211; seed 100 (all `queued`; 70 managed / 29 BYO / 1 unknown). Difficulty fixtures: GitHub 1, Notion 1, Slack 3, Gmail 5 (send-only 3), Instagram 4, Microsoft 3.
+  - Contract notes for agents: gate `skipForProfiles` + `difficulty(gates, {profile})`; validate-guides rejects a `verdict.difficulty` that doesn't match `difficulty(gates)`; milestones exactly 3 in order; `requiredFor`/`affects` use milestone ids; `Claim.testKind`; guides have `ownApp` and `oauthConfig`.
+  - Lead glue: UI reads migrated to `approvalModel` / `composio.managed`; `npm run check` now includes `build`. `vitest.config.ts` → `vitest.config.mts`.
 
 ## In progress
 
-- Kit copied into the repo and committed to `main` (human, 01:30).
+- Push `main` to `origin` (awaiting human OK), then the Phase 1 parallel kickoff.
 
 ## Schedule (IST)
 
