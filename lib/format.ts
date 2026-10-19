@@ -20,6 +20,7 @@ export function formatWait(w: Milestone["wait"] | undefined): string {
   if (!w) return UNKNOWN;
   if (w.maxDays === null) return `${w.minDays}+ days`;
   if (w.maxDays === 0) return "no wait";
+  if (w.minDays === 0) return `up to ${w.maxDays} ${w.maxDays === 1 ? "day" : "days"}`;
   return range(w.minDays, w.maxDays, w.maxDays === 1 ? "day" : "days");
 }
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import type { LibraryEntry } from "@/lib/data";
+import { DIFFICULTY_UNKNOWN } from "@/lib/guide-content";
 import type { Managed, Tier } from "@/lib/schema";
 
 export const tierStyles: Record<Tier, string> = {
@@ -53,7 +54,7 @@ export function AppCard({ entry }: { entry: LibraryEntry }) {
         {guide ? (
           <>
             <p className="mt-4 text-sm font-medium text-zinc-900">
-              {guide.difficulty.score}/5 · {guide.difficulty.label}
+              {guide.difficulty ? `${guide.difficulty.score}/5 · ${guide.difficulty.label}` : DIFFICULTY_UNKNOWN}
             </p>
             <p className="mt-1 line-clamp-2 text-sm text-zinc-600">{guide.summary}</p>
             <p className="mt-3 inline-flex rounded-md bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">
