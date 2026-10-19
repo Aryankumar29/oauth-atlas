@@ -20,7 +20,7 @@ Before you start:
 - Start with the box **"Do you need your own OAuth app?"** Gmail is Composio-managed, so stay on managed auth until you need your own brand, scopes, or quota.
 - Difficulty **5**, computed from the gates, not by the LLM. `gmail.readonly` / `gmail.modify` are restricted scopes, which means verification plus an annual CASA assessment.
 - The **send-only** profile (`gmail.send`) scores **3**: sensitive-scope verification, no CASA. "Pick the narrowest scope and the whole path changes."
-- Three milestones: dev-ready under an hour, pilot-ready (Testing mode, 100 test users, 7-day refresh tokens), production-ready at 14+ days with no upper bound.
+- Three milestones: dev-ready in up to an hour (0.5–1 h hands-on), pilot-ready (Testing mode, 100 test users, 7-day refresh tokens), production-ready at 14+ days with no upper bound.
 
 ## 2:15–3:00 — Instagram, weeks of waiting (`/apps/instagram`)
 

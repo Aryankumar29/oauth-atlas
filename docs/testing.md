@@ -53,9 +53,9 @@ The first time, run `npx playwright install chromium`. There are five tests:
 2. `/apps` shows "100 tracked" and 100 cards; the difficulty filter narrows them.
 3. Queued app cards link to `/generate`.
 4. `/apps/gmail` shows the Composio box and three milestones.
-5. `/generate` with "Miro" streams steps and lands on `/generate/<id>` with the `MOCK MODE` banner.
+5. `/generate` with "Miro" streams steps and lands on `/generate/<id>`. Locally it expects the `MOCK MODE` banner; against `E2E_BASE_URL` it expects no mock banner and a "Cached demo guide" or "Live-generated" label.
 
-Against a real deployment (`E2E_BASE_URL`), test 5 fails by design, because the deployed app is not in mock mode. Treat it as a manual check (`docs/deploy.md` §5). Results go to `e2e/.results` (traces are kept on failure).
+Against a deployment, test 5 is a cache hit only if Miro was warmed (`docs/deploy.md` §4); otherwise it uses up one live run of the 5/IP/hour budget. Results go to `e2e/.results` (traces are kept on failure).
 
 ## Live check (real keys)
 Put the keys in `.env.local` (names in `.env.example`) and leave `MOCK_LLM` unset. Run `npm run dev`, then go to `/generate` and submit "Miro". Expect:

@@ -79,7 +79,7 @@ Run on the preview, then on production in incognito.
 - [ ] `/evidence` loads. Note: its links to repo docs 404 while the GitHub repo is private (QA-6).
 - [ ] The 6th live run from one IP within an hour returns HTTP 429 with a rate-limit message.
 - [ ] The browser console shows no errors on the pages above.
-- [ ] Optional: `E2E_BASE_URL=https://<preview> npx playwright test`. The Miro case expects `MOCK MODE`, so it fails against a real deployment by design. The other cases should pass.
+- [ ] Optional: `E2E_BASE_URL=https://<preview> npx playwright test`. The spec is deployment-aware: against a deployment, the Miro case asserts there is no `MOCK MODE` banner and the guide is labeled "Cached demo guide" or "Live-generated". Caveat: Miro is a cache hit only after warming (§4); otherwise the test triggers one live run, which uses up one of the 5 runs per IP per hour and can take up to 3 min.
 
 ## 6. Rollback
 

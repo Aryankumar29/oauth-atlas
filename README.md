@@ -42,7 +42,7 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 
 `app/api/generate/route.ts` streams Server-Sent Events from `runPipeline` (`lib/agent/pipeline.ts`):
 
-1. **Resolve.** Matches the query to the seed list: exact name, slug, or alias first, then word-prefix. Short queries never pick a substring hit. An ambiguous match is listed in the guide's unknowns, and so is a guessed website.
+1. **Resolve.** Matches the query to the seed list in three tiers: exact name, slug, or alias first, then word-prefix, then substring. Substring matching applies only to queries of 3 or more characters; shorter queries resolve on an exact match only. A pasted URL matches the seed website host first, then the docs/console host, then the registrable domain. An ambiguous match is listed in the guide's unknowns, and so is a guessed website.
 2. **Composio.** Checks whether the app is Composio-managed. Sources in order: the toolkit API (with `COMPOSIO_API_KEY`), the live managed-auth page, then the bundled snapshot `data/composio-managed.json`: 123 managed / 211 bring-your-own toolkits, snapshot 2026-10-20, from https://docs.composio.dev/toolkits/managed-auth.
 3. **Discover** and **probe**, run concurrently:
    - **Discover:** a grounded LLM research call, then fetching official docs. A 403 gets a browser User-Agent retry, with the Jina Reader as a fallback. Login walls are detected.
@@ -70,7 +70,7 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 
 ```bash
 npm ci
-cp .env.example .env.local   # leave values empty for offline mode
+cp .env.example .env.local   # leave values empty; set MOCK_LLM=1 for offline mode
 ```
 
 Offline, with no keys:
