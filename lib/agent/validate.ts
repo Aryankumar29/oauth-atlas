@@ -127,9 +127,16 @@ export function officialDomainsFor(
   return [...out];
 }
 
+// Q&A and community paths on otherwise-official hosts (learn.microsoft.com/answers, Google Help Community, Meta threads).
+const UGC_PATHS = ["/answers/questions/", "/thread/", "/community/"];
+
 export function isUserContentUrl(url: string, domains: string[]): boolean {
   const h = hostOf(url);
   if (!h) return true;
+  try {
+    const path = new URL(url).pathname.toLowerCase();
+    if (UGC_PATHS.some((p) => path.includes(p))) return true;
+  } catch {}
   if (UGC_PREFIXES.includes(h.split(".")[0]) || UGC_HOSTS.includes(h) || h.endsWith("githubusercontent.com")) return true;
   if (h.endsWith(".slack.com") && !SLACK_OFFICIAL_HOSTS.includes(h)) return true;
   if (h === "github.com") {

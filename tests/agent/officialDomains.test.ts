@@ -43,6 +43,21 @@ describe("QA-7: user-generated hosts are never official", () => {
   });
 });
 
+describe("QA-10.1: Q&A and community paths", () => {
+  it.each([
+    ["https://learn.microsoft.com/en-us/answers/questions/123/oauth-consent", officialDomainsFor({ slug: "microsoft", website: "https://microsoft.com" })],
+    ["https://support.google.com/accounts/thread/12345/oauth-verification", officialDomainsFor({ slug: "google", website: "https://workspace.google.com" })],
+    ["https://developers.facebook.com/community/threads/123/", officialDomainsFor({ slug: "instagram", website: "https://instagram.com" })],
+  ])("%s is not official", (url, d) => {
+    expect(isOfficialUrl(url, d)).toBe(false);
+  });
+
+  it("normal docs on the same hosts stay official", () => {
+    expect(isOfficialUrl("https://learn.microsoft.com/en-us/entra/identity-platform/", officialDomainsFor({ slug: "microsoft", website: "https://microsoft.com" }))).toBe(true);
+    expect(isOfficialUrl("https://support.google.com/cloud/answer/9110914", officialDomainsFor({ slug: "google", website: "https://workspace.google.com" }))).toBe(true);
+  });
+});
+
 describe("QA-7: registrable domains", () => {
   it("keeps 3 labels for 2-level public suffixes", () => {
     expect(registrable("developer.acme.co.uk")).toBe("acme.co.uk");
