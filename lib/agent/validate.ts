@@ -42,10 +42,43 @@ export const OFFICIAL_DOMAINS: Record<string, string[]> = {
   slack: ["slack.com", "slack.dev"],
   google: ["google.com", "googleapis.com"],
   gmail: ["google.com", "googleapis.com"],
+  youtube: ["google.com", "googleapis.com"],
   github: ["github.com"],
   notion: ["notion.com", "notion.so"],
   microsoft: ["microsoft.com", "microsoftonline.com"],
+  outlook: ["microsoft.com"],
+  "one-drive": ["microsoft.com"],
+  onenote: ["microsoft.com"],
+  "microsoft-todo": ["microsoft.com"],
+  "microsoft-teams": ["microsoft.com"],
+  linkedin: ["microsoft.com"],
+  bitbucket: ["atlassian.com"],
+  trello: ["atlassian.com"],
+  jira: ["atlassian.com"],
+  confluence: ["atlassian.com"],
 };
+
+// GitHub orgs whose repos count as the provider's own (github.com/<org>/...). Default: the app slug.
+export const GITHUB_ORGS: Record<string, string[]> = {
+  github: ["github"],
+  slack: ["slackapi"],
+  microsoft: ["microsoft", "microsoftdocs", "azuread"],
+  google: ["google", "googleapis"],
+  notion: ["makenotion"],
+};
+
+// User-generated content, never primary even on an official domain (QA-7).
+const UGC_PREFIXES = ["community", "forum", "forums", "answers", "techcommunity", "groups", "sites", "discuss"];
+const UGC_HOSTS = ["storage.googleapis.com", "gist.github.com"];
+const SLACK_OFFICIAL_HOSTS = ["slack.com", "api.slack.com", "docs.slack.com"];
+// First path segments on github.com that are GitHub's own pages, not a user or org.
+const GITHUB_RESERVED = new Set([
+  "settings", "apps", "marketplace", "login", "features", "pricing", "enterprise", "about", "site",
+  "security", "organizations", "developer", "partners", "customer-stories", "",
+]);
+// Shared hosting suffixes: each subdomain is a different owner, so only the full host is official.
+const PLATFORM_SUFFIXES = ["github.io", "vercel.app", "netlify.app", "herokuapp.com", "notion.site", "pages.dev"];
+const SLD = new Set(["co", "com", "net", "org", "gov", "ac", "edu"]);
 
 const hostOf = (url: string): string | null => {
   try {
@@ -54,23 +87,63 @@ const hostOf = (url: string): string | null => {
     return null;
   }
 };
-const registrable = (host: string) => host.split(".").slice(-2).join(".");
 
-// The app website's registrable domain, the docs/console hosts, and the provider table.
-export function officialDomainsFor(app: Pick<ResolvedApp, "slug" | "website" | "docsUrl" | "consoleUrl">): string[] {
+export function registrable(host: string): string {
+  if (PLATFORM_SUFFIXES.some((p) => host === p || host.endsWith(`.${p}`))) return host;
+  const labels = host.split(".");
+  const n = labels.length;
+  // acme.co.uk, acme.com.au
+  if (n >= 3 && SLD.has(labels[n - 2]) && labels[n - 1].length === 2) return labels.slice(-3).join(".");
+  return labels.slice(-2).join(".");
+}
+
+const githubOwner = (url: string): string | null => {
+  try {
+    return new URL(url).pathname.split("/")[1]?.toLowerCase() ?? "";
+  } catch {
+    return null;
+  }
+};
+
+// Official set entries are domains ("miro.com", subdomains included) or GitHub scopes ("github.com/<org>").
+export function officialDomainsFor(
+  app: Pick<ResolvedApp, "slug" | "website" | "docsUrl" | "consoleUrl" | "websiteGuessed">,
+): string[] {
   const out = new Set<string>(OFFICIAL_DOMAINS[app.slug] ?? []);
-  const site = hostOf(app.website);
+  for (const org of GITHUB_ORGS[app.slug] ?? [app.slug]) out.add(`github.com/${org.toLowerCase()}`);
+  // A guessed website (bare name → name.com) is not evidence of ownership.
+  const site = app.websiteGuessed ? null : hostOf(app.website);
   if (site) out.add(registrable(site));
   for (const u of [app.docsUrl, app.consoleUrl]) {
     const h = u && hostOf(u);
-    if (h) out.add(h);
+    if (!h) continue;
+    if (h === "github.com") {
+      const owner = githubOwner(u);
+      if (owner && !GITHUB_RESERVED.has(owner)) out.add(`github.com/${owner}`);
+    } else {
+      out.add(h);
+    }
   }
   return [...out];
 }
 
+export function isUserContentUrl(url: string, domains: string[]): boolean {
+  const h = hostOf(url);
+  if (!h) return true;
+  if (UGC_PREFIXES.includes(h.split(".")[0]) || UGC_HOSTS.includes(h) || h.endsWith("githubusercontent.com")) return true;
+  if (h.endsWith(".slack.com") && !SLACK_OFFICIAL_HOSTS.includes(h)) return true;
+  if (h === "github.com") {
+    const owner = githubOwner(url);
+    return owner === null || (!GITHUB_RESERVED.has(owner) && !domains.includes(`github.com/${owner}`));
+  }
+  return false;
+}
+
 export function isOfficialUrl(url: string, domains: string[]): boolean {
   const h = hostOf(url);
-  return !!h && domains.some((d) => h === d || h.endsWith(`.${d}`));
+  if (!h || isUserContentUrl(url, domains)) return false;
+  if (h === "github.com" && domains.some((d) => d.startsWith("github.com/") && d === `github.com/${githubOwner(url)}`)) return true;
+  return domains.some((d) => !d.includes("/") && (h === d || h.endsWith(`.${d}`)));
 }
 
 const urlKey = (url: string) => {
