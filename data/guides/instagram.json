@@ -94,7 +94,7 @@
             }
           ],
           "lastChecked": "2026-10-20",
-          "note": "Lowest developer-reported App Review time (reports range 9–29 days); Business Verification runs in parallel; Meta publishes no SLA. From research.md §3.6. The thread returned 403 to our fetcher today. Confirm by reading the App Review dashboard during an attempt."
+          "note": "Lowest developer-reported App Review time (reports range 9–29 days); Meta publishes no SLA. From research.md §3.6. The thread returned 403 to our fetcher today. Confirm by reading the App Review dashboard during an attempt."
         }
       ]
     }
