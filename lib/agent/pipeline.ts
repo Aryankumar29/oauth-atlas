@@ -172,7 +172,7 @@ export async function runPipeline(
         deps.llm,
         { query: `${resolved.name} (${resolved.website})`, docs, probes: ctx.probes, composio },
         ctx,
-        { partial, timeoutMs: Math.max(1, hardRemaining()) },
+        { partial, remainingMs: hardRemaining },
       );
       guide = ex.guide;
       if (ex.ok) {

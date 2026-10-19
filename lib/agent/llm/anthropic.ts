@@ -110,7 +110,8 @@ export function anthropicAdapter(model: string, deps: AnthropicDeps): LlmAdapter
 
 export async function createAnthropicLlm(apiKey: string, model = ANTHROPIC_DEFAULT_MODEL): Promise<LlmAdapter> {
   const { default: AnthropicSdk } = await import("@anthropic-ai/sdk");
-  const client = new AnthropicSdk({ apiKey, maxRetries: 2 });
+  // No SDK retries: the pipeline owns retries and deadlines, and an abandoned call must not keep retrying (and billing).
+  const client = new AnthropicSdk({ apiKey, maxRetries: 0 });
   return anthropicAdapter(model, {
     create: (params, options) => client.beta.messages.create(params, options),
     errors: AnthropicSdk,

@@ -72,13 +72,25 @@ export async function extractGuide(
   llm: LlmAdapter,
   input: ExtractInput,
   ctx: GuideContext,
-  opts: { partial: boolean; attempts?: number; timeoutMs?: number },
+  opts: {
+    partial: boolean;
+    attempts?: number;
+    // Time left before the pipeline's hard deadline; every attempt is bounded by it.
+    remainingMs: () => number;
+    // Don't start a retry with less than this left (default 20 s).
+    minRetryMs?: number;
+  },
 ): Promise<ExtractOutcome> {
   const errors: string[] = [];
   const max = opts.attempts ?? 2;
+  const minRetryMs = opts.minRetryMs ?? 20_000;
   for (let attempt = 1; attempt <= max; attempt++) {
+    if (attempt > 1 && opts.remainingMs() < minRetryMs) {
+      errors.push(`retry skipped: ${Math.max(0, Math.round(opts.remainingMs() / 1000))}s left before the hard deadline`);
+      break;
+    }
     try {
-      const raw = await withTimeout(llm.extract(input), opts.timeoutMs ?? 120_000, "extract");
+      const raw = await withTimeout(llm.extract(input), opts.remainingMs(), "extract");
       const llmDifficulty = isObj(raw) && isObj(raw.verdict) ? raw.verdict.difficulty : undefined;
       const parsed = guideSchema.safeParse(normalizeDraft(raw, ctx, opts.partial));
       if (parsed.success) return { ok: true, guide: parsed.data, attempts: attempt, llmDifficulty };
