@@ -1,0 +1,39 @@
+{
+  "_note": "MOCK_LLM=1 HTTP fixtures. Entries marked synthetic are hand-written test pages, not real provider docs. Unlisted URLs return 404.",
+  "entries": [
+    {
+      "url": "https://developers.miro.com/docs/getting-started-with-oauth",
+      "synthetic": true,
+      "status": 200,
+      "contentType": "text/html",
+      "body": "<html><head><title>MOCK FIXTURE: Miro OAuth (synthetic)</title></head><body><h1>Synthetic Miro OAuth page</h1><p>This is a synthetic test fixture used in MOCK_LLM mode. It is not the real Miro documentation and must not be cited.</p><p>Fixture sentence A: apps can be installed by the developer in their own team for testing before any listing.</p><p>Fixture sentence B: to list an app in the marketplace, submit it for review.</p><p>Fixture sentence C: the authorization code grant is used with a redirect URI registered in app settings.</p><p>Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length.</p></body></html>"
+    },
+    {
+      "url": "https://developers.miro.com",
+      "synthetic": true,
+      "status": 302,
+      "headers": { "location": "https://miro.com/login/" },
+      "body": ""
+    },
+    {
+      "url": "https://developer.calendly.com/how-to-authenticate-with-oauth",
+      "synthetic": true,
+      "status": 403,
+      "contentType": "text/html",
+      "body": "<html><body>Forbidden</body></html>",
+      "browserUA": {
+        "status": 200,
+        "contentType": "text/html",
+        "body": "<html><head><title>MOCK FIXTURE: Calendly OAuth (synthetic)</title></head><body><p>Synthetic test fixture served only to a browser User-Agent. Not real Calendly documentation.</p><p>Fixture sentence A: register an OAuth application to receive a client ID and secret.</p><p>Fixture sentence B: the authorization code flow requires a redirect URI.</p><p>Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length.</p></body></html>"
+      }
+    },
+    {
+      "url": "https://docs.example-loginwall.test/oauth",
+      "synthetic": true,
+      "status": 200,
+      "finalUrl": "https://docs.example-loginwall.test/login?next=/oauth",
+      "contentType": "text/html",
+      "body": "<html><body><h1>Sign in</h1><form>Email <input> Password <input type=password></form></body></html>"
+    }
+  ]
+}

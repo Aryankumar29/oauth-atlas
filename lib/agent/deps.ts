@@ -1,0 +1,36 @@
+import { createMockFetch, createMockLlm } from "@/lib/agent/llm/mock";
+import type { PipelineOptions } from "@/lib/agent/pipeline";
+import type { LlmAdapter, PipelineDeps, RunEvent } from "@/lib/agent/types";
+import { getStore } from "@/lib/store";
+
+export const isMockMode = () => process.env.MOCK_LLM === "1";
+
+export type LlmProvider = "gemini" | "anthropic" | "openai";
+
+export function llmProvider(): LlmProvider {
+  const p = (process.env.LLM_PROVIDER || "gemini").toLowerCase();
+  return p === "anthropic" || p === "openai" ? p : "gemini";
+}
+
+export async function getLlm(): Promise<LlmAdapter> {
+  if (isMockMode()) return createMockLlm();
+  const { createLlm } = await import("@/lib/agent/llm");
+  return createLlm(llmProvider());
+}
+
+export async function createDeps(emit: (e: RunEvent) => void): Promise<PipelineDeps> {
+  return {
+    fetch: isMockMode() ? createMockFetch() : globalThis.fetch.bind(globalThis),
+    llm: await getLlm(),
+    store: await getStore(),
+    now: () => new Date(),
+    emit,
+  };
+}
+
+export function pipelineOptionsFromEnv(): PipelineOptions {
+  return {
+    reader: { enabled: !isMockMode() && process.env.READER_FALLBACK !== "0", apiKey: process.env.JINA_API_KEY || undefined },
+    composioApiKey: isMockMode() ? undefined : process.env.COMPOSIO_API_KEY || undefined,
+  };
+}

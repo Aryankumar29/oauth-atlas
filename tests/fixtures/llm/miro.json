@@ -1,0 +1,138 @@
+{
+  "_note": "MOCK_LLM fixture. Synthetic content for offline tests; quotes match tests/fixtures/http/recorded.json, not real Miro docs.",
+  "match": ["miro"],
+  "research": {
+    "citedUrls": ["https://developers.miro.com/docs/getting-started-with-oauth"]
+  },
+  "extract": {
+    "confidence": "high",
+    "ownApp": { "triggers": [], "notes": "[MOCK] Synthetic fixture." },
+    "verdict": {
+      "difficulty": 4,
+      "approvalModel": "listing-review",
+      "summary": "[MOCK] Synthetic guide: install in your own team for testing; marketplace listing needs review.",
+      "canTestBeforeApproval": true
+    },
+    "milestones": [
+      {
+        "id": "dev-ready",
+        "definition": "OAuth works for your own team in development.",
+        "handsOnHours": { "min": 0.5, "max": 1 },
+        "wait": { "minDays": 0, "maxDays": 0 },
+        "basis": "estimate",
+        "limitsUntilNext": [
+          {
+            "value": "Apps can be installed in the developer's own team before listing.",
+            "status": "primary",
+            "sources": [
+              {
+                "url": "https://developers.miro.com/docs/getting-started-with-oauth",
+                "quote": "apps can be installed by the developer in their own team for testing before any listing",
+                "fetchedAt": "2026-10-20T00:00:00Z"
+              }
+            ],
+            "lastChecked": "2026-10-20"
+          }
+        ]
+      },
+      {
+        "id": "pilot-ready",
+        "definition": "A few external teams can install the app.",
+        "handsOnHours": { "min": 1, "max": 2 },
+        "wait": { "minDays": 0, "maxDays": null },
+        "basis": "unknown",
+        "limitsUntilNext": []
+      },
+      {
+        "id": "production-ready",
+        "definition": "Any Miro user can install the app.",
+        "handsOnHours": { "min": 2, "max": 6 },
+        "wait": { "minDays": 0, "maxDays": null },
+        "basis": "unknown",
+        "limitsUntilNext": [
+          {
+            "value": "Marketplace review takes exactly 3 days.",
+            "status": "primary",
+            "sources": [
+              {
+                "url": "https://developers.miro.com/docs/getting-started-with-oauth",
+                "quote": "review is completed within three business days",
+                "fetchedAt": "2026-10-20T00:00:00Z"
+              }
+            ],
+            "lastChecked": "2026-10-20"
+          }
+        ]
+      }
+    ],
+    "gates": [
+      {
+        "type": "self-serve",
+        "name": "Create an app in the developer console",
+        "appliesWhen": "always",
+        "requiredFor": ["pilot-ready", "production-ready"]
+      },
+      {
+        "type": "marketplace-review",
+        "name": "Marketplace listing review",
+        "appliesWhen": "Only if you want a public marketplace listing",
+        "requiredFor": []
+      }
+    ],
+    "requirements": [],
+    "scopes": [],
+    "steps": [
+      {
+        "id": "create-app",
+        "phase": "create",
+        "title": "Create the app",
+        "actions": ["[MOCK] Create an app in the developer console."],
+        "owner": "human",
+        "doneWhen": "You have a client ID."
+      }
+    ],
+    "oauthConfig": {
+      "redirectUris": [
+        {
+          "value": "Authorization code grant with a redirect URI registered in app settings.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://developers.miro.com/docs/getting-started-with-oauth",
+              "quote": "the authorization code grant is used with a redirect URI registered in app settings",
+              "fetchedAt": "2026-10-20T00:00:00Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ],
+      "rateLimits": []
+    },
+    "blockers": [],
+    "agentTasks": ["[MOCK] Draft the marketplace listing text."],
+    "humanTasks": ["[MOCK] Create the developer account."],
+    "unknowns": ["[MOCK] Real review timelines were not researched in mock mode."],
+    "evidence": [
+      {
+        "id": "ev-install-own-team",
+        "claim": "Apps can be installed in your own team before listing.",
+        "sourceUrl": "https://developers.miro.com/docs/getting-started-with-oauth",
+        "sourceType": "official-doc",
+        "quote": "apps can be installed by the developer in their own team for testing before any listing",
+        "retrievedAt": "2026-10-20T00:00:00Z",
+        "status": "primary",
+        "confidence": "high"
+      },
+      {
+        "id": "ev-review-time",
+        "claim": "Marketplace review takes three business days.",
+        "sourceUrl": "https://developers.miro.com/docs/getting-started-with-oauth",
+        "sourceType": "official-doc",
+        "quote": "review is completed within three business days",
+        "retrievedAt": "2026-10-20T00:00:00Z",
+        "status": "primary",
+        "confidence": "high"
+      }
+    ]
+  }
+}
