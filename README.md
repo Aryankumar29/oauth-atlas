@@ -86,7 +86,7 @@ Deploying (Vercel, env var owners, duration limits, cache warming, smoke checkli
 ## Testing
 
 ```bash
-npm run check      # typecheck && lint && vitest (128 tests) && validate:guides && next build
+npm run check      # typecheck && lint && vitest (146 tests) && validate:guides && next build
 npm run test:e2e   # Playwright smoke on :3300 with MOCK_LLM=1 (first run: npx playwright install chromium)
 ```
 
@@ -96,7 +96,7 @@ Everything runs without API keys. Details are in [`docs/testing.md`](docs/testin
 
 `scripts/generate-library.ts` runs the same pipeline over the queued seed apps. It writes `data/guides/<slug>.json` only for guides that pass the SPEC §12 QA gate (`qaGate` in `lib/agent/batch.ts`). The gate requires all of these:
 - the guide is not partial
-- at least 3 distinct sources, at least 1 of them primary after validation
+- at least 3 distinct sources, not counting the run's own probe URLs, and at least 1 primary source after validation
 - at least one milestone limit is cited, and every gate that drives the difficulty score is cited
 - the probe step ran
 - the unknowns list is not empty
@@ -107,7 +107,7 @@ npx tsx scripts/generate-library.ts --dry-run --limit 3        # report only, wr
 npx tsx scripts/generate-library.ts --only miro,calendly        # write data/guides/<slug>.json for passing guides
 ```
 
-- **Idempotent:** existing guide files are skipped unless you pass `--force`.
+- **Idempotent:** existing guide files are skipped unless you pass `--force`. Curated guides (hand-written, or tier `verified`/`tested`) are never overwritten, even with `--force`. `--limit` must be a positive integer.
 - **Mock mode:** `MOCK_LLM=1` is refused without `--dry-run`, because mock output is never published.
 - **Isolated store:** batch runs use a memory store, so they never touch the public `guide:{slug}` cache.
 - **No auto-publish:** the script never edits `data/guides/index.ts` or the seed. It prints the import lines and the tier change for a human to apply after a spot check.
@@ -141,14 +141,14 @@ See `DECISIONS.md` for the full ADR log.
 
 - **No completed provider approvals.** No paid accounts or production domains were used.
 - **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) are **pending** in the verification log. Until they're recorded, `tested` evidence comes from credential-free endpoint probes only.
-- **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" and Business Verification "up to 14 business days" are secondary sources, and they are labeled as such.
+- **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" comes from community reports, and Business Verification "up to 14 business days" comes from a Meta business solution provider (360dialog). Both are labeled secondary.
 - **Live guides are drafts** until a human checks the sources. They are labeled unverified and never rated high confidence.
 - **LLM quota.** Live runs depend on the provider's quota; at 5 runs/IP/hour, a long run may end as a labeled partial guide.
 - Unverified items: see `docs/research.md` §6.4. These include the exact Composio BYO callback URL, the Microsoft Partner Center verification duration, LinkedIn partner timelines, Salesforce (JS-rendered) and Intuit (403) pages, and the "no self-serve" candidates.
 - Open QA items (`docs/qa-report.md`), all P2:
   - **QA-10(2):** `github.com/<slug>` is treated as official for every app, with no ownership check.
   - **QA-12:** The `/thread/` and `/community/` UGC denylist could downgrade a real docs page with that path segment.
-  - **QA-13:** URL inputs match seed apps by registrable domain only, so `https://mail.google.com` resolves to the generic `google` seed instead of `gmail`. Name inputs ("Gmail") are unaffected.
+  - **QA-13 residual:** URL inputs now match the seed website host, then the docs/console host, then the registrable domain. The match ignores the path, so `www.microsoft.com/microsoft-teams` resolves to `microsoft`, with Teams listed as an alternative.
   - Accepted: no `server-only` guard (QA-3); unknown slugs return 200 with a not-found page (QA-5); `/evidence` links to repo docs 404 while the repo is private (QA-6).
 - Time estimates are ranges with a stated basis, not guarantees. This is not legal or compliance advice.
 
