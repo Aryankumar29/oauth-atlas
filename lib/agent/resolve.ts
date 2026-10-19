@@ -54,6 +54,20 @@ function fromSeed(app: App, alternatives: ResolvedApp["alternatives"]): Resolved
   };
 }
 
+// Common names that don't match a seed slug or name.
+export const ALIASES: Record<string, string> = {
+  x: "twitter",
+  gcal: "googlecalendar",
+  "ms teams": "microsoft-teams",
+  "ms-teams": "microsoft-teams",
+};
+
+const words = (s: string) => s.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+
+function wordPrefix(a: App, lower: string, qs: string): boolean {
+  return words(a.name).some((w) => w.startsWith(lower)) || a.slug.split("-").some((w) => w.startsWith(qs)) || a.name.toLowerCase().startsWith(lower);
+}
+
 const brief = (a: App) => ({ slug: a.slug, name: a.name, website: a.website });
 
 // Deterministic resolution against the seed list; unknown apps are derived from the input.
@@ -84,16 +98,24 @@ export function resolveApp(query: string, slug?: string): ResolvedApp | { error:
   }
 
   const qs = slugify(q);
-  const lower = q.toLowerCase();
-  const exact = apps.filter((a) => a.slug === qs || a.name.toLowerCase() === lower);
-  const partial = apps.filter(
-    (a) => !exact.includes(a) && (a.slug.includes(qs) || a.name.toLowerCase().includes(lower)),
-  );
-  const ranked = [...exact, ...partial];
+  if (!qs) return { error: `"${q}" is not an app name or URL.` };
+  const lower = q.toLowerCase().replace(/\s+/g, " ");
+  const alias = ALIASES[lower] ?? ALIASES[qs];
+  const exact = apps.filter((a) => a.slug === qs || a.slug === alias || a.name.toLowerCase() === lower);
+  // Short queries ("x", "go") only resolve on an exact slug, name or alias match.
+  const ranked =
+    qs.length < 3
+      ? exact
+      : [
+          ...exact,
+          ...apps.filter((a) => !exact.includes(a) && wordPrefix(a, lower, qs)),
+          ...apps.filter((a) => !exact.includes(a) && !wordPrefix(a, lower, qs) && (a.slug.includes(qs) || a.name.toLowerCase().includes(lower))),
+        ];
   if (ranked.length) return fromSeed(ranked[0], ranked.slice(1, 5).map(brief));
 
+  // Unknown app: never a random seed match; the guessed website is labeled downstream.
   return {
-    slug: qs || "app",
+    slug: qs,
     name: q,
     website: `https://${qs.replace(/-/g, "")}.com`,
     category: "Uncategorized",
