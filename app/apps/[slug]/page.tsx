@@ -39,7 +39,7 @@ export default async function AppPage(props: PageProps<"/apps/[slug]">) {
           </span>
         </div>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-600">
-          {app.archetype.replaceAll("-", " ")} ·{" "}
+          {app.approvalModel.replaceAll("-", " ")} ·{" "}
           <a
             href={app.website}
             target="_blank"

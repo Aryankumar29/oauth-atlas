@@ -12,7 +12,7 @@
     "test:e2e": "playwright test",
     "validate:guides": "tsx scripts/validate-guides.ts",
     "snapshot:composio": "tsx scripts/snapshot-composio.ts",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run validate:guides"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run validate:guides && npm run build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",
