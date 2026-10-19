@@ -105,7 +105,8 @@
               "fetchedAt": "2026-10-19T20:43:34Z"
             }
           ],
-          "lastChecked": "2026-10-20"
+          "lastChecked": "2026-10-20",
+          "note": "Slack publishes only upper bounds (up to 10 business days, then up to 10 weeks); no minimum is published."
         }
       ]
     }
