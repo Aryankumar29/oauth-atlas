@@ -1,6 +1,6 @@
 import { LlmError } from "@/lib/agent/llm/errors";
 import type { ResolvedApp } from "@/lib/agent/resolve";
-import type { ExtractInput, LlmAdapter } from "@/lib/agent/types";
+import type { ExtractInput, LlmAdapter, LlmCallOptions } from "@/lib/agent/types";
 import { difficulty } from "@/lib/difficulty";
 import { guideSchema, type App, type ComposioInfo, type Guide, type Probe } from "@/lib/schema";
 
@@ -79,6 +79,7 @@ export async function extractGuide(
     remainingMs: () => number;
     // Don't start a retry with less than this left (default 20 s).
     minRetryMs?: number;
+    llmOpts?: LlmCallOptions;
   },
 ): Promise<ExtractOutcome> {
   const errors: string[] = [];
@@ -90,7 +91,7 @@ export async function extractGuide(
       break;
     }
     try {
-      const raw = await withTimeout(llm.extract(input), opts.remainingMs(), "extract");
+      const raw = await withTimeout(llm.extract(input, opts.llmOpts), opts.remainingMs(), "extract");
       const llmDifficulty = isObj(raw) && isObj(raw.verdict) ? raw.verdict.difficulty : undefined;
       const parsed = guideSchema.safeParse(normalizeDraft(raw, ctx, opts.partial));
       if (parsed.success) return { ok: true, guide: parsed.data, attempts: attempt, llmDifficulty };

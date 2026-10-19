@@ -3,7 +3,7 @@ import type { BetaMessage, MessageCreateParamsNonStreaming } from "@anthropic-ai
 import { afterEach, describe, expect, it } from "vitest";
 
 import { llmProvider } from "@/lib/agent/deps";
-import { ANTHROPIC_DEFAULT_MODEL, anthropicAdapter, mapAnthropicError } from "@/lib/agent/llm/anthropic";
+import { ANTHROPIC_DEFAULT_MODEL, anthropicAdapter, mapAnthropicError, type RequestOptions } from "@/lib/agent/llm/anthropic";
 import { LlmError, LlmRefusalError } from "@/lib/agent/llm/errors";
 import { createMockFetch, createMockLlm } from "@/lib/agent/llm/mock";
 import { runPipeline } from "@/lib/agent/pipeline";
@@ -20,13 +20,15 @@ const results = (...urls: string[]) => ({
 
 function fakeClient(responses: BetaMessage[]) {
   const calls: MessageCreateParamsNonStreaming[] = [];
-  const create = async (params: MessageCreateParamsNonStreaming) => {
+  const options: RequestOptions[] = [];
+  const create = async (params: MessageCreateParamsNonStreaming, opts: RequestOptions) => {
     calls.push(structuredClone(params));
+    options.push(opts);
     const r = responses.shift();
     if (!r) throw new Error("no more fake responses");
     return r;
   };
-  return { calls, adapter: anthropicAdapter(ANTHROPIC_DEFAULT_MODEL, { create, errors: Anthropic }) };
+  return { calls, options, adapter: anthropicAdapter(ANTHROPIC_DEFAULT_MODEL, { create, errors: Anthropic }) };
 }
 
 const input = { query: "Miro (https://miro.com)" };
@@ -97,12 +99,90 @@ describe("anthropic adapter: extract", () => {
   });
 });
 
+describe("per-request options (timeout, retries, signal)", () => {
+  const ex = { query: "Miro", docs: [], probes: [], composio: { managed: "yes" as const, checkedAt: "2026-10-20" } };
+
+  it("extract: maxRetries 0, timeout capped by the deadline, signal forwarded", async () => {
+    const { options, adapter } = fakeClient([msg("end_turn", [{ type: "text", text: "{}" }])]);
+    const signal = new AbortController().signal;
+    await adapter.extract(ex, { deadlineAt: Date.now() + 5_000, signal });
+    expect(options).toHaveLength(1);
+    expect(options[0].maxRetries).toBe(0);
+    expect(options[0].timeout).toBeGreaterThan(4_000);
+    expect(options[0].timeout).toBeLessThanOrEqual(5_000);
+    expect(options[0].signal).toBe(signal);
+  });
+
+  it("extract without a deadline uses the 180 s cap", async () => {
+    const { options, adapter } = fakeClient([msg("end_turn", [{ type: "text", text: "{}" }])]);
+    await adapter.extract(ex);
+    expect(options[0]).toMatchObject({ timeout: 180_000, maxRetries: 0 });
+  });
+
+  it("extract past the deadline fails fast without calling the API", async () => {
+    const { options, adapter } = fakeClient([]);
+    await expect(adapter.extract(ex, { deadlineAt: Date.now() - 1 })).rejects.toMatchObject({ kind: "timeout", retryable: false });
+    expect(options).toHaveLength(0);
+  });
+
+  it("research: maxRetries 1, timeout is min(own budget, soft deadline), signal on every continuation", async () => {
+    const { options, adapter } = fakeClient([msg("pause_turn", []), msg("end_turn", [])]);
+    const signal = new AbortController().signal;
+    await adapter.research(input, { deadlineAt: Date.now() + 60_000, signal });
+    expect(options).toHaveLength(2);
+    for (const o of options) {
+      expect(o.maxRetries).toBe(1);
+      expect(o.timeout).toBeLessThanOrEqual(60_000);
+      expect(o.signal).toBe(signal);
+    }
+    const { options: o2, adapter: a2 } = fakeClient([msg("end_turn", [])]);
+    await a2.research(input);
+    expect(o2[0].timeout).toBeLessThanOrEqual(140_000);
+    expect(o2[0].timeout).toBeGreaterThan(139_000);
+  });
+
+  it("research with under 5 s to the deadline makes no call", async () => {
+    const { options, adapter } = fakeClient([]);
+    await expect(adapter.research(input, { deadlineAt: Date.now() + 3_000 })).rejects.toMatchObject({ kind: "timeout" });
+    expect(options).toHaveLength(0);
+  });
+
+  it("the pipeline aborts the extract signal at the hard deadline and passes the soft-deadline signal to research", async () => {
+    let extractSignal: AbortSignal | undefined;
+    let researchSignal: AbortSignal | undefined;
+    const base = createMockLlm();
+    await runPipeline(
+      { query: "Miro", runId: "sig" },
+      {
+        fetch: createMockFetch(),
+        llm: {
+          research: (i, o) => {
+            researchSignal = o?.signal;
+            return base.research(i);
+          },
+          extract: (_i, o) => {
+            extractSignal = o?.signal;
+            return new Promise((_, reject) => o?.signal?.addEventListener("abort", () => reject(new Error("aborted"))));
+          },
+        },
+        store: createMemoryStore(),
+        now: () => new Date(),
+        emit: () => {},
+      },
+      { probeStepMs: 100, probeRequestMs: 50, fetchTimeoutMs: 100, hardDeadlineMs: 300 },
+    );
+    expect(researchSignal).toBeInstanceOf(AbortSignal);
+    expect(extractSignal?.aborted).toBe(true);
+  });
+});
+
 describe("error mapping (typed classes, most specific first)", () => {
   const headers = new Headers();
   it.each([
     [new Anthropic.RateLimitError(429, {}, "slow down", headers), "rate_limit"],
     [new Anthropic.AuthenticationError(401, {}, "bad key", headers), "auth"],
     [new Anthropic.APIConnectionTimeoutError(), "timeout"],
+    [new Anthropic.APIUserAbortError(), "timeout"],
     [new Anthropic.InternalServerError(500, {}, "boom", headers), "api"],
   ])("%s → %s", (err, kind) => {
     expect(mapAnthropicError(err, Anthropic)).toMatchObject({ kind });

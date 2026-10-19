@@ -3,7 +3,7 @@ import type { BetaMessage, MessageCreateParamsNonStreaming } from "@anthropic-ai
 
 import { LlmError, LlmRefusalError } from "@/lib/agent/llm/errors";
 import { EXTRACT_SYSTEM, extractPrompt, parseJsonLoose, researchFromText, researchPrompt } from "@/lib/agent/llm/prompts";
-import type { LlmAdapter } from "@/lib/agent/types";
+import type { LlmAdapter, LlmCallOptions } from "@/lib/agent/types";
 
 // Exact model ID, no date suffix. LLM_MODEL overrides. Thinking is always on for this model: never send `thinking`.
 export const ANTHROPIC_DEFAULT_MODEL = "claude-opus-5-5";
@@ -13,8 +13,12 @@ const MAX_CONTINUATIONS = 3;
 export const RESEARCH_BUDGET_MS = 140_000;
 export const EXTRACT_TIMEOUT_MS = 180_000;
 
-type CreateFn = (params: MessageCreateParamsNonStreaming, options?: { timeout?: number }) => Promise<BetaMessage>;
-type ErrorClasses = Pick<typeof Anthropic, "RateLimitError" | "AuthenticationError" | "APIConnectionTimeoutError" | "APIError">;
+export type RequestOptions = { timeout: number; maxRetries: number; signal?: AbortSignal };
+type CreateFn = (params: MessageCreateParamsNonStreaming, options: RequestOptions) => Promise<BetaMessage>;
+type ErrorClasses = Pick<
+  typeof Anthropic,
+  "RateLimitError" | "AuthenticationError" | "APIUserAbortError" | "APIConnectionTimeoutError" | "APIError"
+>;
 
 export type AnthropicDeps = { create: CreateFn; errors: ErrorClasses; now?: () => number };
 
@@ -29,6 +33,7 @@ export function mapAnthropicError(e: unknown, errors: ErrorClasses): unknown {
   if (e instanceof LlmError) return e;
   if (e instanceof errors.RateLimitError) return new LlmError("rate_limit", `Anthropic rate limit: ${e.message}`, false);
   if (e instanceof errors.AuthenticationError) return new LlmError("auth", "Anthropic API key was rejected", false);
+  if (e instanceof errors.APIUserAbortError) return new LlmError("timeout", "Anthropic request cancelled at the pipeline deadline", false);
   if (e instanceof errors.APIConnectionTimeoutError) return new LlmError("timeout", "Anthropic request timed out", false);
   if (e instanceof errors.APIError) return new LlmError("api", `Anthropic API error ${e.status ?? ""}: ${e.message}`, true);
   return e;
@@ -50,8 +55,11 @@ export function anthropicAdapter(model: string, deps: AnthropicDeps): LlmAdapter
   };
 
   return {
-    async research(input) {
+    async research(input, call?: LlmCallOptions) {
       const started = now();
+      // Own budget, capped by the pipeline's soft deadline.
+      const remainingFor = () =>
+        Math.min(RESEARCH_BUDGET_MS - (now() - started), (call?.deadlineAt ?? Infinity) - now());
       const params: MessageCreateParamsNonStreaming = {
         ...base,
         max_tokens: 16000,
@@ -61,9 +69,9 @@ export function anthropicAdapter(model: string, deps: AnthropicDeps): LlmAdapter
       const responses: BetaMessage[] = [];
       try {
         for (let i = 0; i <= MAX_CONTINUATIONS; i++) {
-          const remaining = RESEARCH_BUDGET_MS - (now() - started);
+          const remaining = remainingFor();
           if (remaining <= 5_000) break;
-          const msg = await deps.create(params, { timeout: remaining });
+          const msg = await deps.create(params, { timeout: remaining, maxRetries: 1, signal: call?.signal });
           checkRefusal(msg);
           responses.push(msg);
           if (msg.stop_reason !== "pause_turn") break;
@@ -84,7 +92,10 @@ export function anthropicAdapter(model: string, deps: AnthropicDeps): LlmAdapter
       return researchFromText(textOf(blocks), searched.slice(0, 4));
     },
 
-    async extract(input) {
+    async extract(input, call?: LlmCallOptions) {
+      // extractGuide owns the single retry, so the SDK makes none.
+      const timeout = Math.min(EXTRACT_TIMEOUT_MS, (call?.deadlineAt ?? Infinity) - now());
+      if (timeout <= 0) throw new LlmError("timeout", "No time left before the hard deadline", false);
       let msg: BetaMessage;
       try {
         msg = await deps.create(
@@ -94,7 +105,7 @@ export function anthropicAdapter(model: string, deps: AnthropicDeps): LlmAdapter
             system: EXTRACT_SYSTEM,
             messages: [{ role: "user", content: extractPrompt(input) }],
           },
-          { timeout: EXTRACT_TIMEOUT_MS },
+          { timeout, maxRetries: 0, signal: call?.signal },
         );
       } catch (e) {
         throw mapAnthropicError(e, deps.errors);
@@ -113,6 +124,7 @@ export async function createAnthropicLlm(apiKey: string, model = ANTHROPIC_DEFAU
   // No SDK retries: the pipeline owns retries and deadlines, and an abandoned call must not keep retrying (and billing).
   const client = new AnthropicSdk({ apiKey, maxRetries: 0 });
   return anthropicAdapter(model, {
+    // Per-request timeout, maxRetries and signal override the client defaults.
     create: (params, options) => client.beta.messages.create(params, options),
     errors: AnthropicSdk,
   });
