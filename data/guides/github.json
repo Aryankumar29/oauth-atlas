@@ -1,0 +1,463 @@
+{
+  "slug": "github",
+  "app": {
+    "slug": "github",
+    "name": "GitHub",
+    "website": "https://github.com",
+    "category": "Developer tools",
+    "docsUrl": "https://docs.github.com/en/apps/oauth-apps",
+    "consoleUrl": "https://github.com/settings/developers",
+    "approvalModel": "none",
+    "composio": {
+      "toolkitSlug": "github",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "verified",
+    "lastVerified": "2026-10-20"
+  },
+  "version": "1.0.0",
+  "lastVerified": "2026-10-20",
+  "confidence": "high",
+  "partial": false,
+  "ownApp": {
+    "triggers": [
+      "Your customers' organizations use OAuth app access restrictions (on by default for new orgs), so an org owner has to approve one specific app by name; you want that app to be yours, not a shared one (inferred from the GitHub restriction docs).",
+      "You want repository-scoped access with fine-grained permissions and short-lived installation tokens, which means registering your own GitHub App (inferred)."
+    ],
+    "notes": "Composio lists GitHub as a Composio-managed OAuth toolkit, so you can test with no app of your own. Registering your own app is free and needs no review. When you do, copy the callback URL from the Composio dashboard (Create Auth Config) into the app's \"Authorization callback URL\"; don't hard-code it. Switching affects new connections only."
+  },
+  "verdict": {
+    "difficulty": 1,
+    "approvalModel": "none",
+    "summary": "Instant: register an OAuth app or GitHub App in minutes, with no review. The only friction is org owners approving your app when an org has OAuth app access restrictions on.",
+    "canTestBeforeApproval": true
+  },
+  "milestones": [
+    {
+      "id": "dev-ready",
+      "definition": "Your own GitHub account can authorize the app and receive a user access token.",
+      "handsOnHours": { "min": 0.1, "max": 0.5 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": []
+    },
+    {
+      "id": "pilot-ready",
+      "definition": "Any GitHub user outside your team can authorize the app.",
+      "handsOnHours": { "min": 0, "max": 0.5 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": [
+        {
+          "value": "Users can authorize the app for their own resources, but organizations with OAuth app access restrictions block access to org resources until an org owner approves the app.",
+          "status": "primary",
+          "sources": [
+            {
+              "url": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
+              "title": "About OAuth app access restrictions",
+              "quote": "When OAuth app access restrictions are enabled, organization members and outside collaborators cannot authorize OAuth app access to organization resources.",
+              "fetchedAt": "2026-10-19T20:37:58Z"
+            }
+          ],
+          "lastChecked": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "id": "production-ready",
+      "definition": "Unrestricted public users can authorize the app. No GitHub review is needed; a Marketplace listing is optional.",
+      "handsOnHours": { "min": 0, "max": 1 },
+      "wait": { "minDays": 0, "maxDays": 0 },
+      "basis": "estimate",
+      "limitsUntilNext": []
+    }
+  ],
+  "gates": [
+    {
+      "type": "self-serve",
+      "name": "Register an OAuth app or GitHub App",
+      "appliesWhen": "always",
+      "requiredFor": ["pilot-ready", "production-ready"],
+      "cost": {
+        "value": "Free. A user or organization can own up to 100 OAuth apps.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+            "title": "Creating an OAuth app",
+            "quote": "A user or organization can own up to 100 OAuth apps.",
+            "fetchedAt": "2026-10-19T20:37:55Z"
+          }
+        ],
+        "lastChecked": "2026-10-20",
+        "note": "The page lists no fee. \"Free\" is our reading of that absence."
+      }
+    },
+    {
+      "type": "admin-consent",
+      "name": "Org OAuth app access restrictions",
+      "appliesWhen": "only if the target org has OAuth app restrictions enabled (default for new orgs)",
+      "requiredFor": [],
+      "duration": {
+        "value": "Depends on each org owner. GitHub publishes no timeline because it is the customer's decision.",
+        "status": "inferred",
+        "sources": [],
+        "lastChecked": "2026-10-20"
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "req-account",
+      "label": "GitHub account with 2FA",
+      "detail": "A personal account, or admin access to the organization that will own the app.",
+      "requiredFor": "dev-ready",
+      "owner": "human",
+      "evidenceIds": ["ev-create"]
+    },
+    {
+      "id": "req-app-type",
+      "label": "Decide: GitHub App or OAuth app",
+      "detail": "GitHub recommends GitHub Apps (fine-grained permissions, per-repository install, short-lived tokens). OAuth apps act only on behalf of a user and use coarse scopes such as repo.",
+      "requiredFor": "dev-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-diff"]
+    },
+    {
+      "id": "req-urls",
+      "label": "Homepage URL and callback URL",
+      "detail": "Homepage URL is required. The callback URL comes from the Composio dashboard if you use Composio. No privacy policy, logo or domain verification is required to register.",
+      "requiredFor": "dev-ready",
+      "owner": "both",
+      "evidenceIds": ["ev-create", "ev-composio-byo"]
+    }
+  ],
+  "scopes": [
+    {
+      "name": "repo",
+      "sensitivity": "unknown",
+      "whyNeeded": "Read and write code, issues and pull requests in private repositories on the user's behalf.",
+      "reviewTrigger": "No GitHub review. Org owners may have to approve the app before it can reach org repositories.",
+      "justificationDraft": "Our agent opens pull requests and comments on issues in repositories the user selects.",
+      "evidenceIds": ["ev-scopes", "ev-restrictions"]
+    },
+    {
+      "name": "read:user",
+      "sensitivity": "basic",
+      "whyNeeded": "Identify the connected user.",
+      "reviewTrigger": "None.",
+      "evidenceIds": ["ev-scopes"]
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "phase": "decide",
+      "title": "Choose GitHub App vs OAuth app",
+      "actions": [
+        "Use a GitHub App if you need per-repository access or want to act as the app; use an OAuth app if you only act as the signed-in user.",
+        "Keep the scope list to what the agent actually calls."
+      ],
+      "owner": "both",
+      "timeMinutes": 5,
+      "doneWhen": "App type and scopes or permissions are written down.",
+      "artifacts": [],
+      "evidenceIds": ["ev-diff"]
+    },
+    {
+      "id": "s2",
+      "phase": "create",
+      "title": "Register the app",
+      "actions": [
+        "Settings → Developer settings → OAuth apps → New OAuth App.",
+        "Fill Application name, Homepage URL and Authorization callback URL (up to 10).",
+        "Leave \"Expire user access tokens\" enabled unless your code can't refresh tokens yet.",
+        "Click Register application, then generate a client secret."
+      ],
+      "owner": "human",
+      "timeMinutes": 5,
+      "doneWhen": "You have a client ID and client secret.",
+      "artifacts": ["client ID", "client secret (store in your secret manager, never in the repo)"],
+      "evidenceIds": ["ev-create"]
+    },
+    {
+      "id": "s3",
+      "phase": "configure",
+      "title": "Wire it into Composio",
+      "actions": [
+        "In Composio, Create Auth Config → GitHub → OAuth2, and copy the redirect URI it shows into the GitHub callback URL.",
+        "Paste the client ID and secret back into Composio and pass the auth config ID in your session."
+      ],
+      "owner": "both",
+      "timeMinutes": 5,
+      "doneWhen": "A Composio session uses your auth config ID for github.",
+      "artifacts": ["auth config ID"],
+      "evidenceIds": ["ev-composio-byo"]
+    },
+    {
+      "id": "s4",
+      "phase": "test",
+      "title": "Authorize yourself and a user in a restricted org",
+      "actions": [
+        "Connect your own account and call one API endpoint.",
+        "Connect an account in an org with OAuth app restrictions and confirm the org-approval request path works."
+      ],
+      "owner": "both",
+      "timeMinutes": 10,
+      "doneWhen": "A token works for personal repos, and you know what an org owner must click.",
+      "artifacts": [],
+      "evidenceIds": ["ev-restrictions"]
+    }
+  ],
+  "oauthConfig": {
+    "redirectUris": [
+      {
+        "value": "Up to 10 callback URLs per OAuth app.",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+            "quote": "You can enter up to 10 callback URLs.",
+            "fetchedAt": "2026-10-19T20:37:55Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ],
+    "pkce": {
+      "value": "Supported with S256; GitHub calls code_challenge \"strongly recommended\".",
+      "status": "tested",
+      "testKind": "probe",
+      "sources": [
+        {
+          "url": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
+          "title": "RFC 8414 metadata (public preview)",
+          "quote": "\"code_challenge_methods_supported\": [\"S256\"]",
+          "fetchedAt": "2026-10-19T20:38:49Z"
+        },
+        {
+          "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+          "quote": "code_challenge string Strongly recommended Used to secure the authentication flow with PKCE (Proof Key for Code Exchange).",
+          "fetchedAt": "2026-10-19T20:37:56Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "tokenLifetime": {
+      "value": "With expiring tokens (on by default for new OAuth apps): access token 8 hours, refresh token 6 months without use.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+          "quote": "The access token expires after eight hours, and the refresh token expires after six months without use.",
+          "fetchedAt": "2026-10-19T20:37:56Z"
+        },
+        {
+          "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+          "quote": "Expire user access tokens is enabled by default.",
+          "fetchedAt": "2026-10-19T20:37:55Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "refresh": {
+      "value": "Refresh tokens are returned when expiring tokens are on, or per sign-in when you request the offline_access scope.",
+      "status": "primary",
+      "sources": [
+        {
+          "url": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+          "quote": "When you request the offline_access scope, you will receive an expiring access token and a refresh token even if your app is not configured to use expiring tokens.",
+          "fetchedAt": "2026-10-19T20:37:56Z"
+        }
+      ],
+      "lastChecked": "2026-10-20"
+    },
+    "rateLimits": [
+      {
+        "value": "5,000 requests per hour per user for OAuth-app requests made on a user's behalf (15,000 for GitHub Enterprise Cloud orgs).",
+        "status": "primary",
+        "sources": [
+          {
+            "url": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+            "quote": "All of these requests count towards your personal rate limit of 5,000 requests per hour.",
+            "fetchedAt": "2026-10-19T20:38:00Z"
+          }
+        ],
+        "lastChecked": "2026-10-20"
+      }
+    ]
+  },
+  "blockers": [
+    {
+      "id": "b-org-restrictions",
+      "severity": "medium",
+      "description": "Org OAuth app access restrictions are on by default for new orgs. Members can't grant your OAuth app access to org resources until an owner approves it.",
+      "affects": "pilot-ready",
+      "workaround": "Ask the org owner to approve the app, or ship a GitHub App that the org installs on selected repositories.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-restrictions"]
+    },
+    {
+      "id": "b-expiring-tokens",
+      "severity": "low",
+      "description": "Expiring user tokens are on by default. Code written for older tutorials that assume non-expiring tokens breaks after 8 hours.",
+      "affects": "dev-ready",
+      "workaround": "Implement the refresh flow, or uncheck the setting until you do.",
+      "agentCanHelp": true,
+      "evidenceIds": ["ev-tokens", "ev-create"]
+    }
+  ],
+  "agentTasks": [
+    "Recommend GitHub App vs OAuth app from the agent's actual API calls.",
+    "Fill the registration form in a logged-in browser and validate the callback URL.",
+    "Draft the message an org owner needs to approve the app."
+  ],
+  "humanTasks": [
+    "Log in to GitHub and complete 2FA.",
+    "Generate and store the client secret.",
+    "Org owners: approve the app for their organization."
+  ],
+  "probes": [
+    {
+      "url": "https://github.com/.well-known/openid-configuration",
+      "method": "GET",
+      "status": 404,
+      "observed": "No discovery document at the root path.",
+      "at": "2026-10-19T20:37:16Z"
+    },
+    {
+      "url": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
+      "method": "GET",
+      "status": 200,
+      "observed": "RFC 8414 metadata: issuer https://github.com/login/oauth, code_challenge_methods_supported [S256], grants authorization_code, refresh_token, device_code.",
+      "at": "2026-10-19T20:38:49Z"
+    },
+    {
+      "url": "https://github.com/login/oauth/authorize?client_id=oauth-atlas-probe&redirect_uri=https%3A%2F%2Fexample.com%2Fcb",
+      "method": "GET",
+      "status": 302,
+      "redirect": "https://github.com/login?client_id=oauth-atlas-probe&return_to=%2Flogin%2Foauth%2Fauthorize%3Fclient_id%3Doauth-atlas-probe%26redirect_uri%3Dhttps%253A%252F%252Fexample.com%252Fcb",
+      "observed": "Unauthenticated request redirects to login before validating the client_id.",
+      "at": "2026-10-19T20:37:17Z"
+    }
+  ],
+  "unknowns": [
+    "Whether Composio's managed GitHub toolkit uses an OAuth app or a GitHub App, and which scopes it requests.",
+    "Registration form fields as seen in the console today: pending the T-011 attempt.",
+    "GitHub Marketplace listing review time (optional path; not researched)."
+  ],
+  "evidence": [
+    {
+      "id": "ev-create",
+      "claim": "OAuth apps take up to 10 callback URLs and expire user tokens by default.",
+      "sourceUrl": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "sourceType": "official-doc",
+      "quote": "You can enter up to 10 callback URLs.",
+      "retrievedAt": "2026-10-19T20:37:55Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-tokens",
+      "claim": "Access tokens last 8 hours; refresh tokens 6 months without use.",
+      "sourceUrl": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps",
+      "sourceType": "official-doc",
+      "quote": "The access token expires after eight hours, and the refresh token expires after six months without use.",
+      "retrievedAt": "2026-10-19T20:37:56Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-diff",
+      "claim": "GitHub Apps are generally preferred over OAuth apps.",
+      "sourceUrl": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/differences-between-github-apps-and-oauth-apps",
+      "sourceType": "official-doc",
+      "quote": "In general, GitHub Apps are preferred over OAuth apps.",
+      "retrievedAt": "2026-10-19T20:37:57Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-restrictions",
+      "claim": "OAuth app access restrictions are enabled by default for new organizations.",
+      "sourceUrl": "https://docs.github.com/en/organizations/managing-oauth-access-to-your-organizations-data/about-oauth-app-access-restrictions",
+      "sourceType": "official-doc",
+      "quote": "When you create a new organization, OAuth app access restrictions are enabled by default.",
+      "retrievedAt": "2026-10-19T20:37:58Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-scopes",
+      "claim": "The repo scope grants full access to public and private repositories.",
+      "sourceUrl": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps",
+      "sourceType": "official-doc",
+      "quote": "Grants full access to public and private repositories including read and write access to code",
+      "retrievedAt": "2026-10-19T20:38:00Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-rate",
+      "claim": "User-to-server requests share a 5,000 requests/hour budget.",
+      "sourceUrl": "https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api",
+      "sourceType": "official-doc",
+      "quote": "All of these requests count towards your personal rate limit of 5,000 requests per hour.",
+      "retrievedAt": "2026-10-19T20:38:00Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-discovery",
+      "claim": "GitHub publishes RFC 8414 and OIDC discovery documents (public preview) under the issuer https://github.com/login/oauth.",
+      "sourceUrl": "https://docs.github.com/en/apps/github-authentication-discovery-endpoints",
+      "sourceType": "official-doc",
+      "quote": "GitHub publishes two metadata documents used in the OAuth 2.0 and OpenID Connect protocols",
+      "retrievedAt": "2026-10-19T20:38:39Z",
+      "status": "primary",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-probe-pkce",
+      "claim": "The RFC 8414 metadata advertises PKCE S256.",
+      "sourceUrl": "https://github.com/.well-known/oauth-authorization-server/login/oauth",
+      "sourceType": "test",
+      "quote": "\"code_challenge_methods_supported\": [\"S256\"]",
+      "retrievedAt": "2026-10-19T20:38:49Z",
+      "status": "tested",
+      "confidence": "high"
+    },
+    {
+      "id": "ev-composio-byo",
+      "claim": "For OAuth toolkits, the Composio dashboard shows the redirect URI to register with the provider.",
+      "sourceUrl": "https://docs.composio.dev/docs/authentication/custom-app-vs-managed-app",
+      "sourceType": "official-doc",
+      "quote": "For OAuth toolkits, the dashboard shows the redirect URI to add in the provider's developer portal.",
+      "retrievedAt": "2026-10-19T20:38:04Z",
+      "status": "primary",
+      "confidence": "high"
+    }
+  ],
+  "corrections": [
+    {
+      "date": "2026-10-20",
+      "claim": "OAuth app callback URLs and token expiry",
+      "before": "One callback URL per OAuth app; user tokens never expire.",
+      "after": "Up to 10 callback URLs; \"Expire user access tokens\" is on by default (8 h access / 6-month refresh).",
+      "reason": "Older tutorials predate the current docs.",
+      "sourceUrl": "https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app",
+      "guideVersion": "1.0.0"
+    },
+    {
+      "date": "2026-10-20",
+      "claim": "GitHub OAuth discovery",
+      "before": "GitHub has no OAuth discovery document (research.md §6.1 probe: 404).",
+      "after": "The root /.well-known/openid-configuration is 404, but GitHub publishes RFC 8414 and OIDC metadata under the issuer https://github.com/login/oauth (public preview, intended for MCP clients).",
+      "reason": "The earlier probe only tried the root path.",
+      "sourceUrl": "https://docs.github.com/en/apps/github-authentication-discovery-endpoints",
+      "guideVersion": "1.0.0"
+    }
+  ],
+  "generatedBy": "human"
+}
