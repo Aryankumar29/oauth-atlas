@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 02:30 IST
+**Last updated:** 2026-10-20 03:00 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -22,26 +22,33 @@
 
 ## In progress
 
-**02:30 block boundary.** Phase 1 started 02:05 (main pushed). The builders work in worktrees under `Desktop/One Piece/oauth-wt/{ui,pipeline,guides,verify,review}`. Agent-type worktree isolation did not apply, so the lead created them manually. No branch is merged or pushed yet; each waits for verifier approval in merge order.
+**03:00 block boundary.** About 1h45m ahead of plan. Local `main` is at 92c3449 and is **19 commits ahead of origin (unpushed; awaiting human OK)**. Builders work in worktrees under `Desktop/One Piece/oauth-wt/`.
 
-| Task | Branch @ sha | State |
-|---|---|---|
-| T-004 guides (5/5) + T-006a docs | `feat/T-004-guides` @ abc6f02 | done, in verifier review (blocks all merges) |
-| T-002 library | `feat/T-002-library` @ a65e85e | **approved** |
-| T-003 guide page | `feat/T-003-guide` @ aa97634 | 8f51c01 **approved**; partial-difficulty fix delta in review |
-| T-006b `/evidence` | `feat/T-006-evidence` @ 0a2e039 | done, queued for review |
-| T-005a+b live generation | `feat/T-005-agent` @ 6cf6152 | done in MOCK_LLM (63 tests); `scripts/cache-guide.ts` pending; GuideView swap after T-003 merges |
-| T-013 e2e smoke | `feat/T-013-e2e` @ 607581d | done; 3 pass and 2 fixme until T-004/T-005 land |
-| T-011 attempts | — | waiting on human + Grokbot |
+**Merged to main (all verifier-approved; integrated main green: check 102/102 tests, 5 guides; e2e 5/5 incl. Miro mock):**
+- T-010 contracts; T-004 5 guides + T-006a corrections/probe methodology (17/17 primary quotes re-matched)
+- T-002 library; T-003 guide page (GuideView, markdown, "up to N days", partial/unknown handling)
+- T-006b `/evidence`
+- T-005 live generation (SSE, store, probe, Gemini/Anthropic/OpenAI adapters, validator, rate limit, demo cache, cache-guide script) + official-domain hardening
+- T-013 Playwright smoke (5 specs) + `docs/qa-report.md`
+- fixes: Next 16 Suspense on `/apps/[slug]`; placeholder milestones render "unknown"; Instagram unsourced wording removed
 
-- **Cut lines at 02:30:** none apply. Every lane is ahead of its cap. The next checks are 03:30 (T-011: GitHub only) and 04:00/04:30 (already met in mock).
-- **Main-only commits since T-010:** 7480a2b (`next typegen` before tsc), a7d447b (`.gitattributes` for snapshot EOL). Not pushed.
-- **Content decisions:** Slack prod floor 0 (only upper bounds are published) and Instagram prod floor 9 (community), both with explicit notes. research.md was wrong in four places (GitHub discovery, the Slack 2026-03-03 extension, X Public Utility, Xero dates); see docs/corrections.md.
-- **Blockers (human):**
-  - A stale `next start -p 3100` (PIDs 25504/18744, started 00:49) locks the main checkout's node_modules, so that checkout needs `npm ci` after it stops. Stopping it was denied by the permission classifier.
-  - Repo visibility: the /evidence links 404 while the repo is private.
-  - Keys must be in before 04:30.
-  - Vercel plan for `maxDuration = 300`.
+**Open:**
+- `fix/T-005-resolve` (pipeline-engineer, cap 03:35): QA-9 P1, `resolveApp("X")` returns Dropbox; QA-10.1 path denylist for Q&A/forum pages.
+- T-011 attempts: no notes from human yet. **Cut 03:30:** GitHub/Notion stay `verified`, log says "not performed".
+- T-007 batch script and real Gemini runs: blocked on keys.
+- T-008 deploy/README: blocked on keys, `vercel link`, repo visibility, Vercel plan (`maxDuration = 300`).
+
+**Cut lines at 03:00:** none triggered. 04:00 (T-003) and 04:30 (live gen end-to-end in mock) are already met. 05:00 (real Gemini) depends on keys.
+
+**Accepted P2s:** typo slugs / unknown run ids return 200 with not-found UI; no `server-only` import (bundle verified clean); `/evidence` links 404 while repo is private.
+
+**Blockers (human):**
+- push approval
+- stale `next start -p 3100` (PIDs 25504/18744) locking the main checkout's node_modules (stop was denied by the permission classifier)
+- keys (Gemini, Upstash) + `vercel link`
+- T-011 notes
+- repo visibility
+- Vercel plan
 
 ## Schedule (IST)
 
