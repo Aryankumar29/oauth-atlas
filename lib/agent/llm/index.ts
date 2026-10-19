@@ -12,11 +12,11 @@ export async function createLlm(provider: LlmProvider): Promise<LlmAdapter> {
   if (!apiKey) throw new Error(`${KEY_ENV[provider]} is not set (LLM_PROVIDER=${provider}). Set MOCK_LLM=1 to run offline.`);
   const model = process.env.LLM_MODEL || undefined;
   switch (provider) {
-    case "anthropic":
-      return (await import("@/lib/agent/llm/anthropic")).createAnthropicLlm(apiKey, model);
+    case "gemini":
+      return (await import("@/lib/agent/llm/gemini")).createGeminiLlm(apiKey, model);
     case "openai":
       return (await import("@/lib/agent/llm/openai")).createOpenAiLlm(apiKey, model);
     default:
-      return (await import("@/lib/agent/llm/gemini")).createGeminiLlm(apiKey, model);
+      return (await import("@/lib/agent/llm/anthropic")).createAnthropicLlm(apiKey, model);
   }
 }

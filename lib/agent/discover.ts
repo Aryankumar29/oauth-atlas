@@ -1,6 +1,6 @@
 import { fetchDoc, type FetchDocOptions } from "@/lib/agent/fetchDoc";
 import type { ResolvedApp } from "@/lib/agent/resolve";
-import type { FetchedDoc, LlmAdapter } from "@/lib/agent/types";
+import type { FetchedDoc, LlmAdapter, LlmCallOptions } from "@/lib/agent/types";
 import { withTimeout } from "@/lib/agent/extract";
 
 export type DiscoverResult = {
@@ -16,14 +16,20 @@ const FETCH_CONCURRENCY = 3;
 
 export async function discover(
   resolved: ResolvedApp,
-  deps: { llm: LlmAdapter; fetchOpts: FetchDocOptions; remainingMs: () => number; onProgress: (msg: string) => void },
+  deps: {
+    llm: LlmAdapter;
+    fetchOpts: FetchDocOptions;
+    remainingMs: () => number;
+    onProgress: (msg: string) => void;
+    llmOpts?: LlmCallOptions;
+  },
 ): Promise<DiscoverResult> {
   const hints = [resolved.docsUrl, resolved.consoleUrl].filter((u): u is string => !!u);
   const out: DiscoverResult = { docs: [], citedUrls: [], failed: [], stoppedEarly: false };
 
   try {
     const research = await withTimeout(
-      deps.llm.research({ query: `${resolved.name} (${resolved.website})`, hints }),
+      deps.llm.research({ query: `${resolved.name} (${resolved.website})`, hints }, deps.llmOpts),
       deps.remainingMs(),
       "research",
     );

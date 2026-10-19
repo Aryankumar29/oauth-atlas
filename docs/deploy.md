@@ -8,9 +8,9 @@ Target: Vercel (Next.js 16 App Router). Deploys run only with the human's explic
 
 | Name | Required | Read by | Notes |
 |---|---|---|---|
-| `LLM_PROVIDER` | no | `lib/agent/deps.ts` | `gemini` (default), `anthropic`, or `openai` |
-| `LLM_MODEL` | no | `lib/agent/llm/index.ts` | Overrides the code defaults: `gemini-2.5-flash`, `claude-sonnet-5-5`, `gpt-5-mini` |
-| `GEMINI_API_KEY` | yes, for the default provider | `lib/agent/llm/index.ts` | Use `ANTHROPIC_API_KEY` or `OPENAI_API_KEY` instead if you switch the provider |
+| `LLM_PROVIDER` | no | `lib/agent/deps.ts` | `anthropic` (default), `gemini`, or `openai` |
+| `LLM_MODEL` | no | `lib/agent/llm/index.ts` | Overrides the code defaults: `claude-opus-5-5`, `gemini-2.5-flash`, `gpt-5-mini` |
+| `ANTHROPIC_API_KEY` | yes, for the default provider | `lib/agent/llm/index.ts` | Use `GEMINI_API_KEY` or `OPENAI_API_KEY` instead if you switch the provider |
 | `UPSTASH_REDIS_REST_URL` | yes, on Vercel | `lib/store.ts` | Without it the store is in-memory per instance: run pages show "not found" on another instance or after a cold start, and the demo cache is empty |
 | `UPSTASH_REDIS_REST_TOKEN` | yes, on Vercel | `lib/store.ts` | |
 | `JINA_API_KEY` | no | `lib/agent/deps.ts` | Jina Reader fallback for docs that block plain fetches. The fallback runs without a key |

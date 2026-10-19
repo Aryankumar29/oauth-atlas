@@ -1,5 +1,6 @@
+import { LlmError } from "@/lib/agent/llm/errors";
 import type { ResolvedApp } from "@/lib/agent/resolve";
-import type { ExtractInput, LlmAdapter } from "@/lib/agent/types";
+import type { ExtractInput, LlmAdapter, LlmCallOptions } from "@/lib/agent/types";
 import { difficulty } from "@/lib/difficulty";
 import { guideSchema, type App, type ComposioInfo, type Guide, type Probe } from "@/lib/schema";
 
@@ -71,13 +72,26 @@ export async function extractGuide(
   llm: LlmAdapter,
   input: ExtractInput,
   ctx: GuideContext,
-  opts: { partial: boolean; attempts?: number; timeoutMs?: number },
+  opts: {
+    partial: boolean;
+    attempts?: number;
+    // Time left before the pipeline's hard deadline; every attempt is bounded by it.
+    remainingMs: () => number;
+    // Don't start a retry with less than this left (default 20 s).
+    minRetryMs?: number;
+    llmOpts?: LlmCallOptions;
+  },
 ): Promise<ExtractOutcome> {
   const errors: string[] = [];
   const max = opts.attempts ?? 2;
+  const minRetryMs = opts.minRetryMs ?? 20_000;
   for (let attempt = 1; attempt <= max; attempt++) {
+    if (attempt > 1 && opts.remainingMs() < minRetryMs) {
+      errors.push(`retry skipped: ${Math.max(0, Math.round(opts.remainingMs() / 1000))}s left before the hard deadline`);
+      break;
+    }
     try {
-      const raw = await withTimeout(llm.extract(input), opts.timeoutMs ?? 120_000, "extract");
+      const raw = await withTimeout(llm.extract(input, opts.llmOpts), opts.remainingMs(), "extract");
       const llmDifficulty = isObj(raw) && isObj(raw.verdict) ? raw.verdict.difficulty : undefined;
       const parsed = guideSchema.safeParse(normalizeDraft(raw, ctx, opts.partial));
       if (parsed.success) return { ok: true, guide: parsed.data, attempts: attempt, llmDifficulty };
@@ -89,7 +103,8 @@ export async function extractGuide(
       );
     } catch (e) {
       errors.push(`attempt ${attempt}: ${e instanceof Error ? e.message : String(e)}`);
-      if (e instanceof TimeoutError) break;
+      // Refusals, auth and rate-limit failures won't change on an immediate retry.
+      if (e instanceof TimeoutError || (e instanceof LlmError && !e.retryable)) break;
     }
   }
   const error = errors.join(" | ");

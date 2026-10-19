@@ -48,10 +48,18 @@ export interface ExtractInput {
   composio: Guide["app"]["composio"];
 }
 
+// Optional per-call bounds from the pipeline. Adapters may ignore them; the pipeline still races its deadlines.
+export interface LlmCallOptions {
+  // Absolute epoch ms the call must finish by.
+  deadlineAt?: number;
+  // Fires when the pipeline abandons the call; forward it so the HTTP request is cancelled.
+  signal?: AbortSignal;
+}
+
 export interface LlmAdapter {
-  research(input: { query: string; hints?: string[] }): Promise<ResearchResult>;
+  research(input: { query: string; hints?: string[] }, opts?: LlmCallOptions): Promise<ResearchResult>;
   // Returns an unvalidated guide draft; the pipeline validates it with guideSchema.
-  extract(input: ExtractInput): Promise<unknown>;
+  extract(input: ExtractInput, opts?: LlmCallOptions): Promise<unknown>;
 }
 
 export interface RunRecord {
