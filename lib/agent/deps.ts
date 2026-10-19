@@ -15,7 +15,15 @@ export function llmProvider(): LlmProvider {
 export async function getLlm(): Promise<LlmAdapter> {
   if (isMockMode()) return createMockLlm();
   const { createLlm } = await import("@/lib/agent/llm");
-  return createLlm(llmProvider());
+  try {
+    return await createLlm(llmProvider());
+  } catch (e) {
+    // Keep the route usable (demo cache, labeled partial guides) when the provider is misconfigured.
+    const fail = async (): Promise<never> => {
+      throw e;
+    };
+    return { research: fail, extract: fail };
+  }
 }
 
 export async function createDeps(emit: (e: RunEvent) => void): Promise<PipelineDeps> {

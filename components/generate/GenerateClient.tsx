@@ -40,7 +40,7 @@ export function GenerateClient({ mock }: { mock: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [mockRun, setMockRun] = useState(false);
 
-  async function start(force = false) {
+  async function start(force = params.get("force") === "1") {
     if (!query.trim() || running) return;
     setRunning(true);
     setEvents([]);

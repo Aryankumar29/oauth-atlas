@@ -9,7 +9,11 @@ import { validateGuide } from "@/lib/agent/validate";
 import type { ComposioInfo, Guide } from "@/lib/schema";
 
 // Persisted run. `guide` is the guide this run produced (guide:{slug} only holds the latest).
-export type StoredRun = RunRecord & { guide?: Guide };
+export type StoredRun = RunRecord & {
+  guide?: Guide;
+  // Set when the demo cache answered instead of a live run.
+  cachedFrom?: { runId?: string; generatedAt: string };
+};
 
 export type PipelineOptions = {
   // SPEC §9.15: stop discovery and extract from what we have.
@@ -203,7 +207,9 @@ export async function runPipeline(
     await record("render", "start", "Saving the guide");
     run.guide = guide;
     run.guideSlug = guide.slug;
-    await deps.store.putGuide(guide);
+    // Never replace a complete guide:{slug} with a partial one; the run record still keeps its own guide.
+    const existing = guide.partial ? await deps.store.getGuide(guide.slug).catch(() => null) : null;
+    if (!existing || existing.partial) await deps.store.putGuide(guide);
     await record("render", "done", guide.partial ? "Saved a partial guide" : "Guide ready", { slug: guide.slug });
     return await finish(run, deps, guide.partial ? "partial" : "done");
   } catch (e) {

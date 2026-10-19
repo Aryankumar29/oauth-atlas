@@ -1,3 +1,4 @@
+import { clientIp, RATE_LIMIT, serveFromCache } from "@/lib/agent/cache";
 import { createDeps, isMockMode, pipelineOptionsFromEnv } from "@/lib/agent/deps";
 import { runPipeline } from "@/lib/agent/pipeline";
 import type { PipelineInput, RunEvent } from "@/lib/agent/types";
@@ -23,6 +24,22 @@ export async function POST(request: Request) {
   const input: PipelineInput = { query: query || slug!, slug, runId: crypto.randomUUID(), force: body.force === true };
   const encoder = new TextEncoder();
 
+  const queued: RunEvent[] = [];
+  let forward: (e: RunEvent) => void = (e) => queued.push(e);
+  const deps = await createDeps((e) => forward(e));
+
+  // Cache hits are free; only live runs count toward the limit (SPEC §9.14). Mock runs are never limited.
+  const cached = await serveFromCache(input, deps);
+  if (!cached && !isMockMode()) {
+    const count = await deps.store.incrRate(clientIp(request), RATE_LIMIT.windowSeconds);
+    if (count > RATE_LIMIT.max) {
+      return Response.json(
+        { error: `Rate limit: at most ${RATE_LIMIT.max} live runs per hour. Try a cached demo app or come back later.` },
+        { status: 429, headers: { "Retry-After": String(RATE_LIMIT.windowSeconds) } },
+      );
+    }
+  }
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let open = true;
@@ -35,11 +52,12 @@ export async function POST(request: Request) {
           open = false;
         }
       };
-      send("run", { runId: input.runId, mock: isMockMode() });
+      send("run", { runId: input.runId, mock: isMockMode(), cached: !!cached });
+      queued.forEach((e) => send("step", e));
+      forward = (e) => send("step", e);
       try {
-        const deps = await createDeps((e: RunEvent) => send("step", e));
-        const run = await runPipeline(input, deps, pipelineOptionsFromEnv());
-        send("done", { runId: run.runId, status: run.status, guideSlug: run.guideSlug, error: run.error });
+        const run = cached ?? (await runPipeline(input, deps, pipelineOptionsFromEnv()));
+        send("done", { runId: run.runId, status: run.status, guideSlug: run.guideSlug, error: run.error, cached: !!cached });
       } catch (e) {
         send("done", { runId: input.runId, status: "failed", error: e instanceof Error ? e.message : String(e) });
       } finally {

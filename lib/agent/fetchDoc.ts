@@ -112,7 +112,8 @@ export async function fetchDoc(url: string, opts: FetchDocOptions): Promise<Fetc
       failures.push(`${via}: HTTP ${r.res.status}`);
       continue;
     }
-    const doc = toDoc(url, r.body, r.res.headers.get("content-type"), opts);
+    // Final URL after redirects (search-grounding links are redirect wrappers).
+    const doc = toDoc(r.res.url || url, r.body, r.res.headers.get("content-type"), opts);
     if (looksLikeLoginWall(r.res, url, doc.text)) {
       loginWall = true;
       failures.push(`${via}: login wall`);

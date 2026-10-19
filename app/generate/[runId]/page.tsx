@@ -38,6 +38,17 @@ async function Run({ params }: { params: PageProps<"/generate/[runId]">["params"
       <p className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800">
         Live-generated — verify before relying on it.
       </p>
+      {run.cachedFrom && guide && (
+        <p className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-900">
+          Cached demo guide, generated {run.cachedFrom.generatedAt}.{" "}
+          <Link
+            href={`/generate?app=${encodeURIComponent(guide.app.name)}&slug=${guide.slug}&force=1`}
+            className="font-medium underline"
+          >
+            Regenerate live
+          </Link>
+        </p>
+      )}
       {run.status === "running" && (
         <p className="text-sm text-zinc-600">This run is still in progress. Refresh to see more.</p>
       )}
