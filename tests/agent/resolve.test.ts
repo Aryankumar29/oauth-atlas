@@ -29,6 +29,21 @@ describe("resolveApp (QA-9)", () => {
     expect("error" in r ? null : { slug: r.slug, website: r.website, seed: r.seed }).toEqual({ slug, website, seed: undefined });
   });
 
+  it.each([
+    ["https://developers.notion.com", "notion"],
+    ["https://developers.notion.com/docs/authorization", "notion"],
+    ["https://mail.google.com", "gmail"],
+    ["calendar.google.com", "googlecalendar"],
+    ["https://drive.google.com/drive/my-drive", "googledrive"],
+    ["miro.com", "miro"],
+    ["https://developers.miro.com", "miro"],
+    ["api.slack.com", "slack"],
+    ["https://github.com/settings", "github"],
+    ["https://docs.github.com/en/apps", "github"],
+  ])("QA-13: pasted URL %s → %s", (q, slug) => {
+    expect(slugOf(q)).toBe(slug);
+  });
+
   it("short queries without an exact match never pick a substring hit", () => {
     expect(slugOf("bo")).toBe("unknown:bo");
   });
