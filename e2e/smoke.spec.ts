@@ -57,7 +57,11 @@ test("gmail guide shows the Composio box and three milestones", async ({ page })
   await expect(page.getByTestId("milestone")).toHaveCount(3);
 });
 
-test("generate Miro streams steps and lands on the run page in mock mode", async ({ page }) => {
+// Locally (MOCK_LLM=1) this asserts the MOCK banner. Against a deployment (E2E_BASE_URL) Miro is normally a
+// demo-cache hit, so it asserts there is no MOCK banner and the guide is labeled cached or live-generated.
+const deployed = !!process.env.E2E_BASE_URL;
+
+test("generate Miro streams steps and lands on the run page", async ({ page }) => {
   test.setTimeout(180_000);
   await page.goto("/generate");
   await page.getByLabel(/app name or website/i).fill("Miro");
@@ -67,8 +71,13 @@ test("generate Miro streams steps and lands on the run page in mock mode", async
   await expect.poll(() => page.getByTestId("generate-step").count()).toBeGreaterThan(1);
 
   await page.waitForURL(/\/generate\/[^/?#]+$/, { timeout: 150_000 });
-  // The /generate banner can linger in the DOM during the client transition; assert on the visible one.
-  await expect(page.getByText(/MOCK MODE/).locator("visible=true")).toHaveCount(1);
+  if (deployed) {
+    await expect(page.getByText(/MOCK MODE/)).toHaveCount(0);
+    await expect(page.getByText(/Cached demo guide|Live-generated/).first()).toBeVisible();
+  } else {
+    // The /generate banner can linger in the DOM during the client transition; assert on the visible one.
+    await expect(page.getByText(/MOCK MODE/).locator("visible=true")).toHaveCount(1);
+  }
   await expect(page.getByTestId("composio-box")).toBeVisible();
   await expect(page.getByTestId("milestone")).toHaveCount(3);
 });
