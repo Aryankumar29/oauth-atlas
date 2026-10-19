@@ -4,218 +4,1337 @@
     "name": "GitHub",
     "website": "https://github.com",
     "category": "Developer tools",
-    "archetype": "self-serve",
     "docsUrl": "https://docs.github.com/en/apps/oauth-apps",
     "consoleUrl": "https://github.com/settings/developers",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "none",
+    "composio": {
+      "toolkitSlug": "github",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "google",
     "name": "Google Workspace",
     "website": "https://workspace.google.com",
     "category": "Productivity",
-    "archetype": "verification-heavy",
     "docsUrl": "https://developers.google.com/identity/protocols/oauth2",
     "consoleUrl": "https://console.cloud.google.com/apis/credentials",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googlesuper",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "slack",
     "name": "Slack",
     "website": "https://slack.com",
     "category": "Communication",
-    "archetype": "marketplace",
     "docsUrl": "https://api.slack.com/authentication/oauth-v2",
     "consoleUrl": "https://api.slack.com/apps",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "slack",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "notion",
     "name": "Notion",
     "website": "https://www.notion.so",
     "category": "Productivity",
-    "archetype": "self-serve",
     "docsUrl": "https://developers.notion.com/docs/authorization",
     "consoleUrl": "https://www.notion.so/my-integrations",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "none",
+    "composio": {
+      "toolkitSlug": "notion",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "salesforce",
     "name": "Salesforce",
     "website": "https://www.salesforce.com",
     "category": "CRM",
-    "archetype": "enterprise",
     "docsUrl": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_oauth_and_connected_apps.htm",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "salesforce",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "plaid",
     "name": "Plaid",
     "website": "https://plaid.com",
     "category": "Fintech",
-    "archetype": "fintech",
     "docsUrl": "https://plaid.com/docs/link/oauth/",
     "consoleUrl": "https://dashboard.plaid.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "managed": "unknown",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "hubspot",
     "name": "HubSpot",
     "website": "https://www.hubspot.com",
     "category": "CRM",
-    "archetype": "marketplace",
     "docsUrl": "https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth",
     "consoleUrl": "https://developers.hubspot.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "hubspot",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "atlassian",
     "name": "Atlassian",
     "website": "https://www.atlassian.com",
     "category": "Productivity",
-    "archetype": "marketplace",
     "docsUrl": "https://developer.atlassian.com/cloud/oauth/getting-started/overview/",
     "consoleUrl": "https://developer.atlassian.com/console/myapps/",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "jira",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "shopify",
     "name": "Shopify",
     "website": "https://www.shopify.com",
     "category": "Commerce",
-    "archetype": "marketplace",
     "docsUrl": "https://shopify.dev/docs/apps/auth/oauth",
     "consoleUrl": "https://partners.shopify.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "shopify",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "microsoft",
     "name": "Microsoft 365",
     "website": "https://www.microsoft.com/microsoft-365",
     "category": "Productivity",
-    "archetype": "enterprise",
     "docsUrl": "https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow",
     "consoleUrl": "https://entra.microsoft.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "outlook",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "miro",
     "name": "Miro",
     "website": "https://miro.com",
     "category": "Collaboration",
-    "archetype": "marketplace",
     "docsUrl": "https://developers.miro.com/docs/getting-started-with-oauth",
     "consoleUrl": "https://developers.miro.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "miro",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "calendly",
     "name": "Calendly",
     "website": "https://calendly.com",
     "category": "Scheduling",
-    "archetype": "long-tail",
     "docsUrl": "https://developer.calendly.com/how-to-authenticate-with-oauth",
     "consoleUrl": "https://developer.calendly.com",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "calendly",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "linear",
     "name": "Linear",
     "website": "https://linear.app",
     "category": "Developer tools",
-    "archetype": "self-serve",
     "docsUrl": "https://developers.linear.app/docs/oauth/authentication",
     "consoleUrl": "https://linear.app/settings/api/applications",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "linear",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "airtable",
     "name": "Airtable",
     "website": "https://www.airtable.com",
     "category": "Productivity",
-    "archetype": "self-serve",
     "docsUrl": "https://airtable.com/developers/web/guides/oauth",
     "consoleUrl": "https://airtable.com/create/oauth",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "airtable",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "asana",
     "name": "Asana",
     "website": "https://asana.com",
     "category": "Productivity",
-    "archetype": "marketplace",
     "docsUrl": "https://developers.asana.com/docs/oauth",
     "consoleUrl": "https://app.asana.com/0/my-apps",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "asana",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "dropbox",
     "name": "Dropbox",
     "website": "https://www.dropbox.com",
     "category": "Storage",
-    "archetype": "marketplace",
     "docsUrl": "https://developers.dropbox.com/oauth-guide",
     "consoleUrl": "https://www.dropbox.com/developers/apps",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "dropbox",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "zoom",
     "name": "Zoom",
     "website": "https://zoom.us",
     "category": "Communication",
-    "archetype": "marketplace",
     "docsUrl": "https://developers.zoom.us/docs/integrations/oauth/",
     "consoleUrl": "https://marketplace.zoom.us/develop/create",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "zoom",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "stripe",
     "name": "Stripe",
     "website": "https://stripe.com",
     "category": "Fintech",
-    "archetype": "fintech",
     "docsUrl": "https://docs.stripe.com/connect/oauth-reference",
     "consoleUrl": "https://dashboard.stripe.com/settings/connect",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "stripe",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "quickbooks",
     "name": "QuickBooks",
     "website": "https://quickbooks.intuit.com",
     "category": "Fintech",
-    "archetype": "enterprise",
     "docsUrl": "https://developer.intuit.com/app/developer/qbo/docs/develop/authentication-and-authorization/oauth-2.0",
     "consoleUrl": "https://developer.intuit.com/app/developer/myapps",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "quickbooks",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   },
   {
     "slug": "meta",
     "name": "Meta",
     "website": "https://www.meta.com",
     "category": "Social",
-    "archetype": "verification-heavy",
     "docsUrl": "https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow",
     "consoleUrl": "https://developers.facebook.com/apps",
-    "managedOAuth": "unknown",
-    "tier": "indexed"
+    "approvalModel": "app-review",
+    "composio": {
+      "toolkitSlug": "facebook",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "gmail",
+    "name": "Gmail",
+    "website": "https://mail.google.com",
+    "category": "Email",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "gmail",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googlecalendar",
+    "name": "Google Calendar",
+    "website": "https://calendar.google.com",
+    "category": "Scheduling",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googlecalendar",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googledrive",
+    "name": "Google Drive",
+    "website": "https://drive.google.com",
+    "category": "Storage",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googledrive",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googlesheets",
+    "name": "Google Sheets",
+    "website": "https://sheets.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googlesheets",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googledocs",
+    "name": "Google Docs",
+    "website": "https://docs.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googledocs",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googleslides",
+    "name": "Google Slides",
+    "website": "https://slides.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googleslides",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googlemeet",
+    "name": "Google Meet",
+    "website": "https://meet.google.com",
+    "category": "Communication",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googlemeet",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googletasks",
+    "name": "Google Tasks",
+    "website": "https://tasks.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googletasks",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "youtube",
+    "name": "YouTube",
+    "website": "https://www.youtube.com",
+    "category": "Media",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "youtube",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "google-analytics",
+    "name": "Google Analytics",
+    "website": "https://analytics.google.com",
+    "category": "Analytics",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "google_analytics",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googleads",
+    "name": "Google Ads",
+    "website": "https://ads.google.com",
+    "category": "Marketing",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googleads",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "google-chat",
+    "name": "Google Chat",
+    "website": "https://chat.google.com",
+    "category": "Communication",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "google_chat",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googlecontacts",
+    "name": "Google Contacts",
+    "website": "https://contacts.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googlecontacts",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "googleforms",
+    "name": "Google Forms",
+    "website": "https://forms.google.com",
+    "category": "Productivity",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "googleforms",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "google-admin",
+    "name": "Google Admin",
+    "website": "https://admin.google.com",
+    "category": "IT admin",
+    "approvalModel": "scope-verification",
+    "composio": {
+      "toolkitSlug": "google_admin",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "outlook",
+    "name": "Outlook",
+    "website": "https://outlook.office.com",
+    "category": "Email",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "outlook",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "microsoft-teams",
+    "name": "Microsoft Teams",
+    "website": "https://www.microsoft.com/microsoft-teams",
+    "category": "Communication",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "microsoft_teams",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "one-drive",
+    "name": "OneDrive",
+    "website": "https://onedrive.live.com",
+    "category": "Storage",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "one_drive",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "share-point",
+    "name": "SharePoint",
+    "website": "https://www.microsoft.com/microsoft-365/sharepoint",
+    "category": "Collaboration",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "share_point",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "excel",
+    "name": "Excel",
+    "website": "https://www.microsoft.com/microsoft-365/excel",
+    "category": "Productivity",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "excel",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "onenote",
+    "name": "Microsoft OneNote",
+    "website": "https://www.onenote.com",
+    "category": "Productivity",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "onenote",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "microsoft-todo",
+    "name": "Microsoft To Do",
+    "website": "https://to-do.office.com",
+    "category": "Productivity",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "microsoft_todo",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "microsoft-power-bi",
+    "name": "Microsoft Power BI",
+    "website": "https://powerbi.microsoft.com",
+    "category": "Analytics",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "microsoft_power_bi",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "dynamics365",
+    "name": "Dynamics 365",
+    "website": "https://dynamics.microsoft.com",
+    "category": "CRM",
+    "approvalModel": "admin-consent",
+    "composio": {
+      "toolkitSlug": "dynamics365",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "instagram",
+    "name": "Instagram",
+    "website": "https://www.instagram.com",
+    "category": "Social",
+    "approvalModel": "app-review",
+    "composio": {
+      "toolkitSlug": "instagram",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "whatsapp",
+    "name": "WhatsApp",
+    "website": "https://www.whatsapp.com",
+    "category": "Communication",
+    "approvalModel": "app-review",
+    "composio": {
+      "toolkitSlug": "whatsapp",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "metaads",
+    "name": "Meta Ads",
+    "website": "https://www.facebook.com/business/ads",
+    "category": "Marketing",
+    "approvalModel": "app-review",
+    "composio": {
+      "toolkitSlug": "metaads",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "linkedin",
+    "name": "LinkedIn",
+    "website": "https://www.linkedin.com",
+    "category": "Social",
+    "approvalModel": "partner-program",
+    "composio": {
+      "toolkitSlug": "linkedin",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "linkedin-ads",
+    "name": "LinkedIn Ads",
+    "website": "https://business.linkedin.com/marketing-solutions/ads",
+    "category": "Marketing",
+    "approvalModel": "partner-program",
+    "composio": {
+      "toolkitSlug": "linkedin_ads",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "jira",
+    "name": "Jira",
+    "website": "https://www.atlassian.com/software/jira",
+    "category": "Developer tools",
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "jira",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "confluence",
+    "name": "Confluence",
+    "website": "https://www.atlassian.com/software/confluence",
+    "category": "Collaboration",
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "confluence",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "zoom-chat",
+    "name": "Zoom Team Chat",
+    "website": "https://www.zoom.com/en/products/team-chat/",
+    "category": "Communication",
+    "approvalModel": "listing-review",
+    "composio": {
+      "toolkitSlug": "zoom_chat",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "gitlab",
+    "name": "GitLab",
+    "website": "https://gitlab.com",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "gitlab",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "bitbucket",
+    "name": "Bitbucket",
+    "website": "https://bitbucket.org",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "bitbucket",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "figma",
+    "name": "Figma",
+    "website": "https://www.figma.com",
+    "category": "Design",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "figma",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "canva",
+    "name": "Canva",
+    "website": "https://www.canva.com",
+    "category": "Design",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "canva",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "clickup",
+    "name": "ClickUp",
+    "website": "https://clickup.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "clickup",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "trello",
+    "name": "Trello",
+    "website": "https://trello.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "trello",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "monday",
+    "name": "monday.com",
+    "website": "https://monday.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "monday",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "box",
+    "name": "Box",
+    "website": "https://www.box.com",
+    "category": "Storage",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "box",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "discord",
+    "name": "Discord",
+    "website": "https://discord.com",
+    "category": "Communication",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "discord",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "reddit",
+    "name": "Reddit",
+    "website": "https://www.reddit.com",
+    "category": "Social",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "reddit",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "pinterest",
+    "name": "Pinterest",
+    "website": "https://www.pinterest.com",
+    "category": "Social",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "pinterest",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "intercom",
+    "name": "Intercom",
+    "website": "https://www.intercom.com",
+    "category": "Support",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "intercom",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "zendesk",
+    "name": "Zendesk",
+    "website": "https://www.zendesk.com",
+    "category": "Support",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "zendesk",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "mailchimp",
+    "name": "Mailchimp",
+    "website": "https://mailchimp.com",
+    "category": "Marketing",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "mailchimp",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "typeform",
+    "name": "Typeform",
+    "website": "https://www.typeform.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "typeform",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "todoist",
+    "name": "Todoist",
+    "website": "https://todoist.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "todoist",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "wrike",
+    "name": "Wrike",
+    "website": "https://www.wrike.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "wrike",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "webex",
+    "name": "Webex",
+    "website": "https://www.webex.com",
+    "category": "Communication",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "webex",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "attio",
+    "name": "Attio",
+    "website": "https://attio.com",
+    "category": "CRM",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "attio",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "basecamp",
+    "name": "Basecamp",
+    "website": "https://basecamp.com",
+    "category": "Productivity",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "basecamp",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "gong",
+    "name": "Gong",
+    "website": "https://www.gong.io",
+    "category": "Sales",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "gong",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "greenhouse",
+    "name": "Greenhouse",
+    "website": "https://www.greenhouse.com",
+    "category": "HR",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "greenhouse",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "pagerduty",
+    "name": "PagerDuty",
+    "website": "https://www.pagerduty.com",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "pagerduty",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "sentry",
+    "name": "Sentry",
+    "website": "https://sentry.io",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "sentry",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "supabase",
+    "name": "Supabase",
+    "website": "https://supabase.com",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "supabase",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "square",
+    "name": "Square",
+    "website": "https://squareup.com",
+    "category": "Commerce",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "square",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "twitch",
+    "name": "Twitch",
+    "website": "https://www.twitch.tv",
+    "category": "Media",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "twitch",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "zoho",
+    "name": "Zoho",
+    "website": "https://www.zoho.com",
+    "category": "CRM",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "zoho",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "freshbooks",
+    "name": "FreshBooks",
+    "website": "https://www.freshbooks.com",
+    "category": "Fintech",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "freshbooks",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "eventbrite",
+    "name": "Eventbrite",
+    "website": "https://www.eventbrite.com",
+    "category": "Events",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "eventbrite",
+      "managed": "yes",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "xero",
+    "name": "Xero",
+    "website": "https://www.xero.com",
+    "category": "Fintech",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "xero",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "docusign",
+    "name": "DocuSign",
+    "website": "https://www.docusign.com",
+    "category": "Legal",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "docusign",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "twitter",
+    "name": "X (Twitter)",
+    "website": "https://x.com",
+    "category": "Social",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "twitter",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "spotify",
+    "name": "Spotify",
+    "website": "https://www.spotify.com",
+    "category": "Media",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "spotify",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "tiktok",
+    "name": "TikTok",
+    "website": "https://www.tiktok.com",
+    "category": "Social",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "tiktok",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "snapchat",
+    "name": "Snapchat",
+    "website": "https://www.snapchat.com",
+    "category": "Social",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "snapchat",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "paypal",
+    "name": "PayPal",
+    "website": "https://www.paypal.com",
+    "category": "Fintech",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "paypal",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "pipedrive",
+    "name": "Pipedrive",
+    "website": "https://www.pipedrive.com",
+    "category": "CRM",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "pipedrive",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "netsuite",
+    "name": "NetSuite",
+    "website": "https://www.netsuite.com",
+    "category": "ERP",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "netsuite",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "workday",
+    "name": "Workday",
+    "website": "https://www.workday.com",
+    "category": "HR",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "workday",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "servicenow",
+    "name": "ServiceNow",
+    "website": "https://www.servicenow.com",
+    "category": "IT admin",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "servicenow",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "gusto",
+    "name": "Gusto",
+    "website": "https://gusto.com",
+    "category": "HR",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "gusto",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "klaviyo",
+    "name": "Klaviyo",
+    "website": "https://www.klaviyo.com",
+    "category": "Marketing",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "klaviyo",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "vercel",
+    "name": "Vercel",
+    "website": "https://vercel.com",
+    "category": "Developer tools",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "vercel",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "webflow",
+    "name": "Webflow",
+    "website": "https://webflow.com",
+    "category": "Web",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "webflow",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "wix",
+    "name": "Wix",
+    "website": "https://www.wix.com",
+    "category": "Web",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "wix",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "bamboohr",
+    "name": "BambooHR",
+    "website": "https://www.bamboohr.com",
+    "category": "HR",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "bamboohr",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
+  },
+  {
+    "slug": "zoominfo",
+    "name": "ZoomInfo",
+    "website": "https://www.zoominfo.com",
+    "category": "Sales",
+    "approvalModel": "unknown",
+    "composio": {
+      "toolkitSlug": "zoominfo",
+      "managed": "no",
+      "checkedAt": "2026-10-20"
+    },
+    "tier": "queued"
   }
 ]
