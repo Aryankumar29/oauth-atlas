@@ -63,8 +63,8 @@ Baseline: local `main` @ c86ab7c, clean `.next`, `MOCK_LLM=1`, checked about 03:
 
 | # | Criterion | Status | Evidence |
 |---|---|---|---|
-| 1 | check passes; deployed; incognito | **PASS** (check, deploy) / **PENDING** (incognito) | check green on main; the preview serves all 12 routes I checked with 200. Incognito can't be tested on an auth-protected preview; do it on prod. |
-| 2 | e2e in MOCK mode | **PASS** (local) | 5/5 on main. Not run against the preview (see "Not covered"). |
+| 1 | check passes; deployed; incognito | **PASS** | check green on main (3× on the prod commit). **Prod** `https://oauth-atlas.vercel.app` (dpl_3cddrZeG…, main b343790), checked with no cookies or auth at about 06:30 IST: all 11 app routes return 200 with no MOCK banner; `/apps` shows 100 tracked. `/.env`, `/.env.local`, `/.env.example`, `/.git/config`, `/package.json`, `/README.md` and `/docs/*` all return 404. A grep of all 11 client JS/CSS assets (738 KB) for key names, `sk-ant-`, `AIza…`, `x-api-key`, `@anthropic-ai` and `upstash.io` found 0 hits. HSTS is set. `GET /api/generate` returns 405. |
+| 2 | e2e | **PASS** | 5/5 locally in MOCK mode, and **5/5 against prod** (`E2E_BASE_URL=https://oauth-atlas.vercel.app`, 9.4 s). The Miro spec was a demo-cache hit (2.7 s), so no live run was spent. |
 | 3 | 100 apps, four filters, correct counts | **PASS** | `/apps` header "100 tracked · 5 guides · 0 tested"; 0 tested is correct after the T-011 cut. |
 | 4 | 5 guide pages with own-app box, 3 milestones, gates, unknowns | **PASS** | `/apps/{github,notion,slack,gmail,instagram}`: `composio-box` ×1 and `milestone` ×3 each, no MOCK banner. |
 | 5 | difficulty from `lib/difficulty.ts` | **PASS** | Live runs report `computed` difficulty; the LLM value is ignored (`llm=null`). Curated scores are unchanged. |
