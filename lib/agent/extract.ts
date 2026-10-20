@@ -90,8 +90,14 @@ export async function extractGuide(
       errors.push(`retry skipped: ${Math.max(0, Math.round(opts.remainingMs() / 1000))}s left before the hard deadline`);
       break;
     }
+    // Don't start a call there is no time for.
+    const ms = opts.remainingMs();
+    if (ms <= 0) {
+      errors.push(`attempt ${attempt}: ${new TimeoutError("extract", 0).message}`);
+      break;
+    }
     try {
-      const raw = await withTimeout(llm.extract(input, opts.llmOpts), opts.remainingMs(), "extract");
+      const raw = await withTimeout(llm.extract(input, opts.llmOpts), ms, "extract");
       const llmDifficulty = isObj(raw) && isObj(raw.verdict) ? raw.verdict.difficulty : undefined;
       const parsed = guideSchema.safeParse(normalizeDraft(raw, ctx, opts.partial));
       if (parsed.success) return { ok: true, guide: parsed.data, attempts: attempt, llmDifficulty };
@@ -155,7 +161,11 @@ export class TimeoutError extends Error {
 }
 
 export function withTimeout<T>(p: Promise<T>, ms: number, label: string): Promise<T> {
-  if (ms <= 0) return Promise.reject(new TimeoutError(label, 0));
+  if (ms <= 0) {
+    // The call was already started: observe its eventual rejection so it can't surface as unhandled.
+    p.catch(() => {});
+    return Promise.reject(new TimeoutError(label, 0));
+  }
   let timer: ReturnType<typeof setTimeout>;
   return Promise.race([
     p,

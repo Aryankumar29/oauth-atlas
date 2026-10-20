@@ -34,9 +34,12 @@ export async function discover(
   const out: DiscoverResult = { docs: [], citedUrls: [], failed: [], stoppedEarly: false, researchTimedOut: false, skippedUnsafe: 0 };
 
   try {
+    // Don't start a research call there is no time for.
+    const ms = deps.remainingMs();
+    if (ms <= 0) throw new TimeoutError("research", 0);
     const research = await withTimeout(
       deps.llm.research({ query: `${resolved.name} (${resolved.website})`, hints }, deps.llmOpts),
-      deps.remainingMs(),
+      ms,
       "research",
     );
     out.docs.push(...research.docs);

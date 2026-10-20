@@ -61,6 +61,13 @@ function isPrivateV6(ip: string): boolean {
   if (p.slice(0, 5).every((x) => x === 0) && (p[5] === 0xffff || p[5] === 0)) {
     return isPrivateV4(`${p[6] >> 8}.${p[6] & 0xff}.${p[7] >> 8}.${p[7] & 0xff}`);
   }
+  const v4 = (hi: number, lo: number) => `${hi >> 8}.${hi & 0xff}.${lo >> 8}.${lo & 0xff}`;
+  // NAT64 64:ff9b::/96 carries the IPv4 in the last 32 bits.
+  if (p[0] === 0x64 && p[1] === 0xff9b && p.slice(2, 6).every((x) => x === 0)) return isPrivateV4(v4(p[6], p[7]));
+  // 6to4 2002::/16 carries it in bits 16-47.
+  if (p[0] === 0x2002) return isPrivateV4(v4(p[1], p[2]));
+  // Teredo 2001::/32 tunnels to an obfuscated IPv4: refuse outright.
+  if (p[0] === 0x2001 && p[1] === 0) return true;
   if ((p[0] & 0xfe00) === 0xfc00) return true; // fc00::/7 unique-local
   if ((p[0] & 0xffc0) === 0xfe80) return true; // fe80::/10 link-local
   if ((p[0] & 0xff00) === 0xff00) return true; // multicast
