@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 06:10 IST
+**Last updated:** 2026-10-20 06:55 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -35,6 +35,9 @@
 
 **Cut lines at 05:30:** 05:00 (real LLM) is met. 05:30 (preview deploy) is met, so no feature freeze is triggered beyond fixes only.
 
+
+**06:55 update: SHIPPED.** Prod https://oauth-atlas.vercel.app passed e2e 5/5 against prod and the incognito smoke (all routes 200, no secrets in the bundle, /.env and /.git 404). Demo guides regenerated live on prod at 06:48: Miro 152 s (run 69bfaa60-c9de-4c89-94c2-f213051c16aa), Calendly 116 s (run 9e60428c-49f3-46c6-a8fb-e1fbb4a1653c). Both are clean, with "Skipped 1 non-public URLs" (QA-18 confirmed live) and 0 off-domain primaries; the cache serves them. No P0 or P1 open. SPEC §14: all PASS except #7 (T-011 cut, disclosed). Open P2s: QA-10(2), QA-12, the QA-13 residual, QA-19, QA-20, QA-22(2).
+- Human, before submission: rotate the Anthropic key, make the repo public, stop the port-3100 server, rehearse with docs/demo-script.md, submit.
 
 **06:10 update: PRODUCTION LIVE** at https://oauth-atlas.vercel.app (dpl_3cddrZeGFk1auywQKr7wb9pRs47f, from main b343790), promoted under the human's option-(c) approval after every gate passed (verifier APPROVE on 21aeccf; check 3x green with 236 tests; e2e 5/5; final preview smoke 11/11 routes at 200, no .env in files). The contaminated first deploy (dpl_HdGd…) has been **removed**. Public smoke without auth: all routes 200, "100 tracked", 100 cards, no MOCK banner.
 - T-009 QA (preview): no P0. QA-18 (SSRF, P1) fixed in b632dcd plus 21aeccf. QA-21 fixed. Open P2s: QA-19 (guessed-website domains), QA-20 (nonexistent app shows as done/5), QA-22(2) (DNS rebinding), QA-10(2), QA-12, the QA-13 Teams residual.
