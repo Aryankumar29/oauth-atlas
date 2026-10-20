@@ -3,7 +3,7 @@
 Before you start:
 - Warm the cache for Miro and Calendly (`docs/deploy.md` §4).
 - Open the tabs: `/apps`, `/apps/gmail`, `/apps/instagram`, `/apps/github`, `/generate`, `/evidence`. Also open the cached Miro run page as the fallback.
-- Use the deployed URL `<!-- LIVE_URL -->`, not localhost.
+- Use the deployed URL `https://oauth-atlas.vercel.app`, not localhost.
 
 ## 0:00–0:30 — The problem
 

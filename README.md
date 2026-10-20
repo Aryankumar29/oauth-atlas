@@ -4,7 +4,7 @@
 
 Provider docs tell you how to configure OAuth. OAuth Atlas tells you whether you need your own OAuth app at all, how long approval will take, what will block you, and what to do next — with sources.
 
-- **Live:** <!-- LIVE_URL -->
+- **Live:** https://oauth-atlas.vercel.app
 - **Repo:** https://github.com/Aryankumar29/oauth-atlas
 
 ## Why this exists

@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 05:30 IST
+**Last updated:** 2026-10-20 06:10 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -35,7 +35,13 @@
 
 **Cut lines at 05:30:** 05:00 (real LLM) is met. 05:30 (preview deploy) is met, so no feature freeze is triggered beyond fixes only.
 
-**Next:** T-009 QA (verifier, 05:25–06:20) → P0 fixes → prod at about 06:30 on the human's explicit OK → incognito smoke test.
+
+**06:10 update: PRODUCTION LIVE** at https://oauth-atlas.vercel.app (dpl_3cddrZeGFk1auywQKr7wb9pRs47f, from main b343790), promoted under the human's option-(c) approval after every gate passed (verifier APPROVE on 21aeccf; check 3x green with 236 tests; e2e 5/5; final preview smoke 11/11 routes at 200, no .env in files). The contaminated first deploy (dpl_HdGd…) has been **removed**. Public smoke without auth: all routes 200, "100 tracked", 100 cards, no MOCK banner.
+- T-009 QA (preview): no P0. QA-18 (SSRF, P1) fixed in b632dcd plus 21aeccf. QA-21 fixed. Open P2s: QA-19 (guessed-website domains), QA-20 (nonexistent app shows as done/5), QA-22(2) (DNS rebinding), QA-10(2), QA-12, the QA-13 Teams residual.
+- Remaining: ~06:45 forced Miro/Calendly regeneration on prod (clears the stale localhost unknowns and confirms SSRF live); verifier e2e against prod; then buffer, demo rehearsal and submission (human).
+- Human, open: rotate the Anthropic key (recommended), repo visibility (the /evidence links need public), stop the stale port-3100 server.
+
+**Earlier next:** T-009 QA (verifier, 05:25–06:20) → P0 fixes → prod at about 06:30 on the human's explicit OK → incognito smoke test.
 
 ## Schedule (IST)
 
