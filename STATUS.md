@@ -1,6 +1,6 @@
 # Status
 
-**Last updated:** 2026-10-20 03:00 IST
+**Last updated:** 2026-10-20 05:30 IST
 **Phase:** 1, ship day (build starts 01:30). **Prod target: 07:00 IST**, buffer to 08:30.
 **Owner:** Grokbot (coordination), Claude Code lead + subagents (build), verifier on Fable (verification), Human (accounts/demo)
 
@@ -22,33 +22,20 @@
 
 ## In progress
 
-**03:00 block boundary.** About 1h45m ahead of plan. Local `main` is at 92c3449 and is **19 commits ahead of origin (unpushed; awaiting human OK)**. Builders work in worktrees under `Desktop/One Piece/oauth-wt/`.
+**05:30 block boundary.** Code complete; all merged work is pushed (origin/main d628e3f). T-009 QA is running on the preview.
 
-**Merged to main (all verifier-approved; integrated main green: check 102/102 tests, 5 guides; e2e 5/5 incl. Miro mock):**
-- T-010 contracts; T-004 5 guides + T-006a corrections/probe methodology (17/17 primary quotes re-matched)
-- T-002 library; T-003 guide page (GuideView, markdown, "up to N days", partial/unknown handling)
-- T-006b `/evidence`
-- T-005 live generation (SSE, store, probe, Gemini/Anthropic/OpenAI adapters, validator, rate limit, demo cache, cache-guide script) + official-domain hardening
-- T-013 Playwright smoke (5 specs) + `docs/qa-report.md`
-- fixes: Next 16 Suspense on `/apps/[slug]`; placeholder milestones render "unknown"; Instagram unsourced wording removed
+**Done since 03:00**
+- All tasks merged and verifier-approved: T-002, T-003, T-004, T-005, T-006a/b, T-007, T-008 docs, T-013, plus QA fixes QA-1…QA-17 (open: QA-10(2), QA-12, the QA-13 Teams residual; accepted: QA-3/5/6/16).
+- **LLM switched to the Claude API** (no Gemini key): `claude-opus-5-5`, effort medium, `web_search_20260209`, pause_turn handling, server-side refusal fallback, per-attempt hard deadline, abort at deadlines.
+- **T-011 cut at 03:30**: setup attempts not performed; SPEC §14 #7 = FAIL (cut). GitHub and Notion stay `verified`.
+- **Vercel**: project `aryn7/oauth-atlas` (Hobby), linked via CLI, no Git integration (no auto-deploys). Env set as secrets: `ANTHROPIC_API_KEY`, Upstash `KV_REST_API_URL/TOKEN`.
+- **Preview** https://oauth-atlas-qwv4suwb6-aryn7.vercel.app (protected): real Miro run done in 168 s (34 claims, 0 downgraded, 25 primary); Calendly 127 s; Miro repeat is a cache hit (8 s). Demo cache is warm in Upstash.
 
-**Open:**
-- `fix/T-005-resolve` (pipeline-engineer, cap 03:35): QA-9 P1, `resolveApp("X")` returns Dropbox; QA-10.1 path denylist for Q&A/forum pages.
-- T-011 attempts: no notes from human yet. **Cut 03:30:** GitHub/Notion stay `verified`, log says "not performed".
-- T-007 batch script and real Gemini runs: blocked on keys.
-- T-008 deploy/README: blocked on keys, `vercel link`, repo visibility, Vercel plan (`maxDuration = 300`).
+**Incident, 04:3x**: Vercel assigned the project's FIRST deploy to production (https://oauth-atlas.vercel.app) without a `--prod` OK. That deploy also uploaded `.env` (Anthropic key) and `claude-kit.zip` into its stored source, because there was no `.vercelignore`. The key is not in client JS; the source is team-visible only. Fixed: `.vercelignore` added (d628e3f), and the clean preview is verified to have no `.env`. **Pending human decision:** delete the contaminated prod deployment, rotate the key, and choose when to promote the clean build.
 
-**Cut lines at 03:00:** none triggered. 04:00 (T-003) and 04:30 (live gen end-to-end in mock) are already met. 05:00 (real Gemini) depends on keys.
+**Cut lines at 05:30:** 05:00 (real LLM) is met. 05:30 (preview deploy) is met, so no feature freeze is triggered beyond fixes only.
 
-**Accepted P2s:** typo slugs / unknown run ids return 200 with not-found UI; no `server-only` import (bundle verified clean); `/evidence` links 404 while repo is private.
-
-**Blockers (human):**
-- push approval
-- stale `next start -p 3100` (PIDs 25504/18744) locking the main checkout's node_modules (stop was denied by the permission classifier)
-- keys (Gemini, Upstash) + `vercel link`
-- T-011 notes
-- repo visibility
-- Vercel plan
+**Next:** T-009 QA (verifier, 05:25–06:20) → P0 fixes → prod at about 06:30 on the human's explicit OK → incognito smoke test.
 
 ## Schedule (IST)
 
