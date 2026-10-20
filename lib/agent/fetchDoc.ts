@@ -1,4 +1,5 @@
 import type { FetchedDoc } from "@/lib/agent/types";
+import { checkFetchUrlResolved, type DnsLookup } from "@/lib/agent/urlGuard";
 
 // SPEC §9.9 fallback chain: plain → browser UA → reader (optional) → unreachable.
 
@@ -12,7 +13,7 @@ export type FetchVia = "plain" | "browser-ua" | "reader";
 
 export type FetchDocResult =
   | { ok: true; doc: FetchedDoc; via: FetchVia; status: number }
-  | { ok: false; url: string; reason: "unreachable" | "login-wall"; detail: string };
+  | { ok: false; url: string; reason: "unreachable" | "login-wall" | "blocked"; detail: string };
 
 export type FetchDocOptions = {
   fetch: typeof globalThis.fetch;
@@ -21,7 +22,11 @@ export type FetchDocOptions = {
   // Reader service (r.jina.ai). Off unless explicitly enabled.
   reader?: { enabled: boolean; apiKey?: string };
   maxChars?: number;
+  // When set, every hop's host must resolve only to public addresses. Unset in MOCK_LLM and tests.
+  dnsLookup?: DnsLookup;
 };
+
+export const MAX_REDIRECTS = 5;
 
 const LOGIN_PATH = /\/(login|signin|sign-in|sign_in|auth\/login|session)(\b|\/|\?|$)/i;
 
@@ -66,26 +71,36 @@ function decodeEntities(s: string): string {
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
 }
 
-function looksLikeLoginWall(res: Response, requested: string, text: string): boolean {
-  const finalUrl = res.url || requested;
+function looksLikeLoginWall(finalUrl: string, requested: string, text: string): boolean {
   if (finalUrl !== requested && LOGIN_PATH.test(new URL(finalUrl).pathname)) return true;
   // Short page dominated by a sign-in form.
   return text.length < 1500 && /(sign in|log in)/i.test(text) && /password/i.test(text);
 }
 
+// Follows redirects by hand so every hop passes the SSRF guard (at most MAX_REDIRECTS hops).
 async function attempt(
   url: string,
   ua: string,
   opts: FetchDocOptions,
-): Promise<{ res: Response; body: string } | { error: string }> {
+): Promise<{ res: Response; body: string; finalUrl: string } | { error: string } | { blocked: string }> {
+  const deadline = Date.now() + (opts.timeoutMs ?? 8000);
+  let current = url;
   try {
-    const res = await fetchWithTimeout(
-      opts.fetch,
-      url,
-      { headers: { "User-Agent": ua, Accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.8" }, redirect: "follow" },
-      opts.timeoutMs ?? 8000,
-    );
-    return { res, body: await res.text() };
+    for (let hop = 0; ; hop++) {
+      const check = await checkFetchUrlResolved(current, opts.dnsLookup);
+      if (!check.ok) return { blocked: hop ? `redirect to ${check.reason}` : check.reason };
+      const res = await fetchWithTimeout(
+        opts.fetch,
+        current,
+        { headers: { "User-Agent": ua, Accept: "text/html,text/plain,application/json;q=0.9,*/*;q=0.8" }, redirect: "manual" },
+        Math.max(1, deadline - Date.now()),
+      );
+      const location = res.status >= 300 && res.status < 400 ? res.headers.get("location") : null;
+      if (!location) return { res, body: await res.text(), finalUrl: current };
+      await res.body?.cancel().catch(() => {});
+      if (hop >= MAX_REDIRECTS) return { error: `more than ${MAX_REDIRECTS} redirects` };
+      current = new URL(location, current).toString();
+    }
   } catch (e) {
     return { error: e instanceof Error && e.name === "AbortError" ? "timeout" : String(e) };
   }
@@ -98,6 +113,9 @@ function toDoc(url: string, body: string, contentType: string | null, opts: Fetc
 }
 
 export async function fetchDoc(url: string, opts: FetchDocOptions): Promise<FetchDocResult> {
+  // Defence in depth: discover already drops unsafe URLs before queueing them.
+  const pre = await checkFetchUrlResolved(url, opts.dnsLookup);
+  if (!pre.ok) return { ok: false, url, reason: "blocked", detail: pre.reason };
   const failures: string[] = [];
   let loginWall = false;
   let lastStatus = 0;
@@ -109,6 +127,7 @@ export async function fetchDoc(url: string, opts: FetchDocOptions): Promise<Fetc
   ] as const) {
     if (ua === MINIMAL_BROWSER_UA && lastStatus !== 400 && lastStatus !== 403) break;
     const r = await attempt(url, ua, opts);
+    if ("blocked" in r) return { ok: false, url, reason: "blocked", detail: r.blocked };
     if ("error" in r) {
       lastStatus = 0;
       failures.push(`${via}: ${r.error}`);
@@ -120,8 +139,8 @@ export async function fetchDoc(url: string, opts: FetchDocOptions): Promise<Fetc
       continue;
     }
     // Final URL after redirects (search-grounding links are redirect wrappers).
-    const doc = toDoc(r.res.url || url, r.body, r.res.headers.get("content-type"), opts);
-    if (looksLikeLoginWall(r.res, url, doc.text)) {
+    const doc = toDoc(r.finalUrl, r.body, r.res.headers.get("content-type"), opts);
+    if (looksLikeLoginWall(r.finalUrl, url, doc.text)) {
       loginWall = true;
       failures.push(`${via}: login wall`);
       break;

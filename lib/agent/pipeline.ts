@@ -5,6 +5,7 @@ import type { FetchDocOptions } from "@/lib/agent/fetchDoc";
 import { runProbes, type ProbeResult } from "@/lib/agent/probe";
 import { resolveApp, type ResolvedApp } from "@/lib/agent/resolve";
 import type { FetchedDoc, PipelineDeps, PipelineInput, PipelineStep, RunEvent, RunRecord } from "@/lib/agent/types";
+import type { DnsLookup } from "@/lib/agent/urlGuard";
 import { officialDomainsFor, validateGuide } from "@/lib/agent/validate";
 import type { ComposioInfo, Guide } from "@/lib/schema";
 
@@ -20,6 +21,8 @@ export type PipelineOptions = {
   reader?: FetchDocOptions["reader"];
   composioApiKey?: string;
   skipProbe?: boolean;
+  // SSRF DNS check for fetchDoc and probes; unset in MOCK_LLM and tests.
+  dnsLookup?: DnsLookup;
 };
 
 const DEFAULTS = {
@@ -131,6 +134,7 @@ export async function runPipeline(
               now: deps.now,
               perRequestMs: opts.probeRequestMs,
               stepMs: opts.probeStepMs,
+              dnsLookup: opts.dnsLookup,
             });
           })();
 
@@ -139,6 +143,7 @@ export async function runPipeline(
         now: deps.now,
         timeoutMs: opts.fetchTimeoutMs,
         reader: opts.reader,
+        dnsLookup: opts.dnsLookup,
       };
       const disc = await discover(resolved, {
         llm: deps.llm,
@@ -156,6 +161,7 @@ export async function runPipeline(
         unknowns.push("Generation hit the soft deadline; discovery stopped early.");
       }
       if (disc.researchError) unknowns.push(`Research call failed: ${disc.researchError}`);
+      if (disc.skippedUnsafe) unknowns.push(`Skipped ${disc.skippedUnsafe} non-public URLs.`);
       await record(
         "discover",
         docs.length ? "done" : "error",
