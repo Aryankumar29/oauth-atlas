@@ -60,4 +60,4 @@ Before you start:
 
 - Never improvise an approval claim or a review time. Read what the guide says, with its status.
 - If a source is login-walled, point to the guide's **Unknowns** section instead of guessing.
-- `/evidence` links to repo docs 404 while the repo is private (QA-6). Open `docs/corrections.md` from the repo if needed.
+- `/evidence` links open the repo docs on GitHub (the repo is public), e.g. `docs/corrections.md`.
