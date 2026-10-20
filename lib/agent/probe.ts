@@ -1,4 +1,5 @@
 import { BROWSER_UA, fetchWithTimeout, htmlToText } from "@/lib/agent/fetchDoc";
+import { checkFetchUrlResolved, isSafeFetchUrl, UnsafeUrlError, type DnsLookup } from "@/lib/agent/urlGuard";
 import type { ResolvedApp } from "@/lib/agent/resolve";
 import type { Probe } from "@/lib/schema";
 
@@ -179,9 +180,14 @@ type ProbeOpts = {
   now: () => Date;
   perRequestMs?: number;
   stepMs?: number;
+  dnsLookup?: DnsLookup;
 };
 
+// Every probe URL derives from user input, the seed, or a remote discovery document: guard each one.
+// Redirects are recorded, never followed.
 async function probeGet(url: string, opts: ProbeOpts, accept: string) {
+  const check = await checkFetchUrlResolved(url, opts.dnsLookup);
+  if (!check.ok) throw new UnsafeUrlError(url, check.reason);
   const res = await fetchWithTimeout(
     opts.fetch,
     url,
@@ -204,7 +210,7 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
   const urls = [
     ...candidateOrigins(resolved, authorizeHint).flatMap((o) => WELL_KNOWN_PATHS.map((p) => o + p)),
     ...(authorizeHint ? pathDiscoveryUrls(authorizeHint) : []),
-  ];
+  ].filter(isSafeFetchUrl);
   const settled = await Promise.allSettled(
     urls.map(async (url) => {
       const r = await probeGet(url, { ...opts, perRequestMs: Math.min(opts.perRequestMs ?? 5000, remaining()) }, "application/json");
@@ -251,7 +257,8 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
       result.authorize = { url, kind };
       probes.push({ url, method: "GET", status: r.status, redirect: r.location ?? undefined, observed, at: at() });
     } catch (e) {
-      probes.push({ url, method: "GET", status: 0, observed: `Request failed: ${errMsg(e)}`, at: at() });
+      // Blocked URLs are dropped silently (no probe record that echoes an internal address).
+      if (!(e instanceof UnsafeUrlError)) probes.push({ url, method: "GET", status: 0, observed: `Request failed: ${errMsg(e)}`, at: at() });
     }
   }
 
@@ -275,7 +282,9 @@ export async function runProbes(resolved: ResolvedApp, opts: ProbeOpts): Promise
         at: at(),
       });
     } catch (e) {
-      probes.push({ url: resolved.consoleUrl, method: "GET", status: 0, observed: `Request failed: ${errMsg(e)}`, at: at() });
+      if (!(e instanceof UnsafeUrlError)) {
+        probes.push({ url: resolved.consoleUrl, method: "GET", status: 0, observed: `Request failed: ${errMsg(e)}`, at: at() });
+      }
     }
   }
 

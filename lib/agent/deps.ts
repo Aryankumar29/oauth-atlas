@@ -1,6 +1,7 @@
 import { createMockFetch, createMockLlm } from "@/lib/agent/llm/mock";
 import type { PipelineOptions } from "@/lib/agent/pipeline";
 import type { LlmAdapter, PipelineDeps, RunEvent } from "@/lib/agent/types";
+import { nodeDnsLookup } from "@/lib/agent/urlGuard";
 import { getStore } from "@/lib/store";
 
 export const isMockMode = () => process.env.MOCK_LLM === "1";
@@ -39,6 +40,8 @@ export async function createDeps(emit: (e: RunEvent) => void): Promise<PipelineD
 
 export function pipelineOptionsFromEnv(): PipelineOptions {
   return {
+    // MOCK_LLM never touches real DNS; fixtures are already static.
+    dnsLookup: isMockMode() ? undefined : nodeDnsLookup,
     reader: { enabled: !isMockMode() && process.env.READER_FALLBACK !== "0", apiKey: process.env.JINA_API_KEY || undefined },
     composioApiKey: isMockMode() ? undefined : process.env.COMPOSIO_API_KEY || undefined,
   };
