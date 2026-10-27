@@ -74,3 +74,21 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
 **Classifier fixes found by this run:** Atlassian's "authorization_code is invalid" was first classified as `other` (regex fixed); Calendly's generic HTML 400 was first read as "open" (now inconclusive: an HTML error page is not an answer from a registration endpoint); GitHub's 404 wording no longer implies a missing endpoint.
 
 **Still not attempted (needs a human):** creating an app in a developer console, a real consent and code exchange, and any review submission. T-011 remains cut.
+
+### Linear — real setup through its MCP server (T-015)
+**Run:** 2026-10-28, `scripts/verify-mcp-setup.ts https://mcp.linear.app --scope read`. Driver: the script; the human signed in to Linear (Google) and clicked Approve in a browser on the same PC. Record: `docs/evidence/linear-mcp-setup.json` (statuses and observations only; no tokens).
+
+| Step | Result |
+|---|---|
+| Register a client (RFC 7591), real JSON body, no credentials | **201**, client_id `pGwE3s08uG8HY82F`, `token_endpoint_auth_method: none`, no secret, no management URI (01:25 IST, first run) |
+| Consent (`scope=read`, PKCE S256, `resource=https://mcp.linear.app/mcp`) | Code returned with `iss=https://mcp.linear.app` (02:15 IST) |
+| Code exchange with the PKCE verifier, no client secret | **200**, bearer token, `scope read`, `expires_in 86100` (~24 h), refresh token issued |
+| MCP `initialize` / `tools/list` | **200** / **200**: server `linear 1.0.2`, 38 tools |
+| Revoke refresh + access token (RFC 7009, same URL as the token endpoint) | **200**, **200** |
+| Reuse the revoked token | **401** |
+
+**What this settles:** the T-014 inference "registration looks open" is confirmed for Linear. An agent can go from nothing to a working, read-scoped MCP connection with no developer console, no OAuth app and no review: the only human step is the user's own consent. `CONFIRMED_REGISTRATION` in `lib/agent/attempt.ts` now rates that evidence `high` and cites this record.
+
+**Left behind:** the registered client stays on Linear's server (no RFC 7592 management URI was issued, so it cannot be deleted by us). Its tokens are revoked; the connection can also be removed in Linear under Settings → third-party applications.
+
+**Run notes:** the first two consent attempts timed out because the consent page opened in a Chrome on another machine (macOS), where `localhost:8976` never reaches the script; the consent page must open on the machine running the script. A stray request without the expected `state` hit the callback once; the script now ignores such requests instead of exiting.

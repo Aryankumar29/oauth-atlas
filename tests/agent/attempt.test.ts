@@ -217,6 +217,17 @@ describe("applyAttemptFacts", () => {
     expect(report.downgraded).toEqual([]);
   });
 
+  it("an endpoint confirmed end to end (Linear) is high confidence and cites the record", () => {
+    const result: AttemptResult = {
+      attempts: [],
+      summary: "",
+      registrations: [{ url: "https://mcp.linear.app/register", kind: "open", for: "mcp", at: "2026-10-28T00:00:00.000Z" }],
+    };
+    const e = applyAttemptFacts(base(), result).evidence.find((x) => x.id === "attempt-dcr-mcp");
+    expect(e).toMatchObject({ confidence: "high" });
+    expect(e?.claim).toContain("docs/evidence/linear-mcp-setup.json");
+  });
+
   it("downgrades an attempt claim that has no attempt record behind it", () => {
     const result: AttemptResult = {
       attempts: [],

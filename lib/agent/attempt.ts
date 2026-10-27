@@ -30,6 +30,11 @@ export const KNOWN_TOKEN: Record<string, string> = {
   asana: "https://app.asana.com/-/oauth_token",
 };
 
+// Registration endpoints where a real client was registered and used end to end (T-015, scripts/verify-mcp-setup.ts).
+export const CONFIRMED_REGISTRATION: Record<string, { date: string; record: string }> = {
+  "https://mcp.linear.app/register": { date: "2026-10-28", record: "docs/evidence/linear-mcp-setup.json" },
+};
+
 export type TokenKind = "pkce-required" | "invalid-client" | "invalid-grant" | "error-in-200" | "not-found" | "other";
 export type RegistrationKind = "open" | "protected" | "unavailable" | "inconclusive";
 
@@ -298,7 +303,16 @@ export function applyAttemptFacts(guide: Guide, result: AttemptResult): Guide {
   for (const r of result.registrations) {
     const where = r.for === "mcp" ? `the remote MCP server (${m?.resource})` : "the OAuth authorization server";
     if (r.kind === "open") {
-      evidence(`attempt-dcr-${r.for}`, `Dynamic Client Registration at ${where} accepts unauthenticated requests, so an agent can likely register its own client.`, r.url, r.at, "medium");
+      const confirmed = CONFIRMED_REGISTRATION[r.url];
+      evidence(
+        `attempt-dcr-${r.for}`,
+        confirmed
+          ? `Dynamic Client Registration at ${where} accepts unauthenticated requests. Confirmed on ${confirmed.date}: an agent registered a client, signed in with PKCE and called the server (${confirmed.record}).`
+          : `Dynamic Client Registration at ${where} accepts unauthenticated requests, so an agent can likely register its own client.`,
+        r.url,
+        r.at,
+        confirmed ? "high" : "medium",
+      );
       const task = `Register an OAuth client for ${where} through Dynamic Client Registration (${r.url}); no developer console needed.`;
       if (!g.agentTasks.includes(task)) g.agentTasks.unshift(task);
     } else if (r.kind === "protected") {

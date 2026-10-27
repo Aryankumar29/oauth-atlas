@@ -1,0 +1,62 @@
+{
+  "host": "https://mcp.linear.app",
+  "scope": "read",
+  "redirectUri": "http://localhost:8976/callback",
+  "outcome": "completed",
+  "clientId": "pGwE3s08uG8HY82F",
+  "steps": [
+    {
+      "step": "metadata",
+      "status": 200,
+      "observed": "issuer https://mcp.linear.app; registration https://mcp.linear.app/register; MCP resource https://mcp.linear.app/mcp",
+      "at": "2026-10-27T20:26:49.202Z"
+    },
+    {
+      "step": "register",
+      "status": 200,
+      "observed": "Reusing client_id pGwE3s08uG8HY82F, registered earlier by this script",
+      "at": "2026-10-27T20:26:49.204Z"
+    },
+    {
+      "step": "consent",
+      "observed": "Callback received with a code and iss=https://mcp.linear.app",
+      "at": "2026-10-27T20:45:34.264Z"
+    },
+    {
+      "step": "token",
+      "status": 200,
+      "observed": "Access token issued (type bearer, expires_in 86100, scope read, refresh token: yes)",
+      "at": "2026-10-27T20:45:36.061Z"
+    },
+    {
+      "step": "mcp-initialize",
+      "status": 200,
+      "observed": "Server linear 1.0.2; session: no",
+      "at": "2026-10-27T20:45:36.107Z"
+    },
+    {
+      "step": "mcp-tools",
+      "status": 200,
+      "observed": "38 tools, e.g. get_attachment, list_agent_skills, get_agent_skill, list_comments, list_cycles, list_custom_views",
+      "at": "2026-10-27T20:45:37.240Z"
+    },
+    {
+      "step": "revoke-refresh_token",
+      "status": 200,
+      "observed": "Revocation accepted",
+      "at": "2026-10-27T20:45:38.872Z"
+    },
+    {
+      "step": "revoke-access_token",
+      "status": 200,
+      "observed": "Revocation accepted",
+      "at": "2026-10-27T20:45:39.327Z"
+    },
+    {
+      "step": "after-revoke",
+      "status": 401,
+      "observed": "Token rejected after revocation",
+      "at": "2026-10-27T20:45:39.370Z"
+    }
+  ]
+}
