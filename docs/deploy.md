@@ -10,6 +10,7 @@ Target: Vercel (Next.js 16 App Router). Deploys run only with the human's explic
 |---|---|---|---|
 | `LLM_PROVIDER` | no | `lib/agent/deps.ts` | `anthropic` (default), `gemini`, or `openai` |
 | `LLM_MODEL` | no | `lib/agent/llm/index.ts` | Overrides the code defaults: `claude-opus-5-5`, `gemini-2.5-flash`, `gpt-5-mini` |
+| `OPENAI_BASE_URL` | no | `lib/agent/llm/index.ts` | Points the OpenAI adapter at an OpenAI-compatible v1 API. Production uses Azure OpenAI (`https://<resource>.openai.azure.com/openai/v1`) with `LLM_PROVIDER=openai` and `LLM_MODEL=gpt-6-sol` (the deployment name) |
 | `ANTHROPIC_API_KEY` | yes, for the default provider | `lib/agent/llm/index.ts` | Use `GEMINI_API_KEY` or `OPENAI_API_KEY` instead if you switch the provider |
 | `UPSTASH_REDIS_REST_URL` | yes, on Vercel | `lib/store.ts` | Without it the store is in-memory per instance: run pages show "not found" on another instance or after a cold start, and the demo cache is empty |
 | `UPSTASH_REDIS_REST_TOKEN` | yes, on Vercel | `lib/store.ts` | |

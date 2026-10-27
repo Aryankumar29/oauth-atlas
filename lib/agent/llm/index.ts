@@ -15,7 +15,7 @@ export async function createLlm(provider: LlmProvider): Promise<LlmAdapter> {
     case "gemini":
       return (await import("@/lib/agent/llm/gemini")).createGeminiLlm(apiKey, model);
     case "openai":
-      return (await import("@/lib/agent/llm/openai")).createOpenAiLlm(apiKey, model);
+      return (await import("@/lib/agent/llm/openai")).createOpenAiLlm(apiKey, model, process.env.OPENAI_BASE_URL || undefined);
     default:
       return (await import("@/lib/agent/llm/anthropic")).createAnthropicLlm(apiKey, model);
   }

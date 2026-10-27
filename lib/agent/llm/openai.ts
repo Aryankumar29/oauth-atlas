@@ -4,9 +4,11 @@ import { EXTRACT_SYSTEM, extractPrompt, parseJsonLoose, researchFromText, resear
 // Model names change often; override with LLM_MODEL.
 export const OPENAI_DEFAULT_MODEL = "gpt-5-mini";
 
-export async function createOpenAiLlm(apiKey: string, model = OPENAI_DEFAULT_MODEL): Promise<LlmAdapter> {
+// baseURL points the same client at an OpenAI-compatible v1 API, e.g. Azure OpenAI's
+// https://<resource>.openai.azure.com/openai/v1 (the model is then the deployment name).
+export async function createOpenAiLlm(apiKey: string, model = OPENAI_DEFAULT_MODEL, baseURL?: string): Promise<LlmAdapter> {
   const { default: OpenAI } = await import("openai");
-  const client = new OpenAI({ apiKey });
+  const client = new OpenAI({ apiKey, baseURL });
 
   return {
     async research(input) {
