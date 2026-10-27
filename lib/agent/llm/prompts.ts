@@ -36,7 +36,8 @@ export const EXTRACT_SYSTEM = `You write decision-grade OAuth setup guides for d
 Output ONE JSON object and nothing else. Rules:
 - Use only the SOURCE DOCUMENTS and PROBE RESULTS given. Do not use memory for facts.
 - A claim or evidence item may have status "primary" only if it carries a "quote" copied VERBATIM (exact characters, 8-300 chars) from a source document's text. Otherwise use "inferred" and say so in "note".
-- Never use status "tested"; the pipeline adds tested claims from probes itself.
+- Never use status "tested"; the pipeline adds tested claims from probes and attempts itself.
+- ATTEMPT lines are setup steps the agent tried itself without credentials. Let them shape the steps, agentTasks and humanTasks. If an attempt found a remote MCP server whose client registration looks open, say in "ownApp.notes" that an agent connecting through MCP can register its own client instead of creating an OAuth app.
 - Never invent review times, costs, or approvals. If a timeline is not stated in the sources, set basis "unknown", wait.maxDays null, and add it to "unknowns".
 - Community or third-party sources are "secondary".
 - If the sources show no public OAuth program, add a gate {"type":"no-self-serve", "requiredFor":["pilot-ready","production-ready"]}.
@@ -79,11 +80,13 @@ export function extractPrompt(input: ExtractInput): string {
     })
     .filter(Boolean)
     .join("\n\n");
-  const probes = input.probes.map((p) => `- ${p.method} ${p.url} → ${p.status}${p.redirect ? ` → ${p.redirect}` : ""}: ${p.observed}`).join("\n");
+  const probes = input.probes
+    .map((p) => `- ${p.kind === "attempt" ? "ATTEMPT " : ""}${p.method} ${p.url} → ${p.status}${p.redirect ? ` → ${p.redirect}` : ""}: ${p.observed}`)
+    .join("\n");
   return [
     `APP: ${input.query}`,
     `COMPOSIO MANAGED OAUTH: ${input.composio.managed} (toolkit ${input.composio.toolkitSlug ?? "unknown"})`,
-    `PROBE RESULTS (endpoint behaviour only, never policy):\n${probes || "(none)"}`,
+    `PROBE AND ATTEMPT RESULTS (endpoint behaviour only, never policy):\n${probes || "(none)"}`,
     `SOURCE DOCUMENTS:\n${docs || "(none)"}`,
     `Return JSON with this shape:\n${EXTRACT_SHAPE}`,
   ].join("\n\n");

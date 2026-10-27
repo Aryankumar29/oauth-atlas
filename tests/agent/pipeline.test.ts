@@ -28,7 +28,7 @@ describe("runPipeline", () => {
 
     expect(run.status).toBe("done");
     const steps = [...new Set(events.map((e) => e.step))];
-    expect(steps).toEqual(expect.arrayContaining(["resolve", "composio", "discover", "probe", "extract", "verify", "render"]));
+    expect(steps).toEqual(expect.arrayContaining(["resolve", "composio", "discover", "probe", "attempt", "extract", "verify", "render"]));
     expect(events.filter((e) => e.status === "error")).toEqual([]);
 
     const guide = guideSchema.parse(run.guide);
@@ -46,6 +46,15 @@ describe("runPipeline", () => {
     const ev = Object.fromEntries(guide.evidence.map((e) => [e.id, e.status]));
     expect(ev["ev-install-own-team"]).toBe("primary");
     expect(ev["ev-review-time"]).toBe("inferred");
+
+    // Recorded Miro attempts: the fake client is rejected, the MCP server is found, and its registration is inconclusive.
+    const attempts = guide.probes.filter((p) => p.kind === "attempt");
+    expect(attempts.map((p) => `${p.method} ${p.url}`)).toEqual(
+      expect.arrayContaining(["POST https://api.miro.com/v1/oauth/token", "GET https://mcp.miro.com/.well-known/oauth-authorization-server", "POST https://mcp.miro.com/register"]),
+    );
+    expect(ev["attempt-mcp"]).toBe("tested");
+    expect(ev["attempt-dcr-mcp"]).toBeUndefined();
+    expect(guide.unknowns.some((u) => u.includes("mcp.miro.com/register") && u.includes("inconclusive"))).toBe(true);
 
     const stored = await deps.store.getRun("r1");
     expect(stored?.status).toBe("done");

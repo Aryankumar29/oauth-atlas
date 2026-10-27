@@ -6,6 +6,7 @@ export type PipelineStep =
   | "composio"
   | "discover"
   | "probe"
+  | "attempt"
   | "extract"
   | "verify"
   | "render";

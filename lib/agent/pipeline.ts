@@ -1,3 +1,4 @@
+import { applyAttemptFacts, runAttempts, type AttemptResult } from "@/lib/agent/attempt";
 import { lookupComposio } from "@/lib/agent/composio";
 import { discover } from "@/lib/agent/discover";
 import { extractGuide, fallbackGuide, type GuideContext } from "@/lib/agent/extract";
@@ -123,19 +124,27 @@ export async function runPipeline(
         await record("composio", "error", `Composio lookup failed: ${msg(e)}`);
       }
 
-      // 3. discover and 4. probe run concurrently; probe has its own 20 s cap.
+      // 3. discover runs concurrently with 4. probe and then 4b. attempt; each of those has its own 20 s cap.
       await record("discover", "start", "Searching and fetching official docs");
+      const probeOpts = {
+        fetch: deps.fetch,
+        now: deps.now,
+        perRequestMs: opts.probeRequestMs,
+        stepMs: opts.probeStepMs,
+        dnsLookup: opts.dnsLookup,
+      };
       const probePromise: Promise<ProbeResult | null> = opts.skipProbe
         ? Promise.resolve(null)
         : (async () => {
             await record("probe", "start", "Probing discovery, authorize, and console endpoints");
-            return runProbes(resolved, {
-              fetch: deps.fetch,
-              now: deps.now,
-              perRequestMs: opts.probeRequestMs,
-              stepMs: opts.probeStepMs,
-              dnsLookup: opts.dnsLookup,
-            });
+            return runProbes(resolved, probeOpts);
+          })();
+      const attemptPromise: Promise<AttemptResult | null> = opts.skipProbe
+        ? Promise.resolve(null)
+        : (async () => {
+            const p = await probePromise.catch(() => null);
+            await record("attempt", "start", "Attempting setup steps: code exchange, MCP server, client registration");
+            return runAttempts(resolved, p, { ...probeOpts, officialDomains: officialDomainsFor(resolved) });
           })();
 
       const fetchOpts: FetchDocOptions = {
@@ -178,11 +187,20 @@ export async function runPipeline(
         await record("probe", "error", `Probe failed: ${msg(e)}`);
       }
 
+      let attempt: AttemptResult | null = null;
+      try {
+        attempt = await attemptPromise;
+        if (attempt) await record("attempt", "done", attempt.summary, { attempts: attempt.attempts });
+        else await record("attempt", "skipped", "Attempts disabled");
+      } catch (e) {
+        await record("attempt", "error", `Attempts failed: ${msg(e)}`);
+      }
+
       // 5. extract
       const ctx: GuideContext = {
         resolved,
         composio,
-        probes: probe?.probes ?? [],
+        probes: [...(probe?.probes ?? []), ...(attempt?.attempts ?? [])],
         runId: input.runId,
         now: deps.now(),
         unknowns,
@@ -214,6 +232,7 @@ export async function runPipeline(
       // 6. verify
       await record("verify", "start", "Checking quotes against fetched docs and computing difficulty");
       if (probe) guide = applyProbeFacts(guide, probe);
+      if (attempt) guide = applyAttemptFacts(guide, attempt);
       guide.partial = guide.partial || partial;
       const v = validateGuide(guide, { docs, officialDomains: officialDomainsFor(resolved), llmDifficulty });
       guide = v.guide;

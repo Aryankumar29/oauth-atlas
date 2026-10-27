@@ -140,6 +140,8 @@ export const probeSchema = z.object({
   redirect: z.string().optional(),
   observed: z.string().min(1),
   at: z.string().min(1),
+  // "attempt": a setup step the agent tried itself (T-014). Unset means a plain probe.
+  kind: z.enum(["probe", "attempt"]).optional(),
 });
 
 export const requirementSchema = z.object({

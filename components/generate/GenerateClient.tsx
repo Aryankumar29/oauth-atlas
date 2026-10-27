@@ -11,6 +11,7 @@ const STEPS: { id: PipelineStep; label: string }[] = [
   { id: "composio", label: "Check Composio managed auth" },
   { id: "discover", label: "Search and fetch official docs" },
   { id: "probe", label: "Probe OAuth endpoints" },
+  { id: "attempt", label: "Attempt setup: code exchange, MCP server, client registration" },
   { id: "extract", label: "Extract the guide" },
   { id: "verify", label: "Verify quotes and compute difficulty" },
   { id: "render", label: "Save and render" },

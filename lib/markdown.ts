@@ -2,6 +2,7 @@ import { difficulty } from "@/lib/difficulty";
 import { humanize, milestoneHours, milestoneWait, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
+  ATTEMPTS_NOTE,
   COMMUNITY_BADGE,
   DIFFICULTY_UNKNOWN,
   isDifficultyUnknown,
@@ -142,11 +143,13 @@ export function guideToMarkdown(guide: Guide): string {
 
   out.push("## Agent vs. human", "", "Agent:", ...list(guide.agentTasks), "", "Human:", ...list(guide.humanTasks), "");
 
+  const line = (p: Guide["probes"][number]) => `\`${p.method} ${p.url}\` → ${p.status}${p.redirect ? ` → ${p.redirect}` : ""}: ${p.observed} (${p.at})`;
+  const attempts = guide.probes.filter((p) => p.kind === "attempt");
+  if (attempts.length) {
+    out.push("## Setup attempts", "", ATTEMPTS_NOTE, "", ...list(attempts.map(line)), "");
+  }
   out.push("## Probe results", "");
-  out.push(
-    ...list(guide.probes.map((p) => `\`${p.method} ${p.url}\` → ${p.status}${p.redirect ? ` → ${p.redirect}` : ""}: ${p.observed} (${p.at})`)),
-    "",
-  );
+  out.push(...list(guide.probes.filter((p) => p.kind !== "attempt").map(line)), "");
 
   out.push("## Evidence", "");
   out.push(

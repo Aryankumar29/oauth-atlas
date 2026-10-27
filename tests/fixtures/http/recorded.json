@@ -56,6 +56,62 @@
           "body": "<html><head><title>MOCK FIXTURE: Meta login docs (synthetic)</title></head><body><p>Synthetic page served only to the minimal User-Agent. Not real Meta documentation.</p><p>Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length. Padding text so the extractor sees a realistic page length.</p></body></html>"
         }
       }
+    },
+    {
+      "url": "https://mcp.miro.com/.well-known/oauth-protected-resource",
+      "recordedAt": "2026-10-28",
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"resource\":\"https://mcp.miro.com/\",\"authorization_servers\":[\"https://mcp.miro.com/\"],\"scopes_supported\":[\"boards:read\",\"boards:write\",\"openid\",\"email\"],\"bearer_methods_supported\":[\"header\"]}"
+    },
+    {
+      "url": "https://mcp.miro.com/.well-known/oauth-authorization-server",
+      "recordedAt": "2026-10-28",
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"issuer\":\"https://mcp.miro.com/\",\"authorization_endpoint\":\"https://mcp.miro.com/authorize\",\"token_endpoint\":\"https://mcp.miro.com/token\",\"registration_endpoint\":\"https://mcp.miro.com/register\",\"scopes_supported\":[\"boards:read\",\"boards:write\",\"openid\",\"email\"],\"response_types_supported\":[\"code\"],\"grant_types_supported\":[\"authorization_code\",\"refresh_token\",\"urn:ietf:params:oauth:grant-type:jwt-bearer\"],\"token_endpoint_auth_methods_supported\":[\"client_secret_post\",\"client_secret_basic\"],\"service_documentation\":\"https://developers.miro.com/docs/miro-mcp#installing-miro-mcp-team-selection\",\"code_challenge_methods_supported\":[\"S256\"],\"authorization_grant_profiles_supported\":[\"urn:ietf:params:oauth:grant-profile:id-jag\"]}"
+    },
+    {
+      "url": "https://mcp.miro.com/register",
+      "recordedAt": "2026-10-28",
+      "status": 500,
+      "contentType": "text/plain; charset=utf-8",
+      "body": "Internal Server Error"
+    },
+    {
+      "url": "https://api.miro.com/v1/oauth/token",
+      "recordedAt": "2026-10-28",
+      "status": 401,
+      "contentType": "application/json",
+      "body": "{\n  \"status\" : 401,\n  \"code\" : \"notFound\",\n  \"message\" : \"Client not found\",\n  \"type\" : \"error\"\n}"
+    },
+    {
+      "url": "https://mcp.calendly.com/.well-known/oauth-protected-resource",
+      "recordedAt": "2026-10-28",
+      "status": 200,
+      "contentType": "application/json",
+      "body": "{\"resource\":\"https://mcp.calendly.com/\",\"authorization_servers\":[\"https://calendly.com/\"],\"scopes_supported\":[\"mcp:scheduling:write\",\"mcp:scheduling:read\"],\"bearer_methods_supported\":[\"header\"]}"
+    },
+    {
+      "url": "https://calendly.com/.well-known/oauth-authorization-server",
+      "recordedAt": "2026-10-28",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"issuer\":\"https://calendly.com/\",\"authorization_endpoint\":\"https://calendly.com/oauth/authorize\",\"token_endpoint\":\"https://calendly.com/oauth/token\",\"registration_endpoint\":\"https://calendly.com/oauth/register\",\"response_types_supported\":[\"code\"],\"token_endpoint_auth_methods_supported\":[\"none\"],\"code_challenge_methods_supported\":[\"S256\"]}"
+    },
+    {
+      "url": "https://calendly.com/oauth/register",
+      "recordedAt": "2026-10-28",
+      "status": 400,
+      "contentType": "text/html; charset=UTF-8",
+      "body": "<!DOCTYPE html><html><head><title>Calendly</title></head><body>Bad Request</body></html>"
+    },
+    {
+      "url": "https://auth.calendly.com/oauth/token",
+      "recordedAt": "2026-10-28",
+      "status": 400,
+      "contentType": "application/json; charset=utf-8",
+      "body": "{\"error\":\"invalid_request\",\"error_description\":\"Missing required parameter: code_verifier.\"}"
     }
   ]
 }

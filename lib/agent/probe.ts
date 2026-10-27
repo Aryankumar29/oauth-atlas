@@ -31,6 +31,7 @@ export type Discovery = {
   issuer?: string;
   authorizationEndpoint?: string;
   tokenEndpoint?: string;
+  registrationEndpoint?: string;
   codeChallengeMethods: string[];
   grantTypes: string[];
   scopes: string[];
@@ -52,6 +53,7 @@ export function parseDiscovery(json: unknown): Discovery | null {
     issuer: typeof j.issuer === "string" ? j.issuer : undefined,
     authorizationEndpoint: typeof j.authorization_endpoint === "string" ? j.authorization_endpoint : undefined,
     tokenEndpoint: typeof j.token_endpoint === "string" ? j.token_endpoint : undefined,
+    registrationEndpoint: typeof j.registration_endpoint === "string" ? j.registration_endpoint : undefined,
     codeChallengeMethods: arr(j.code_challenge_methods_supported),
     grantTypes: arr(j.grant_types_supported),
     scopes: arr(j.scopes_supported),
@@ -175,7 +177,7 @@ function candidateOrigins(resolved: ResolvedApp, authorizeHint?: string): string
   return [...hosts].slice(0, 4);
 }
 
-type ProbeOpts = {
+export type ProbeOpts = {
   fetch: typeof globalThis.fetch;
   now: () => Date;
   perRequestMs?: number;

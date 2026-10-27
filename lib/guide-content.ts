@@ -18,6 +18,9 @@ export const REDIRECT_URI_NOTE =
 export const SWITCH_NOTE =
   "Switching to your own app affects new connections only. Existing connected accounts stay on the old auth config until users re-authenticate.";
 
+export const ATTEMPTS_NOTE =
+  "The agent tried these setup steps itself, without an account: a code exchange with a fake client, a search for a remote MCP server, and a client registration request it made impossible to accept. Nothing was created. Steps that need a login, a real client or a review submission are yours.";
+
 export const OWN_APP_SOURCES = [
   { title: "Composio managed-auth directory", url: COMPOSIO_SOURCES.managedAuth },
   { title: "Custom app vs. managed app", url: COMPOSIO_SOURCES.customVsManaged },

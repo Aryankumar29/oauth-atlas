@@ -205,7 +205,7 @@ export function validateGuide(
         c.status = to;
         c.note = [c.note, `Downgraded to ${to}: ${reason}.`].filter(Boolean).join(" ");
       }
-    } else if (c.status === "tested" && !(c.testKind === "probe" && c.sources.some((s) => probeUrls.has(s.url)))) {
+    } else if (c.status === "tested" && !(c.testKind && c.sources.some((s) => probeUrls.has(s.url)))) {
       report.downgraded.push({ where, value: c.value, from: "tested", reason: "no matching probe record" });
       c.status = "inferred";
       c.testKind = undefined;

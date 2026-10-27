@@ -5,6 +5,7 @@ import { difficulty } from "@/lib/difficulty";
 import { humanize, milestoneHours, milestoneWait, UNKNOWN } from "@/lib/format";
 import {
   alternateProfiles,
+  ATTEMPTS_NOTE,
   COMMUNITY_BADGE,
   DIFFICULTY_UNKNOWN,
   isDifficultyUnknown,
@@ -95,12 +96,23 @@ function List({ items }: { items: ReactNode[] }) {
   return <ul className="list-disc space-y-1.5 pl-5">{items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
 }
 
+function probeItem(p: Guide["probes"][number]) {
+  return (
+    <>
+      <code className="break-all text-xs">{p.method} {p.url}</code> → <strong>{p.status}</strong>
+      {p.redirect ? <span className="break-all"> → {p.redirect}</span> : null}
+      <span className="block text-zinc-600">{p.observed} <span className="text-xs text-zinc-400">({p.at})</span></span>
+    </>
+  );
+}
+
 export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolean }) {
   const { app } = guide;
   const d = isDifficultyUnknown(guide) ? null : difficulty(guide.gates, { profile: guide.verdict.profile });
   const alternates = alternateProfiles(guide).map((p) => ({ profile: p, result: difficulty(guide.gates, { profile: p }) }));
   const live = isLiveGenerated(guide);
   const oc = guide.oauthConfig;
+  const attempts = guide.probes.filter((p) => p.kind === "attempt");
 
   return (
     <article className="space-y-6">
@@ -356,16 +368,15 @@ export function GuideView({ guide, mock = false }: { guide: Guide; mock?: boolea
         </div>
       </Section>
 
+      {attempts.length ? (
+        <Section id="attempts" title="Setup attempts">
+          <p className="mb-3 text-zinc-600">{ATTEMPTS_NOTE}</p>
+          <List items={attempts.map(probeItem)} />
+        </Section>
+      ) : null}
+
       <Section id="probes" title="Probe results">
-        <List
-          items={guide.probes.map((p) => (
-            <>
-              <code className="break-all text-xs">{p.method} {p.url}</code> → <strong>{p.status}</strong>
-              {p.redirect ? <span className="break-all"> → {p.redirect}</span> : null}
-              <span className="block text-zinc-600">{p.observed} <span className="text-xs text-zinc-400">({p.at})</span></span>
-            </>
-          ))}
-        />
+        <List items={guide.probes.filter((p) => p.kind !== "attempt").map(probeItem)} />
       </Section>
 
       <Section id="evidence" title="Evidence">
