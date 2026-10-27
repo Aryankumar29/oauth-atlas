@@ -3,7 +3,7 @@
   "scope": "read",
   "redirectUri": "http://localhost:8976/callback",
   "outcome": "completed",
-  "clientId": "pGwE3s08uG8HY82F",
+  "clientId": "pGwE…2F",
   "steps": [
     {
       "step": "metadata",
@@ -14,7 +14,7 @@
     {
       "step": "register",
       "status": 200,
-      "observed": "Reusing client_id pGwE3s08uG8HY82F, registered earlier by this script",
+      "observed": "Reusing client_id pGwE…2F, registered earlier by this script",
       "at": "2026-10-27T20:26:49.204Z"
     },
     {

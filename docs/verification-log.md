@@ -80,7 +80,7 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
 
 | Step | Result |
 |---|---|
-| Register a client (RFC 7591), real JSON body, no credentials | **201**, client_id `pGwE3s08uG8HY82F`, `token_endpoint_auth_method: none`, no secret, no management URI (01:25 IST, first run) |
+| Register a client (RFC 7591), real JSON body, no credentials | **201**, client_id `pGwE…2F`, `token_endpoint_auth_method: none`, no secret, no management URI (01:25 IST, first run) |
 | Consent (`scope=read`, PKCE S256, `resource=https://mcp.linear.app/mcp`) | Code returned with `iss=https://mcp.linear.app` (02:15 IST) |
 | Code exchange with the PKCE verifier, no client secret | **200**, bearer token, `scope read`, `expires_in 86100` (~24 h), refresh token issued |
 | MCP `initialize` / `tools/list` | **200** / **200**: server `linear 1.0.2`, 38 tools |

@@ -16,6 +16,8 @@ function flag(name: string, fallback?: string): string | undefined {
 }
 
 const b64url = (b: Buffer) => b.toString("base64url");
+// docs/evidence/README.md redaction rule: client IDs are masked in records.
+const mask = (id: string) => `${id.slice(0, 4)}…${id.slice(-2)}`;
 type Step = { step: string; at: string; status?: number; observed: string };
 
 async function json(res: Response): Promise<Record<string, unknown>> {
@@ -86,9 +88,9 @@ async function main() {
     step: "register",
     status: reg.status,
     observed: client.reused
-      ? `Reusing client_id ${clientId}, registered earlier by this script`
+      ? `Reusing client_id ${mask(clientId!)}, registered earlier by this script`
       : clientId
-      ? `Registered without any credentials: client_id ${clientId}; auth method ${client.token_endpoint_auth_method ?? "unspecified"}; secret issued: ${"client_secret" in client ? "yes (not recorded)" : "no"}; management URI: ${client.registration_client_uri ? "yes" : "no"}`
+      ? `Registered without any credentials: client_id ${mask(clientId)}; auth method ${client.token_endpoint_auth_method ?? "unspecified"}; secret issued: ${"client_secret" in client ? "yes (not recorded)" : "no"}; management URI: ${client.registration_client_uri ? "yes" : "no"}`
       : `Registration failed: ${JSON.stringify(client).slice(0, 200)}`,
   });
   if (!clientId) return record({ outcome: "registration-failed" });
@@ -134,7 +136,7 @@ async function main() {
       ? `Callback received with a code${callback.get("iss") ? ` and iss=${callback.get("iss")}` : ""}`
       : `Callback error: ${callback.get("error")} ${callback.get("error_description") ?? ""}`,
   });
-  if (!code) return record({ outcome: "consent-failed", clientId });
+  if (!code) return record({ outcome: "consent-failed", clientId: mask(clientId) });
 
   // 4. Code exchange with the PKCE verifier and no client secret.
   const tok = await fetch(d.tokenEndpoint, {
@@ -151,7 +153,7 @@ async function main() {
       ? `Access token issued (type ${tokens.token_type}, expires_in ${tokens.expires_in ?? "unspecified"}, scope ${tokens.scope ?? "unspecified"}, refresh token: ${tokens.refresh_token ? "yes" : "no"})`
       : `Token exchange failed: ${JSON.stringify(tokens).slice(0, 200)}`,
   });
-  if (!access) return record({ outcome: "token-failed", clientId });
+  if (!access) return record({ outcome: "token-failed", clientId: mask(clientId) });
 
   // 5. Use it: MCP initialize, then tools/list.
   const mcp = async (body: object, session?: string) =>
@@ -193,7 +195,7 @@ async function main() {
   } else {
     log({ step: "revoke", observed: "No revocation endpoint advertised; the token expires on its own" });
   }
-  record({ outcome: "completed", clientId });
+  record({ outcome: "completed", clientId: mask(clientId) });
 }
 
 main().catch((e) => {
