@@ -4,6 +4,7 @@
   "private": true,
   "description": "Decision-grade OAuth setup and approval guides for developers building AI agents.",
   "author": "Aryan Kumar (https://github.com/Aryankumar29)",
+  "license": "MIT",
   "homepage": "https://oauth-atlas.vercel.app",
   "repository": {
     "type": "git",

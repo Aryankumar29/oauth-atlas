@@ -210,3 +210,7 @@ I ran this like a small team with AI agents doing the building and me owning the
 A branch merged only after the verifier approved it and `npm run check` passed. The repo is the source of truth: `SPEC.md`, `TASKS.md`, `STATUS.md`, `DECISIONS.md`.
 
 — Aryan Kumar
+
+## License
+
+[MIT](LICENSE) © 2026 Aryan Kumar. The guides summarize public provider documentation with links to the sources; they are not legal or compliance advice.
