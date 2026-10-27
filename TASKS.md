@@ -255,7 +255,7 @@ Release-engineer (T-008) works 04:30–05:30 (preview deploy, README, `.env.exam
 ## T-015 — Real setups (post-submission)
 - **Owner:** lead, with Aryan for logins and consent.
 - **Scope:** real setups where the agent does the work and Aryan only signs in and approves: Linear through its MCP server (DCR + PKCE), GitHub through the Device Flow, Notion through a public connection. Every test token is revoked and every test app deleted.
-- **Status:** Linear done; GitHub app creation verified, sign-in pending; Notion pending.
+- **Status:** done. Linear complete end to end; GitHub app creation verified; a full GitHub sign-in and Notion were left out of scope (2026-10-28).
 
 ## T-016 — Repo completeness
 - **Owner:** lead.

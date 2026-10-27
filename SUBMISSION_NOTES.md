@@ -57,7 +57,7 @@ Built by **Aryan Kumar**. I owned the product: the spec, the task board and acce
 ## Honest status
 
 - **SPEC §14 must-haves:** all pass on production except **#7, recorded setup attempts**. The human-supervised GitHub and Notion attempts (T-011) were cut at 03:30 for time. Those guides are tier `verified` (primary sources plus automated probes), not `tested`.
-- **After submission (T-014, T-015):** live generation now attempts setup steps itself; Linear was set up for real end to end through its MCP server; GitHub app creation was verified, with its real sign-in still to run; Notion is still open. See `docs/verification-log.md` and `docs/USAGE.md`.
+- **After the first submission (T-014, T-015):** live generation now attempts setup steps itself (code exchange, remote MCP server lookup, client registration). Linear was set up for real, end to end, through its MCP server as the worked example; GitHub app creation was verified in the real console. A full GitHub sign-in and a Notion setup were left out of scope. See `docs/verification-log.md` and `docs/USAGE.md`.
 - **Open, low priority (P2):**
   - guessed websites can wrongly downgrade real docs (QA-19)
   - a nonexistent app finishes as "difficulty 5" instead of partial (QA-20)

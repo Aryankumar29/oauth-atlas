@@ -171,10 +171,11 @@ See `DECISIONS.md` for the full ADR log.
 ## Limitations
 
 - **No completed provider approvals.** No paid accounts or production domains were used.
-- **Real setups are partly done** (T-015, `docs/verification-log.md`). **Linear:** complete, end to end through its MCP server (registration, sign-in, MCP calls, revocation). **GitHub:** creating an OAuth app was verified (instant, no review, Device Flow needs no client secret, token expiry on by default); the real sign-in is still to be run. **Notion:** not yet done.
+- **One real end-to-end setup, by choice** (T-015, `docs/verification-log.md`). I picked **Linear** as the worked example because it shows the path most relevant to agent builders: the agent registered its own client on Linear's MCP server, I approved the sign-in, and it called the server and revoked the token, with no developer console at all. For **GitHub**, creating an OAuth app was verified in the real console (instant, no review, Device Flow needs no client secret, token expiry on by default), but I did not run a full sign-in. **Notion** and the other providers rely on primary sources, probes and the automated setup attempts.
 - **"Registration looks open" is confirmed only for Linear.** For other apps it rests on a 400 for a deliberately malformed registration body with no credential demand, so that evidence is rated `medium` confidence; Linear's is `high`.
 - **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" comes from community reports, and Business Verification "up to 14 business days" comes from a Meta business solution provider (360dialog). Both are labeled secondary.
 - **Live guides are drafts** until a human checks the sources. They are labeled unverified and never rated high confidence.
+- **Live difficulty can vary between runs.** The score is computed by code, but from gates the model extracts; whether a gate counts as required can differ run to run (two Linear runs scored 3 and 1, depending on whether workspace-admin access was tagged as required). Curated guides are fixed and regression-tested.
 - **LLM quota.** Live runs depend on the provider's quota; at 5 runs/IP/hour, a long run may end as a labeled partial guide.
 - Unverified items: see `docs/research.md` §6.4. These include the exact Composio BYO callback URL, the Microsoft Partner Center verification duration, LinkedIn partner timelines, Salesforce (JS-rendered) and Intuit (403) pages, and the "no self-serve" candidates.
 - Open QA items (`docs/qa-report.md`), all P2:

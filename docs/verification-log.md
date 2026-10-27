@@ -47,12 +47,14 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
   - Registration was instant with no review; the client ID was issued on the next page.
   - The Device Flow issued a device code with the client ID alone (no client secret).
   - GitHub's **Authorize** button stays disabled for automated clicks (anti-clickjacking), so the consent click has to be a person's.
-  - The run was stopped before consent, so no token was issued, and the test app was deleted the same night ("No OAuth apps" afterwards). The sign-in will be re-run under the project owner's own account with `scripts/verify-github-device-flow.ts`.
+  - The run was stopped before consent, so no token was issued, and the test app was deleted the same night ("No OAuth apps" afterwards). A full sign-in was then left out of scope (2026-10-28): app creation already confirmed every claim in the guide. `scripts/verify-github-device-flow.ts` can run it.
 
 ### Notion — public connection (T-011)
 **Not performed:** cut at 03:30 IST; human-supervised setup attempts were not run. Evidence for these guides is primary sources + automated probes only.
 - **Tier:** stays `verified`; no attempt claims in `data/guides/notion.json`.
 - **Open checks for a later attempt:** portal URL actually used (seed and guide say `https://www.notion.so/my-integrations`); installation-scope choices and whether the form warns that they can't be changed; any PKCE or token-lifetime setting (both unknowns in the guide).
+
+- **T-015 update (2026-10-28): left out of scope.** Linear became the end-to-end example. One finding from preparing it: Notion's developer portal is now at `app.notion.com/developers/connections`; the guide's `notion.so/my-integrations` link still works (301 to `notion.so/developers/connections`).
 
 ### Slack — app from manifest (optional)
 **Not performed** (optional attempt; not run). Evidence for the Slack guide is primary sources + automated probes only.

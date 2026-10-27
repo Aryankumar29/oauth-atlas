@@ -40,11 +40,13 @@ Before you start:
   1. resolve
   2. **Composio** check
   3. search and fetch official docs, while the **probe** hits discovery, authorize, and console endpoints in parallel
-  4. extract
-  5. verify quotes and compute difficulty
-  6. save
+  4. **attempt**: the agent tries setup steps itself, with no account (a fake-code exchange, a remote MCP server lookup, a client registration request that can't register anything)
+  5. extract
+  6. verify quotes and compute difficulty
+  7. save
 - "A claim is **primary** only if the source is an official Miro host *and* the quote is in the doc fetched from that exact URL. Off-domain sources drop to secondary."
-- Open the result. Show the "Live-generated — verify." banner, the probe-backed PKCE claim (if found), the sources, and the **Unknowns** section.
+- Open the result. Show the "Live-generated — verify." banner, the **Setup attempts** section, the sources, and the **Unknowns** section.
+- **The Linear story (30 s):** open the Linear run (`/generate/3ae40efd-0247-45ba-83a5-6af49e4f6bdf`). "The attempt step found Linear's MCP server accepts client registration without credentials, so the guide's first agent task is: register yourself, no developer console. I then ran that for real: the agent registered a client, I approved the sign-in, it called Linear's 38 MCP tools and revoked the token." Record: `docs/evidence/linear-mcp-setup.json`.
 - If the cached guide appears ("Cached demo guide, generated …"), say so. "Regenerate live" re-runs the pipeline.
 
 **Fallback if the LLM is slow** (no steps after about 20 s, or past 1:30): "Live generation can take up to three minutes. Here's the cached run from earlier." Switch to the pre-opened Miro run tab. If a run hits the 150 s soft deadline, it still returns a guide labeled **partial**. Show that label as a feature.
@@ -53,7 +55,7 @@ Before you start:
 
 - How claims are checked; the statuses tested / primary / secondary / inferred.
 - One correction, from `docs/corrections.md`: "Research said Slack extended the unlisted-app throttle to existing installs on 2026-03-03. We found no official source, so it isn't in the guide."
-- Limits: no completed provider approvals, community-sourced review times, live guides are drafts, and 5 live runs per IP per hour.
+- Limits: no completed provider approvals, one real end-to-end setup (Linear), community-sourced review times, live guides are drafts (their difficulty can vary between runs), and 5 live runs per IP per hour.
 - Close: "This is the decision layer above provider docs and managed OAuth directories."
 
 ## Rules
