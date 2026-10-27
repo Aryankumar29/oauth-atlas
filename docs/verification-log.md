@@ -41,6 +41,13 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
 **Not performed:** cut at 03:30 IST; human-supervised setup attempts were not run. Evidence for these guides is primary sources + automated probes only.
 - **Tier:** stays `verified`; no attempt claims in `data/guides/github.json`.
 - **Open checks for a later attempt:** up to 10 callback URLs; "Expire user access tokens" on by default; required fields (docs: Application name, Homepage URL, Authorization callback URL; description optional; "Enable Device Flow" checkbox).
+- **T-015 update (2026-10-28 02:19 IST): app creation verified; real sign-in still open.** The agent filled the form in a browser signed in to a separate test GitHub account. Observed:
+  - The form has Application name, Homepage URL, an optional **Application description**, and a **Redirect URIs** list ("You may add up to 10 redirect URIs"), with a new **Allow wildcard matching** option (off by default) that the guide does not yet cover.
+  - **Expire user access tokens** is **checked by default**, confirming the guide.
+  - Registration was instant with no review; the client ID was issued on the next page.
+  - The Device Flow issued a device code with the client ID alone (no client secret).
+  - GitHub's **Authorize** button stays disabled for automated clicks (anti-clickjacking), so the consent click has to be a person's.
+  - The run was stopped before consent, so no token was issued, and the test app was deleted the same night ("No OAuth apps" afterwards). The sign-in will be re-run under the project owner's own account with `scripts/verify-github-device-flow.ts`.
 
 ### Notion — public connection (T-011)
 **Not performed:** cut at 03:30 IST; human-supervised setup attempts were not run. Evidence for these guides is primary sources + automated probes only.

@@ -22,6 +22,9 @@
 
 - **T-014 (2026-10-28, post-submission): automated setup attempts.** New `attempt` step (`lib/agent/attempt.ts`): fake-code exchange, remote MCP discovery, unparseable client-registration request. Facts written as `tested` / `testKind: "attempt"`; "Setup attempts" section on the guide and in Markdown. `npm run check` green (254 tests), e2e 5/5. Live check on 10 apps logged in `docs/verification-log.md`. T-011 (human-logged-in console attempts) stays cut.
 
+- **T-015 (2026-10-28): real setups.** Linear set up for real end to end through its MCP server (`scripts/verify-mcp-setup.ts`, record in `docs/evidence/`). GitHub app creation verified; real sign-in pending. Notion pending. Production LLM moved to Azure OpenAI (`gpt-6-sol`) via `OPENAI_BASE_URL`.
+- **T-016 (2026-10-28): repo completeness.** `docs/USAGE.md`, `docs/screenshots/` (captured from production), author metadata, site footer, README in Aryan's voice; fixed the "no wait wait" chip and the stale `/generate` steps list.
+
 ## In progress
 
 **05:30 block boundary.** Code complete; all merged work is pushed (origin/main d628e3f). T-009 QA is running on the preview.

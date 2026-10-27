@@ -57,7 +57,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <footer className="border-t border-zinc-200 bg-white">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-6 py-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
             <p>OAuth Atlas — decision-grade guides, with sources.</p>
-            <p>Scaffold · October 2026</p>
+            <p>
+              Built by Aryan Kumar ·{" "}
+              <a href="https://github.com/Aryankumar29/oauth-atlas" className="underline underline-offset-2 hover:text-zinc-900">
+                Source on GitHub
+              </a>
+            </p>
           </div>
         </footer>
       </body>

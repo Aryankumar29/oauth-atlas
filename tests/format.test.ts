@@ -38,4 +38,14 @@ describe("formatWait", () => {
     });
     expect(devToProdChip(failed)).toBe("Dev unknown → Prod unknown");
   });
+
+  it("says 'no wait' once, and suffixes real waits", () => {
+    const g = guideSchema.parse(sample);
+    const prod = g.milestones.find((m) => m.id === "production-ready")!;
+    prod.basis = "official-estimate";
+    prod.wait = { minDays: 0, maxDays: 0 };
+    expect(devToProdChip(g)).toMatch(/→ Prod no wait$/);
+    prod.wait = { minDays: 0, maxDays: 84 };
+    expect(devToProdChip(g)).toMatch(/→ Prod up to 84 days wait$/);
+  });
 });

@@ -7,7 +7,7 @@ Everything below runs **without API keys**. Unit tests inject fakes directly. `M
 |---|---|---|
 | `npm run typecheck` | `next typegen && tsc --noEmit` | every change |
 | `npm run lint` | `eslint` | every change |
-| `npm test` | `vitest run`: 14 files, 146 tests as of 83d643d | every change |
+| `npm test` | `vitest run`: 20 files, 256 tests (2026-10-28) | every change |
 | `npm run validate:guides` | `scripts/validate-guides.ts`: Zod-validates `data/apps.seed.json` and every `data/guides/*.json`, plus no duplicate slugs, filename = slug, slug in the seed, file imported in `data/guides/index.ts`, and `verdict.difficulty` equal to the computed score. Prints `OK: 100 apps, 5 guides` | after any guide or seed edit |
 | `npm run build` | `next build` | part of `check` |
 | `npm run check` | typecheck && lint && test && validate:guides && build | **definition of done** |

@@ -12,7 +12,7 @@ cp .env.example .env.local     # then set MOCK_LLM=1 in .env.local for offline m
 npm run dev                    # http://localhost:3000
 ```
 
-- `npm run check`: typecheck, lint, 254 unit tests, guide validation and production build.
+- `npm run check`: typecheck, lint, 256 unit tests, guide validation and production build.
 - `npm run test:e2e`: 5 Playwright smoke tests in mock mode.
 - Real live generation needs `ANTHROPIC_API_KEY`. Upstash Redis is optional locally; without it, runs are kept in memory.
 
@@ -44,7 +44,7 @@ npm run dev                    # http://localhost:3000
 
 ## How it was built
 
-One lead Claude Code session orchestrated six subagents (`.claude/agents/`): schema-architect, ui-builder, pipeline-engineer, guide-researcher, release-engineer, and an independent **verifier** that never reviewed its own code.
+Built by **Aryan Kumar**. I owned the product: the spec, the task board and acceptance criteria, the product decisions, accounts and consent steps, deploy approvals, and the real setups. One lead Claude Code session orchestrated six subagents (`.claude/agents/`): schema-architect, ui-builder, pipeline-engineer, guide-researcher, release-engineer, and an independent **verifier** that never reviewed its own code.
 
 - Contracts were landed first; then the agents worked in parallel git worktrees, one branch per task.
 - A branch merged only after verifier approval and a green `npm run check`.
@@ -57,6 +57,7 @@ One lead Claude Code session orchestrated six subagents (`.claude/agents/`): sch
 ## Honest status
 
 - **SPEC §14 must-haves:** all pass on production except **#7, recorded setup attempts**. The human-supervised GitHub and Notion attempts (T-011) were cut at 03:30 for time. Those guides are tier `verified` (primary sources plus automated probes), not `tested`.
+- **After submission (T-014, T-015):** live generation now attempts setup steps itself; Linear was set up for real end to end through its MCP server; GitHub app creation was verified, with its real sign-in still to run; Notion is still open. See `docs/verification-log.md` and `docs/USAGE.md`.
 - **Open, low priority (P2):**
   - guessed websites can wrongly downgrade real docs (QA-19)
   - a nonexistent app finishes as "difficulty 5" instead of partial (QA-20)

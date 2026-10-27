@@ -10,7 +10,7 @@
 - `verifier`: runs on the Fable model, as the independent check.
 - `release-engineer`
 - `grokbot`: coordination outside Claude Code; can drive the box browser for T-011.
-- `human`: Pranjal. Accounts, 2FA, keys, approvals, submission.
+- `human`: Aryan Kumar (project owner). Accounts, 2FA, keys, approvals, submission.
 
 **Rules**
 - One task per branch (`feat/T-xxx-*`). The merge gate is acceptance criteria plus `npm run check` green.
@@ -251,6 +251,15 @@ Release-engineer (T-008) works 04:30–05:30 (preview deploy, README, `.env.exam
   - Registration bodies are never parseable JSON (unit-tested); private-address endpoints are never contacted.
   - Unit tests on recorded responses (Google, Slack, Calendly, Asana, Atlassian, Miro, GitHub, Notion, Linear); the mock Miro run includes attempts; `npm run check` and `npm run test:e2e` green.
   - Live check on ≥8 real apps, logged in `docs/verification-log.md`.
+
+## T-015 — Real setups (post-submission)
+- **Owner:** lead, with Aryan for logins and consent.
+- **Scope:** real setups where the agent does the work and Aryan only signs in and approves: Linear through its MCP server (DCR + PKCE), GitHub through the Device Flow, Notion through a public connection. Every test token is revoked and every test app deleted.
+- **Status:** Linear done; GitHub app creation verified, sign-in pending; Notion pending.
+
+## T-016 — Repo completeness
+- **Owner:** lead.
+- **Scope:** usage guide, screenshots from production, author attribution (Aryan Kumar), no stale placeholders, nothing confidential in the repo.
 
 ## Coordination rules
 - The lead keeps `STATUS.md` current at each block boundary and calls the cut lines.

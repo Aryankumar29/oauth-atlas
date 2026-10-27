@@ -6,6 +6,32 @@ Provider docs tell you how to configure OAuth. OAuth Atlas tells you whether you
 
 - **Live:** https://oauth-atlas.vercel.app
 - **Repo:** https://github.com/Aryankumar29/oauth-atlas
+- **Using it for your own app:** [`docs/USAGE.md`](docs/USAGE.md)
+- **Built by:** Aryan Kumar ([@Aryankumar29](https://github.com/Aryankumar29))
+
+![OAuth Atlas home page](docs/screenshots/01-home.png)
+
+## In my words
+
+I built OAuth Atlas because the hard part of letting an AI agent act on a user's behalf is rarely the OAuth code. It is everything around it: do I even need my own OAuth app, which scopes will trigger a review, can I test with real users before approval, and is this an hour of work or six weeks of waiting? Today you piece that together from docs, forum threads and trial and error.
+
+So each guide leads with the decision, not the documentation. It asks whether a managed app is enough, gives a difficulty score with its reason, and splits the path into three milestones with hands-on time and the wait you can't speed up. Then it says what to do next and who does it.
+
+Three choices shape everything else:
+
+- **The model reads; code decides.** A language model drafts the guide from official docs, but code checks every quote against the page it was fetched from and computes the difficulty from the provider's gates. A model never assigns a score, and it can never mark a claim as tested.
+- **Evidence is per claim.** Each claim carries a source and a status (tested, primary, community, or inferred), and gaps are listed as unknowns instead of being filled in.
+- **The agent tries the setup itself.** Without an account, it probes the provider's OAuth endpoints, attempts a code exchange, and looks for a remote MCP server where it can register its own client. Those findings change the guide. For Linear, I then ran the full setup for real: the agent registered itself, I approved the sign-in, and it called Linear's MCP server, with no developer console involved.
+
+## Screenshots
+
+| Library | Curated guide (Gmail) |
+|---|---|
+| ![Library of 100 tracked apps](docs/screenshots/02-library.png) | ![Gmail guide](docs/screenshots/03-guide-gmail.png) |
+| **Live generation** | **Live-generated guide (Linear)** |
+| ![Live generation](docs/screenshots/04-generate.png) | ![Generated Linear guide](docs/screenshots/05-generated-linear.png) |
+
+More in [`docs/screenshots/`](docs/screenshots/).
 
 ## Why this exists
 
@@ -69,7 +95,7 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 
 **Mock mode.** `MOCK_LLM=1` swaps in a mock LLM, recorded HTTP fixtures (unrecorded URLs return 404), and an in-memory store, so no network calls are made and no keys are needed. A `MOCK MODE` banner is shown. Mock runs never write to Redis.
 
-**Providers.** Anthropic by default: `claude-opus-5-5` with the server-side web search tool for research, then a separate JSON extraction call (effort `medium`, server-side refusal fallback). Gemini (`gemini-2.5-flash` with Google Search grounding) and OpenAI stay available via `LLM_PROVIDER=gemini|openai`; override the model with `LLM_MODEL`.
+**Providers.** Production runs on **Azure OpenAI** (deployment `gpt-6-sol`) through the OpenAI adapter: `LLM_PROVIDER=openai` with `OPENAI_BASE_URL` set to the Azure v1 endpoint; the web search tool and JSON output both work there. The code default is Anthropic (`claude-opus-5-5` with server-side web search, then a separate JSON extraction call). Gemini (`gemini-2.5-flash` with Google Search grounding) and OpenAI itself are also supported; override the model with `LLM_MODEL`. Settings for each: [`docs/USAGE.md`](docs/USAGE.md#4-self-hosting).
 
 ## Quickstart
 
@@ -91,7 +117,7 @@ Deploying (Vercel, env var owners, duration limits, cache warming, smoke checkli
 ## Testing
 
 ```bash
-npm run check      # typecheck && lint && vitest (254 tests) && validate:guides && next build
+npm run check      # typecheck && lint && vitest (256 tests) && validate:guides && next build
 npm run test:e2e   # Playwright smoke on :3300 with MOCK_LLM=1 (first run: npx playwright install chromium)
 ```
 
@@ -126,7 +152,7 @@ npx tsx scripts/generate-library.ts --only miro,calendly        # write data/gui
 - **Difficulty is computed from gates**, not judged by an LLM. The scores for the curated guides are regression-tested.
 - **Evidence is claim-level.** Statuses are tested / primary / secondary / inferred. Probes and the agent's own setup attempts are the only way to get `tested`.
 - **Quality tiers over mass coverage.** 100 tracked apps, 5 curated guides, and live generation for the rest. We don't have 100 thin guides.
-- **Claude (`claude-opus-5-5`) with web search by default**, provider-switchable to Gemini or OpenAI.
+- **Provider-agnostic models.** One adapter interface for Anthropic, OpenAI (including Azure OpenAI) and Gemini; production uses Azure OpenAI.
 - **Redis (Upstash) for runs and generated guides**, because Vercel's filesystem is read-only. The curated library is static JSON.
 - **No token storage, accounts, or billing.** This is a guidance product, not an OAuth provider.
 
@@ -145,8 +171,8 @@ See `DECISIONS.md` for the full ADR log.
 ## Limitations
 
 - **No completed provider approvals.** No paid accounts or production domains were used.
-- **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) were **cut** at 03:30 IST and not performed (see the verification log). `tested` evidence comes from credential-free probes and automated setup attempts (T-014: code exchange, MCP discovery, client registration). No attempt logs in, creates an app, or completes a real consent.
-- **"Registration looks open" is an inference.** It rests on a 400 for a deliberately malformed body with no credential demand; the agent never registers a real client to confirm it. That evidence is rated `medium` confidence.
+- **Real setups are partly done** (T-015, `docs/verification-log.md`). **Linear:** complete, end to end through its MCP server (registration, sign-in, MCP calls, revocation). **GitHub:** creating an OAuth app was verified (instant, no review, Device Flow needs no client secret, token expiry on by default); the real sign-in is still to be run. **Notion:** not yet done.
+- **"Registration looks open" is confirmed only for Linear.** For other apps it rests on a 400 for a deliberately malformed registration body with no credential demand, so that evidence is rated `medium` confidence; Linear's is `high`.
 - **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" comes from community reports, and Business Verification "up to 14 business days" comes from a Meta business solution provider (360dialog). Both are labeled secondary.
 - **Live guides are drafts** until a human checks the sources. They are labeled unverified and never rated high confidence.
 - **LLM quota.** Live runs depend on the provider's quota; at 5 runs/IP/hour, a long run may end as a labeled partial guide.
@@ -155,7 +181,7 @@ See `DECISIONS.md` for the full ADR log.
   - **QA-10(2):** `github.com/<slug>` is treated as official for every app, with no ownership check.
   - **QA-12:** The `/thread/` and `/community/` UGC denylist could downgrade a real docs page with that path segment.
   - **QA-13 residual:** URL inputs now match the seed website host, then the docs/console host, then the registrable domain. The match ignores the path, so `www.microsoft.com/microsoft-teams` resolves to `microsoft`, with Teams listed as an alternative.
-  - Accepted: no `server-only` guard (QA-3); unknown slugs return 200 with a not-found page (QA-5); `/evidence` links to repo docs 404 while the repo is private (QA-6).
+  - Accepted: no `server-only` guard (QA-3); unknown slugs return 200 with a not-found page (QA-5). QA-6 (`/evidence` repo links 404) is resolved now that the repo is public.
 - Time estimates are ranges with a stated basis, not guarantees. This is not legal or compliance advice.
 
 ## Repository map
@@ -166,16 +192,21 @@ components/           Library, guide view, generate client
 lib/                  schema.ts, difficulty.ts, store.ts (Upstash/memory), agent/ (pipeline, resolve,
                       composio, discover, fetchDoc, probe, extract, validate, cache, llm/)
 data/                 apps.seed.json (100), guides/*.json (5), composio-managed.json
-scripts/              generate-library (T-007 batch), validate-guides, cache-guide, probe, snapshot-composio
+scripts/              generate-library (T-007 batch), validate-guides, cache-guide, probe, snapshot-composio,
+                      verify-mcp-setup + verify-github-device-flow (real setups), capture-screenshots
 tests/, e2e/          Vitest unit + offline pipeline tests; Playwright smoke
-docs/                 deploy, testing, demo-script, verification log, corrections, qa-report, research
+docs/                 USAGE (start here to use it), deploy, testing, demo-script, verification log, corrections,
+                      qa-report, research, evidence/ (setup records), screenshots/
 ```
 
-## Team workflow
+## How I built it
 
-- **Grokbot:** coordinator/PM. Backlog, acceptance criteria, merge order.
-- **Claude Code (Opus 5.5) and subagents:** lead builder plus the schema-architect, pipeline-engineer, ui-builder, guide-researcher, and release-engineer subagents, one branch per task.
-- **Fable 5.1:** independent verifier. Source checks, red-team, QA (`docs/qa-report.md`).
-- **Human:** provider accounts, legal acceptance, deploy approval, final submission.
+I ran this like a small team with AI agents doing the building and me owning the product. I wrote the spec and the task board with acceptance criteria, made the product calls (decision first, computed difficulty, claim-level evidence, quality tiers over 100 thin guides), and handled everything that needs a person: provider accounts, consent screens, deploy approvals, and the real setups.
 
-The repo is the source of truth. `STATUS.md` is updated after each work block.
+- **Claude Code (Opus 5.5):** lead builder, coordinating subagents for schema, pipeline, UI, guide research and release, one branch per task.
+- **Fable 5.1:** an independent verifier that never reviewed its own code. It checked sources, red-teamed live generation, and drove fixes such as an SSRF hole and off-domain "primary" sources (`docs/qa-report.md`).
+- **Grokbot:** backlog and merge-order coordination.
+
+A branch merged only after the verifier approved it and `npm run check` passed. The repo is the source of truth: `SPEC.md`, `TASKS.md`, `STATUS.md`, `DECISIONS.md`.
+
+— Aryan Kumar

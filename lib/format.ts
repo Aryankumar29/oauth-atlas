@@ -50,5 +50,7 @@ export function milestoneWait(m: Milestone | undefined): string {
 // "dev-ready → production-ready" chip for library cards.
 export function devToProdChip(guide: Guide): string {
   const wait = milestoneWait(milestone(guide, "production-ready"));
-  return `Dev ${milestoneHours(milestone(guide, "dev-ready"))} → Prod ${wait === UNKNOWN ? UNKNOWN : `${wait} wait`}`;
+  // "no wait" already says it; only ranges need the suffix ("Prod up to 84 days wait").
+  const prod = wait === UNKNOWN || wait.endsWith("wait") ? wait : `${wait} wait`;
+  return `Dev ${milestoneHours(milestone(guide, "dev-ready"))} → Prod ${prod}`;
 }

@@ -17,7 +17,7 @@ You ship OAuth Atlas to Vercel and write the docs a reviewer reads first. Read `
    - Check the function `maxDuration` limit for the plan in the Vercel docs, and record it in `docs/deploy.md`.
 3. **Preview deploy:** `vercel`. It's an ask-permission command, so the human approves. Smoke-test `/`, `/apps`, `/apps/gmail`, and `/generate` with Miro.
 4. **Warm the demo cache:** trigger live runs for Miro and Calendly on the preview so `guide:{slug}` exists.
-5. **`README.md`** (keep Pranjal's voice and structure; update it). Sections:
+5. **`README.md`** (keep Aryan's voice and structure; update it). Sections:
    - **What it does.** Library, guide, live generation, evidence.
    - **Quickstart.** `.env.example` → `.env.local`; `MOCK_LLM=1` for no keys.
    - **Testing.** Link to `docs/testing.md`.

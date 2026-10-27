@@ -470,7 +470,7 @@ Build:
 
    Shareable via a static URL, plus a "Copy as Markdown" export so it can be pasted into Slack, Notion, or a PRD.
 3. **Live generation.** Input an app name or URL. A streaming progress log shows each search, fetch, and probe, and each claim as it's extracted. The output is a guide in the same schema at `/guides/[slug]`, labelled "Agent-generated · evidence levels shown."
-4. **Evidence pass on 2–3 apps:** real attempts by Pranjal (see §6.3) recorded in `evidence_report.tested`, plus a "corrections" list.
+4. **Evidence pass on 2–3 apps:** real attempts by Aryan (see §6.3) recorded in `evidence_report.tested`, plus a "corrections" list.
 
 Explicitly out of scope: an auth or user system, editing guides, all 100 apps, a scheduler for re-checks (mention as future work), and actually completing provider approvals.
 
@@ -533,7 +533,7 @@ Explicitly out of scope: an auth or user system, editing guides, all 100 apps, a
 - **Google CASA:** tiers have been renamed **AL1/AL2** (formerly Tier 2/3) [S].
 - **Meta App Review time:** the dashboard estimate reportedly went from about 10 to **about 20 days** in 2026 [A]. Needs confirmation.
 
-### 6.3 Recommended "verified-by-attempt" tests for Pranjal (about 60–90 min total, free accounts)
+### 6.3 Recommended "verified-by-attempt" tests for Aryan (about 60–90 min total, free accounts)
 1. **GitHub:** create an OAuth app and confirm the field list, the 10-callback limit, and the token-expiry default (5 min).
 2. **Notion:** create a public connection and note the required fields (5 min).
 3. **Slack:** create the app from a manifest, enable distribution, and screenshot the Marketplace submission page's "estimated review time" (10 min).

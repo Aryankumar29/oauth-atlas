@@ -8,6 +8,7 @@ const steps = [
   "Resolve the app and check Composio managed auth",
   "Search and fetch the official developer docs",
   "Probe discovery, authorize, and console endpoints (no credentials)",
+  "Attempt setup steps itself, without an account: a code exchange, a remote MCP server lookup, and client registration",
   "Extract the guide in the library schema",
   "Check every primary quote against the fetched docs; compute difficulty from gates",
   "Save a shareable guide, partial if anything timed out",
