@@ -12,7 +12,7 @@ cp .env.example .env.local     # then set MOCK_LLM=1 in .env.local for offline m
 npm run dev                    # http://localhost:3000
 ```
 
-- `npm run check`: typecheck, lint, 256 unit tests, guide validation and production build.
+- `npm run check`: typecheck, lint, 264 unit tests, guide validation and production build.
 - `npm run test:e2e`: 5 Playwright smoke tests in mock mode.
 - Real live generation needs `ANTHROPIC_API_KEY`. Upstash Redis is optional locally; without it, runs are kept in memory.
 
@@ -59,7 +59,6 @@ Built by **Aryan Kumar**. I owned the product: the spec, the task board and acce
 - **SPEC §14 must-haves:** all pass on production except **#7, recorded setup attempts**. The human-supervised GitHub and Notion attempts (T-011) were cut at 03:30 for time. Those guides are tier `verified` (primary sources plus automated probes), not `tested`.
 - **After the first submission (T-014, T-015):** live generation now attempts setup steps itself (code exchange, remote MCP server lookup, client registration). Linear was set up for real, end to end, through its MCP server as the worked example; GitHub app creation was verified in the real console. A full GitHub sign-in and a Notion setup were left out of scope. See `docs/verification-log.md` and `docs/USAGE.md`.
 - **Open, low priority (P2):**
-  - guessed websites can wrongly downgrade real docs (QA-19)
   - a nonexistent app finishes as "difficulty 5" instead of partial (QA-20)
   - DNS rebinding between the URL check and the fetch (QA-22(2))
   - three minor resolver and domain edge cases (QA-10(2), QA-12, QA-13)

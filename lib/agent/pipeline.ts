@@ -1,5 +1,6 @@
 import { applyAttemptFacts, runAttempts, type AttemptResult } from "@/lib/agent/attempt";
 import { lookupComposio } from "@/lib/agent/composio";
+import { confirmGuessedWebsite } from "@/lib/agent/confirmWebsite";
 import { discover } from "@/lib/agent/discover";
 import { extractGuide, fallbackGuide, type GuideContext } from "@/lib/agent/extract";
 import type { FetchDocOptions } from "@/lib/agent/fetchDoc";
@@ -93,14 +94,25 @@ export async function runPipeline(
         await record("resolve", "error", resolvedOrErr.error);
         return await finish(run, deps, "failed", resolvedOrErr.error);
       }
-      const resolved: ResolvedApp = resolvedOrErr;
+      let resolved: ResolvedApp = resolvedOrErr;
       if (resolved.alternatives.length) {
         unknowns.push(
           `"${input.query}" also matched ${resolved.alternatives.map((a) => a.name).join(", ")}; this guide covers ${resolved.name}.`,
         );
       }
-      if (resolved.websiteGuessed) unknowns.push(`Website ${resolved.website} was guessed from the name; confirm it is the right product.`);
-      await record("resolve", "done", `${resolved.name} (${resolved.website})${resolved.seed ? " — in the seed list" : ""}`, {
+      let websiteNote = "";
+      if (resolved.websiteGuessed) {
+        // QA-19: an unconfirmed guess is never an official domain; a homepage that names the app confirms it.
+        const site = await confirmGuessedWebsite(resolved, { fetch: deps.fetch, dnsLookup: opts.dnsLookup, timeoutMs: opts.fetchTimeoutMs });
+        if (site.confirmed) {
+          resolved = { ...resolved, websiteGuessed: false };
+          websiteNote = ` — website confirmed: ${site.observed}`;
+        } else {
+          unknowns.push(`Website ${resolved.website} was guessed from the name and could not be confirmed (${site.observed}); confirm it is the right product.`);
+          websiteNote = " — website guessed, not confirmed";
+        }
+      }
+      await record("resolve", "done", `${resolved.name} (${resolved.website})${resolved.seed ? " — in the seed list" : ""}${websiteNote}`, {
         slug: resolved.slug,
         name: resolved.name,
         website: resolved.website,

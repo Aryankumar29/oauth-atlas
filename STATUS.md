@@ -25,6 +25,8 @@
 - **T-015 (2026-10-28): real setups.** Linear set up for real end to end through its MCP server (`scripts/verify-mcp-setup.ts`, record in `docs/evidence/`). GitHub app creation verified; a full GitHub sign-in and the Notion setup were left out of scope (decided 2026-10-28; Linear is the end-to-end example). Production LLM moved to Azure OpenAI (`gpt-6-sol`) via `OPENAI_BASE_URL`.
 - **T-016 (2026-10-28): repo completeness.** `docs/USAGE.md`, `docs/screenshots/` (captured from production), author metadata, site footer, README in Aryan's voice; fixed the "no wait wait" chip and the stale `/generate` steps list. Deployed to production (dpl_CsiQKkjGP8vJNfok3Y2L7nbLiUJr): all routes 200, `/.env` 404, footer and fixes live; a live Asana run completed in 2 min 18 s with 0 of 26 claims downgraded. Screenshots recaptured from this deploy.
 
+- **QA-19 fixed (2026-10-28):** a website guessed for an app outside the library is confirmed when its homepage names the app (title, og:site_name or application-name, same-domain redirects only); only then do its docs count as official. Strava (not in the library) went from 26 of 28 claims downgraded to 0 of 24, and its MCP server was then found.
+
 ## In progress
 
 **05:30 block boundary.** Code complete; all merged work is pushed (origin/main d628e3f). T-009 QA is running on the preview.

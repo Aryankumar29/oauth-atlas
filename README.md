@@ -117,7 +117,7 @@ Deploying (Vercel, env var owners, duration limits, cache warming, smoke checkli
 ## Testing
 
 ```bash
-npm run check      # typecheck && lint && vitest (256 tests) && validate:guides && next build
+npm run check      # typecheck && lint && vitest (264 tests) && validate:guides && next build
 npm run test:e2e   # Playwright smoke on :3300 with MOCK_LLM=1 (first run: npx playwright install chromium)
 ```
 
