@@ -242,6 +242,16 @@ Release-engineer (T-008) works 04:30–05:30 (preview deploy, README, `.env.exam
 ## T-012 — (Stretch) Microsoft Entra/Graph guide
 - **Owner:** guide-researcher · Only if T-004 is done by 04:00; otherwise generate it live as `generated`.
 
+## T-014 — Automated setup attempts (post-submission)
+- **Owner:** lead · **Why:** the brief asks agents to "attempt as much of the setup process as practical"; T-011 (recorded human-logged-in attempts) was cut, so live generation only probed.
+- **Scope:** new pipeline step `attempt` (SPEC §9.4b): fake-code exchange at the token endpoint, remote MCP server discovery (RFC 9728 → RFC 8414), and a registration request that cannot register anything. No accounts, nothing created.
+- **Acceptance:**
+  - Attempts stream as their own step and appear in a "Setup attempts" section on the guide and in the Markdown export.
+  - Facts from attempts are written by code as `tested` / `testKind: "attempt"` and survive validation; an attempt claim with no attempt record is downgraded.
+  - Registration bodies are never parseable JSON (unit-tested); private-address endpoints are never contacted.
+  - Unit tests on recorded responses (Google, Slack, Calendly, Asana, Atlassian, Miro, GitHub, Notion, Linear); the mock Miro run includes attempts; `npm run check` and `npm run test:e2e` green.
+  - Live check on ≥8 real apps, logged in `docs/verification-log.md`.
+
 ## Coordination rules
 - The lead keeps `STATUS.md` current at each block boundary and calls the cut lines.
 - Every subagent stays inside its owned paths (see `CLAUDE.md`). Cross-path changes go to the lead as a request.

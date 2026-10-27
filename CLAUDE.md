@@ -8,7 +8,7 @@
 Decision-grade OAuth setup and approval guides for developers building AI agents. It has three parts:
 1. **Library** of curated guides, plus 100 tracked apps (most of them `queued`).
 2. **Guide page.** Opens with "Do you need your own OAuth app?" (Composio managed status), then a computed difficulty, three milestones (dev-ready, pilot-ready, production-ready), gates, an agent/human split, and evidence.
-3. **Live generation** for any app: resolve → composio → discover → probe → extract → verify → render, streamed over SSE and persisted in Upstash.
+3. **Live generation** for any app: resolve → composio → discover → probe → attempt → extract → verify → render, streamed over SSE and persisted in Upstash.
 
 Sources of truth:
 - `SPEC.md`: product and schema
@@ -45,7 +45,7 @@ Need a change outside your lane, such as a new dependency or a schema field? Ask
 - The pipeline uses dependency injection: `runPipeline(input, deps)`, with `deps = { fetch, llm, store, now, emit }`. No hidden globals, so it can be tested offline.
 - Difficulty is **only** computed by `lib/difficulty.ts`. Never accept an LLM-provided score.
 - Evidence statuses: `tested | primary | secondary | inferred | conflicting | stale`.
-  - Probe results are `tested` (kind `probe`) and carry an ISO timestamp.
+  - Probe results are `tested` (kind `probe`) and carry an ISO timestamp. Setup attempts are probes with `kind: "attempt"` and back `testKind: "attempt"` claims.
   - Community timelines are `secondary` and get a badge.
 - Guides load through static imports in `data/guides/index.ts`. **No runtime `fs`**, because Vercel's filesystem is read-only.
 - Server-only code (LLM keys, Redis) never ships in client components.

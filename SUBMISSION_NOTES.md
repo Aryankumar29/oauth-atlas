@@ -12,7 +12,7 @@ cp .env.example .env.local     # then set MOCK_LLM=1 in .env.local for offline m
 npm run dev                    # http://localhost:3000
 ```
 
-- `npm run check`: typecheck, lint, 236 unit tests, guide validation and production build.
+- `npm run check`: typecheck, lint, 254 unit tests, guide validation and production build.
 - `npm run test:e2e`: 5 Playwright smoke tests in mock mode.
 - Real live generation needs `ANTHROPIC_API_KEY`. Upstash Redis is optional locally; without it, runs are kept in memory.
 
@@ -30,7 +30,9 @@ npm run dev                    # http://localhost:3000
 
 ## How it works
 
-`resolve → composio → discover → probe → extract → verify → render`, streamed over SSE (`app/api/generate`, `lib/agent/*`).
+`resolve → composio → discover → probe → attempt → extract → verify → render`, streamed over SSE (`app/api/generate`, `lib/agent/*`).
+
+- **Attempts** (T-014, added after submission): with no account and without creating anything, the agent exchanges a fake code at the token endpoint, looks for a remote MCP server, and sends an unparseable client-registration request. Asana, Notion, Linear and Atlassian MCP servers accept unauthenticated registration (an agent can likely register itself); Calendly's token endpoint requires PKCE; Slack returns errors with HTTP 200. See `docs/verification-log.md`.
 
 - **Difficulty is computed, never generated** (`lib/difficulty.ts`): it's the highest-weight gate required for production.
 - **"Primary" evidence** must come from an official host and quote text actually fetched from that URL; anything else is downgraded (`lib/agent/validate.ts`).

@@ -20,6 +20,8 @@
   - Contract notes for agents: gate `skipForProfiles` + `difficulty(gates, {profile})`; validate-guides rejects a `verdict.difficulty` that doesn't match `difficulty(gates)`; milestones exactly 3 in order; `requiredFor`/`affects` use milestone ids; `Claim.testKind`; guides have `ownApp` and `oauthConfig`.
   - Lead glue: UI reads migrated to `approvalModel` / `composio.managed`; `npm run check` now includes `build`. `vitest.config.ts` → `vitest.config.mts`.
 
+- **T-014 (2026-10-28, post-submission): automated setup attempts.** New `attempt` step (`lib/agent/attempt.ts`): fake-code exchange, remote MCP discovery, unparseable client-registration request. Facts written as `tested` / `testKind: "attempt"`; "Setup attempts" section on the guide and in Markdown. `npm run check` green (254 tests), e2e 5/5. Live check on 10 apps logged in `docs/verification-log.md`. T-011 (human-logged-in console attempts) stays cut.
+
 ## In progress
 
 **05:30 block boundary.** Code complete; all merged work is pushed (origin/main d628e3f). T-009 QA is running on the preview.

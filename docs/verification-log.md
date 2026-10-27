@@ -49,3 +49,28 @@ The T-004 probes for the five demo guides were run by hand with `curl`, because 
 
 ### Slack — app from manifest (optional)
 **Not performed** (optional attempt; not run). Evidence for the Slack guide is primary sources + automated probes only.
+
+### Automated setup attempts, 10 apps (T-014)
+**Run:** 2026-10-28 00:28 IST (2026-10-27T18:58Z), `runProbes` + `runAttempts` from a local script against the live providers. No accounts; nothing created. The code exchange used `client_id=oauth-atlas-probe-fake` and `code=oauth-atlas-attempt`; every registration request carried a body that is not JSON. Each app took 1.1–4.4 s.
+
+| App | Code exchange (fake client, fake code) | Remote MCP server | Client registration |
+|---|---|---|---|
+| Asana | 400 `invalid_grant`: checks the code before the client | `mcp.asana.com` | MCP: **looks open** (400 "Invalid request body format") |
+| Notion | 401 `invalid_client` | `mcp.notion.com` | MCP: **looks open** (400 `invalid_client_metadata`) |
+| Slack | **HTTP 200** with `{"ok":false,"error":"invalid_code"}` (via the OIDC token endpoint): errors are in the body | `mcp.slack.com`, but its auth server is Slack's own OAuth (`oauth/v2_user`) | none advertised: a Slack app is still needed |
+| Calendly | 400 **`Missing required parameter: code_verifier`**: PKCE required | `mcp.calendly.com` → auth server `calendly.com` | inconclusive (generic HTML 400 page) |
+| GitHub | 404 `Not Found` for the fake client (not evidence the endpoint is missing) | none found | — |
+| Miro | 401 "Client not found" | `mcp.miro.com` | inconclusive (500) |
+| Linear | no token endpoint known | `mcp.linear.app` | MCP: **looks open** (400 `invalid_request`) |
+| Gmail | 401 `invalid_client` | none found | — |
+| Atlassian | 400 "authorization_code is invalid": checks the code first | `mcp.atlassian.com` (no RFC 9728 document; metadata on the host itself) | MCP: **looks open**; main OAuth `auth.atlassian.com/oidc/register`: 404, unavailable |
+| Zoom | 400 `invalid_client` | `mcp.zoom.us` (auth server is `zoom.us` OAuth) | none advertised |
+
+**What this changed in the guidance:**
+- Four of the ten apps (Asana, Notion, Linear, Atlassian) run an MCP server whose client registration accepts unauthenticated requests. An agent connecting through MCP can likely register its own client, with no developer console and no OAuth app review. Guides now say so, as `tested` evidence (confidence `medium`, because a 400 for a malformed body is strong but indirect evidence) and as the first agent task.
+- Slack's and Zoom's MCP servers sit on their regular OAuth, so they don't remove the need for an app.
+- Calendly's PKCE requirement is now `tested` (`testKind: "attempt"`), not just "advertised in discovery".
+
+**Classifier fixes found by this run:** Atlassian's "authorization_code is invalid" was first classified as `other` (regex fixed); Calendly's generic HTML 400 was first read as "open" (now inconclusive: an HTML error page is not an answer from a registration endpoint); GitHub's 404 wording no longer implies a missing endpoint.
+
+**Still not attempted (needs a human):** creating an app in a developer console, a real consent and code exchange, and any review submission. T-011 remains cut.

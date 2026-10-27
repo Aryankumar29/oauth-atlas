@@ -47,11 +47,16 @@ Today that answer is assembled from docs, blogs, forums, and trial and error. OA
 3. **Discover** and **probe**, run concurrently:
    - **Discover:** a grounded LLM research call, then fetching official docs. A 403 gets a browser User-Agent retry, with the Jina Reader as a fallback. Login walls are detected.
    - **Probe:** credential-free requests (20 s cap) to the provider's discovery, authorize, and console endpoints.
+   - **Attempt** (after the probe, 20 s cap; `lib/agent/attempt.ts`): the agent tries the setup steps it can take without an account, and nothing is created.
+     - It exchanges a fake code at the token endpoint and reads the error. `code_verifier` demanded first means PKCE is required; HTTP 200 with an error body means errors are in the body.
+     - It looks for a remote MCP server at `mcp.<official domain>` (RFC 9728, then RFC 8414 metadata).
+     - Where client registration is advertised, it sends a registration request whose body is not JSON. A 400 with no credential demand means registration looks open, so an agent can likely register its own client with no developer console.
+     - Code writes these as `tested` facts (`testKind: "attempt"`); the guide shows them under "Setup attempts". Results for 10 real apps: `docs/verification-log.md`.
 4. **Extract.** A separate JSON-mode LLM call fills the Zod guide schema (`lib/schema.ts`). If the output doesn't validate, it is retried once; if it still fails, a labeled partial guide is saved instead.
 5. **Verify** (`lib/agent/validate.ts`). Checks every claim:
    - A claim stays **primary** only if its source is on an **official host** for that app *and* its quote is found in the doc **fetched from that same URL**. If the quote is there but the host is off-domain (blogs, Composio docs), it becomes **secondary**. Otherwise it becomes **inferred**.
    - User-generated content on official domains is never primary: community and forum subdomains, Q&A and thread paths, Slack workspaces, and arbitrary GitHub repos.
-   - `tested` needs a matching probe record. Probe facts (e.g. PKCE methods from a discovery document) are attached as `tested`.
+   - `tested` needs a matching probe or attempt record. Probe and attempt facts (e.g. PKCE methods from a discovery document, or PKCE required by the token endpoint) are attached as `tested`.
    - **Difficulty is computed, never generated** (`lib/difficulty.ts`). It is the maximum weight of the gates required for production-ready (self-serve 1 … security assessment / partner program / no self-serve 5). Profile-specific gates (e.g. Gmail `send-only`) are skipped for that profile.
    - Generated guides never claim high confidence. They are `medium` only if they are complete with at least 3 primary evidence items; otherwise `low`.
 6. **Render.** Saves `run:{id}` (30-day TTL) and `guide:{slug}`. A partial guide never overwrites a complete one.
@@ -86,7 +91,7 @@ Deploying (Vercel, env var owners, duration limits, cache warming, smoke checkli
 ## Testing
 
 ```bash
-npm run check      # typecheck && lint && vitest (146 tests) && validate:guides && next build
+npm run check      # typecheck && lint && vitest (254 tests) && validate:guides && next build
 npm run test:e2e   # Playwright smoke on :3300 with MOCK_LLM=1 (first run: npx playwright install chromium)
 ```
 
@@ -119,7 +124,7 @@ npx tsx scripts/generate-library.ts --only miro,calendly        # write data/gui
 - **"Do you need your own OAuth app?" comes first.** Composio already manages OAuth for 123 toolkits (123 managed / 211 bring-your-own, snapshot 2026-10-20, [source](https://docs.composio.dev/toolkits/managed-auth)). Your own app (with its review path) becomes your problem only when you need your brand, custom scopes, or dedicated quota. Each guide says which case you're in.
 - **Three milestones.** Dev-ready, pilot-ready, and production-ready each have hands-on hours, wait days, and the limits until the next milestone. Time to first test user is separate from time to public launch.
 - **Difficulty is computed from gates**, not judged by an LLM. The scores for the curated guides are regression-tested.
-- **Evidence is claim-level.** Statuses are tested / primary / secondary / inferred. Probes and recorded setup attempts are the only way to get `tested`.
+- **Evidence is claim-level.** Statuses are tested / primary / secondary / inferred. Probes and the agent's own setup attempts are the only way to get `tested`.
 - **Quality tiers over mass coverage.** 100 tracked apps, 5 curated guides, and live generation for the rest. We don't have 100 thin guides.
 - **Claude (`claude-opus-5-5`) with web search by default**, provider-switchable to Gemini or OpenAI.
 - **Redis (Upstash) for runs and generated guides**, because Vercel's filesystem is read-only. The curated library is static JSON.
@@ -140,7 +145,8 @@ See `DECISIONS.md` for the full ADR log.
 ## Limitations
 
 - **No completed provider approvals.** No paid accounts or production domains were used.
-- **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) were **cut** at 03:30 IST and not performed (see the verification log). `tested` evidence comes from credential-free endpoint probes only.
+- **T-011 setup attempts** (creating a real GitHub OAuth app and a Notion public connection) were **cut** at 03:30 IST and not performed (see the verification log). `tested` evidence comes from credential-free probes and automated setup attempts (T-014: code exchange, MCP discovery, client registration). No attempt logs in, creates an app, or completes a real consent.
+- **"Registration looks open" is an inference.** It rests on a 400 for a deliberately malformed body with no credential demand; the agent never registers a real client to confirm it. That evidence is rated `medium` confidence.
 - **Review timelines are community-sourced where providers publish none.** For example, Meta App Review "about 20 days" comes from community reports, and Business Verification "up to 14 business days" comes from a Meta business solution provider (360dialog). Both are labeled secondary.
 - **Live guides are drafts** until a human checks the sources. They are labeled unverified and never rated high confidence.
 - **LLM quota.** Live runs depend on the provider's quota; at 5 runs/IP/hour, a long run may end as a labeled partial guide.

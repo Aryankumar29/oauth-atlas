@@ -264,9 +264,10 @@ Rules:
    2. **composio** (managed status lookup)
    3. discover (search + fetch official docs)
    4. **probe**
-   5. extract
-   6. verify (validator + `lib/difficulty.ts`)
-   7. render
+   5. **attempt** (T-014, below)
+   6. extract
+   7. verify (validator + `lib/difficulty.ts`)
+   8. render
 
    Critique is nice-to-have.
 4. **Probe step** (automated, no credentials; results tagged `tested` with an ISO timestamp):
@@ -279,6 +280,12 @@ Rules:
    - Check console URL reachability (status, plus whether it redirects to login).
    - Treat a miss as "unknown," never "unsupported." For example, GitHub and Notion publish no discovery doc.
    - Timeout is 5 s per request; the whole step is capped at 20 s.
+4b. **Attempt step** (T-014, `lib/agent/attempt.ts`; automated, no account, never creates anything). The agent tries the setup steps it can take itself and records each one as a probe with `kind: "attempt"`:
+   - **Code exchange.** POST a fake code with a fake client to the token endpoint (from discovery, else `KNOWN_TOKEN`). The error shape is the result: `code_verifier` demanded first → PKCE required; HTTP 200 with an error body → check the body, not the status; otherwise which check fails first (client or code).
+   - **Remote MCP server.** For each official domain, GET `mcp.<domain>/.well-known/oauth-protected-resource` (RFC 9728), then the named authorization server's RFC 8414 metadata; without protected-resource metadata, try the MCP host's own metadata.
+   - **Client registration.** Where a `registration_endpoint` is advertised (MCP or main OAuth server), POST a body that is not JSON, so nothing can be registered. A 400/422 OAuth or plain-text error with no credential demand → registration looks open (evidence confidence `medium`); 401/403 → protected; 404/405 → unavailable; a generic HTML page, 5xx or anything else → inconclusive, listed in unknowns.
+   - Every URL passes the SSRF guard; redirects are never followed. Same caps as the probe step (5 s per request, 20 s per step). It runs after the probe step, in parallel with discovery.
+   - **Code, not the LLM, writes the facts:** PKCE required becomes `oauthConfig.pkce` with `status: "tested"`, `testKind: "attempt"`; the MCP server and registration result become `tested` evidence; open registration becomes the first agent task. The validator accepts `tested` only when an attempt or probe record backs it.
 5. Produce the same guide schema as the library.
 6. Show "Live-generated — verify before relying on it."
 7. Include source count, confidence, probe results, and "what we couldn't verify."
