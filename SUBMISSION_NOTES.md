@@ -1,5 +1,7 @@
 # OAuth Atlas: submission notes (start here)
 
+> These notes describe the take-home submission. The repo has since been cleaned up into a reusable product; the exact state that was submitted, including the task board, status log, QA report and agent definitions, is preserved at tag [`v0.1.0-submission`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission).
+
 **What it is.** Decision-grade OAuth setup and approval guides for developers building AI agents. For any app it answers: *do I need my own OAuth app, can I ship, how long will approval take, what will block me, and what do I do next?* It has three parts: a library of 100 tracked apps with 5 curated guides, a shareable guide page, and live generation for any app.
 
 **Live:** https://oauth-atlas.vercel.app. Try `/apps`, `/apps/gmail` and `/generate` (type "Miro").
@@ -21,12 +23,12 @@ npm run dev                    # http://localhost:3000
 | Read this | For |
 |---|---|
 | `README.md` | What it does, architecture, key decisions, limitations, evidence summary |
-| `SPEC.md`, `DECISIONS.md` | Product spec and decision log |
-| `docs/qa-report.md` | Independent QA: SPEC §14 pass/fail, live red team, every bug (QA-1…QA-22) and its status |
+| `docs/SPEC.md`, `docs/DECISIONS.md` | Product spec and decision log |
+| [`docs/qa-report.md`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission/docs/qa-report.md) (at the submission tag) | Independent QA: SPEC §14 pass/fail, live red team, every bug (QA-1…QA-22) and its status |
 | `docs/verification-log.md`, `docs/corrections.md` | Probe methodology, setup-attempt log, and corrections to common assumptions |
 | `docs/research.md` | The research brief the guides are built from |
 | `data/guides/*.json` | The 5 curated guides (GitHub, Notion, Slack, Gmail, Instagram), with claim-level sources |
-| `STATUS.md`, `TASKS.md` | The ship-day timeline, task board and cut lines as they happened |
+| [`STATUS.md`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission/STATUS.md), [`TASKS.md`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission/TASKS.md) (at the submission tag) | The ship-day timeline, task board and cut lines as they happened |
 
 ## How it works
 
@@ -44,7 +46,7 @@ npm run dev                    # http://localhost:3000
 
 ## How it was built
 
-Built by **Aryan Kumar**. I owned the product: the spec, the task board and acceptance criteria, the product decisions, accounts and consent steps, deploy approvals, and the real setups. One lead Claude Code session orchestrated six subagents (`.claude/agents/`): schema-architect, ui-builder, pipeline-engineer, guide-researcher, release-engineer, and an independent **verifier** that never reviewed its own code.
+Built by **Aryan Kumar**. I owned the product: the spec, the task board and acceptance criteria, the product decisions, accounts and consent steps, deploy approvals, and the real setups. One lead Claude Code session orchestrated six subagents ([`.claude/agents/`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission/.claude/agents)): schema-architect, ui-builder, pipeline-engineer, guide-researcher, release-engineer, and an independent **verifier** that never reviewed its own code.
 
 - Contracts were landed first; then the agents worked in parallel git worktrees, one branch per task.
 - A branch merged only after verifier approval and a green `npm run check`.
@@ -52,7 +54,7 @@ Built by **Aryan Kumar**. I owned the product: the spec, the task board and acce
   - off-domain "primary" sources
   - an extraction retry that could overrun Vercel's 300 s limit
   - a server-side request forgery (SSRF) hole in URL fetching
-- Every bug is in `docs/qa-report.md` with its fix commit.
+- Every bug is in [`docs/qa-report.md`](https://github.com/Aryankumar29/oauth-atlas/tree/v0.1.0-submission/docs/qa-report.md) with its fix commit.
 
 ## Honest status
 

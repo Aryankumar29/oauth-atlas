@@ -32,6 +32,19 @@ Open **https://oauth-atlas.vercel.app/generate**, type the app's name or website
 
 A live guide is labeled **Live-generated — verify** until a person checks its sources. If the run hits its time limit, it saves a guide labeled **partial** rather than a blank page. Public use is limited to 5 live runs per hour per IP.
 
+## Use it from your agent (API)
+
+The same guides are available as a read-only JSON API, open to any origin, so an agent can check an app's OAuth path before it asks a user to connect it. `{app}` can be a slug (`gmail`), a name (`Notion`) or a URL (`slack.com`).
+
+| Request | Returns |
+|---|---|
+| `GET /api/guides` | All 100 tracked apps: name, website, approval model, Composio-managed status, tier, and the guide's difficulty and summary where one exists |
+| `GET /api/guides/{app}` | `{ source, url, difficulty, guide }`, where `source` is `curated` or `generated` and `guide` follows `lib/schema.ts` |
+| `GET /api/guides/{app}?format=md` | The same guide as Markdown, ready to drop into a prompt |
+| `POST /api/generate` with `{"query": "<name or URL>"}` | Server-Sent Events: `run`, then `step` per pipeline step, then `done` with `guideSlug`. Rate-limited to 5 runs per IP per hour on the public site |
+
+A missing guide answers `404` with a `generateUrl`. Useful fields for an agent: `guide.app.composio.managed` and `guide.ownApp.triggers` (can you use managed auth?), `difficulty.score` and `difficulty.rationale`, `guide.milestones` (hours and waits), `guide.humanTasks` (what to hand to the user), and `guide.unknowns`.
+
 ## 3. Run the setup checks yourself
 
 The repo includes the scripts used to verify the guides. They run from a clone (see [Self-hosting](#4-self-hosting) for setup) and need no API keys.

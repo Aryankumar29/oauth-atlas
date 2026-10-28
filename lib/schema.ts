@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// v1 contract — see SPEC.md §5. Do not change without updating the spec and seed.
+// v1 contract — see docs/SPEC.md §5. Do not change without updating the spec and seed.
 
 export const tierSchema = z.enum(["tested", "verified", "generated", "queued"]);
 
